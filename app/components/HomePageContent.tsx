@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AiInsightsTicker } from "@/app/components/AiInsightsTicker";
+import { AiTryDemos } from "@/app/components/AiTryDemos";
 import { ContactForm } from "@/app/components/ContactForm";
 import { Reveal } from "@/app/components/Reveal";
 import { IT_SERVICES } from "@/app/components/home/services-data";
@@ -194,6 +196,8 @@ export function HomePageContent() {
         </div>
       </section>
 
+      <AiInsightsTicker />
+
       <section className="border-b border-zinc-800/40 px-6 py-10">
         <div className="mx-auto max-w-6xl">
           <Reveal>
@@ -289,6 +293,22 @@ export function HomePageContent() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="try-ai" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <Reveal>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              Interactive
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">Try Our AI</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-500">
+              Quick, privacy-conscious demos powered by the same stack we use for client work — see how we think about
+              language understanding and summarization.
+            </p>
+          </Reveal>
+          <AiTryDemos />
         </div>
       </section>
 

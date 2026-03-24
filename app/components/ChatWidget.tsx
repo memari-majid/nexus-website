@@ -3,6 +3,13 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+
+const QUICK_PROMPTS = [
+  "What services do you offer?",
+  "Tell me about NVIDIA workshops",
+  "How do I get a consultation?",
+];
 
 function textFromMessage(m: { parts: { type: string; text?: string }[] }) {
   return m.parts
@@ -128,9 +135,14 @@ export function ChatWidget() {
           <div className="flex h-[min(560px,85vh)] w-full max-w-md flex-col rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
               <div>
-                <h2 id="chat-title" className="text-sm font-semibold text-zinc-100">
-                  Nexus AI Assistant
-                </h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 id="chat-title" className="text-sm font-semibold text-zinc-100">
+                    Nexus AI Assistant
+                  </h2>
+                  <span className="inline-flex items-center rounded-full border border-sky-900/50 bg-sky-950/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-400">
+                    Powered by AI
+                  </span>
+                </div>
                 <p className="text-xs text-zinc-500">Ask about our services, workshops, or careers</p>
               </div>
               <div className="flex gap-2">
@@ -158,10 +170,25 @@ export function ChatWidget() {
 
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {messages.length === 0 && (
-                <p className="text-sm text-zinc-500">
-                  Hi — I can answer questions about Nexus AI Solutions, Dr. Memari&apos;s work, NVIDIA workshops,
-                  government AI projects, and open roles. How can I help?
-                </p>
+                <div className="space-y-3">
+                  <p className="text-sm text-zinc-500">
+                    Hi — I can answer questions about Nexus AI Solutions, Dr. Memari&apos;s work, NVIDIA workshops,
+                    government AI projects, and open roles. How can I help?
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {QUICK_PROMPTS.map((q) => (
+                      <button
+                        key={q}
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void sendMessage({ text: q })}
+                        className="rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-left text-xs text-zinc-300 transition hover:border-sky-700 hover:text-sky-200 disabled:opacity-50"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
               {messages.map((m) => (
                 <div
@@ -172,7 +199,19 @@ export function ChatWidget() {
                       : "mr-4 bg-zinc-900/80 text-zinc-300 border border-zinc-800/80"
                   }`}
                 >
-                  {m.role === "assistant" ? displayAssistantText(textFromMessage(m)) : textFromMessage(m)}
+                  {m.role === "assistant" ? (
+                    <div className="max-w-none text-sm leading-relaxed [&_a]:text-sky-400 [&_a]:underline [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-1.5 [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-zinc-800 [&_code]:px-1">
+                      <ReactMarkdown
+                        components={{
+                          a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                        }}
+                      >
+                        {displayAssistantText(textFromMessage(m))}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    textFromMessage(m)
+                  )}
                 </div>
               ))}
               {error && (

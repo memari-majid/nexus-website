@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { SITE } from "@/lib/site";
+import { classifyInquiry, fallbackInquiryResponse, type InquiryCategory } from "@/lib/inquiry-ai";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+/** Smaller / cheaper model for classification (override with CONTACT_CLASSIFY_MODEL). */
+const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "gpt-4o-mini";
 
 export async function POST(request: Request) {
   try {
@@ -19,8 +23,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
     }
 
+    const apiKey = process.env.OPENAI_API_KEY?.trim();
+    let category: InquiryCategory = "general";
+    let autoReply = fallbackInquiryResponse().autoReply;
+
+    if (apiKey) {
+      try {
+        const classified = await classifyInquiry({
+          name,
+          message,
+          apiKey,
+          modelId: CLASSIFY_MODEL,
+        });
+        category = classified.category;
+        autoReply = classified.autoReply;
+      } catch (err) {
+        console.error("[contact] classifyInquiry:", err);
+        const fb = fallbackInquiryResponse();
+        category = fb.category;
+        autoReply = fb.autoReply;
+      }
+    }
+
     const to = process.env.CONTACT_TO_EMAIL ?? SITE.email;
-    const subject = `[Nexus AI Website] Message from ${name}`;
+    const subject = `[Nexus AI Website] [${category}] Message from ${name}`;
 
     if (resend) {
       const { error } = await resend.emails.send({
@@ -28,7 +54,7 @@ export async function POST(request: Request) {
         to: [to],
         replyTo: email,
         subject,
-        text: `From: ${name} <${email}>\nSource: ${source}\n\n${message}`,
+        text: `From: ${name} <${email}>\nSource: ${source}\nAI category: ${category}\n\n${message}`,
       });
       if (error) {
         console.error("Resend error:", error);
@@ -39,11 +65,17 @@ export async function POST(request: Request) {
         name,
         email,
         source,
+        category,
         messagePreview: message.slice(0, 200),
       });
     }
 
-    return NextResponse.json({ ok: true, dev: !resend });
+    return NextResponse.json({
+      ok: true,
+      dev: !resend,
+      category,
+      autoReply,
+    });
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }

@@ -27,8 +27,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Purpose |
 | -------- | ------- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL (SEO, sitemap, JSON-LD). Default: `https://nexusaisolution.net` |
-| `OPENAI_API_KEY` | Required for the floating chat assistant (`/api/chat`) |
+| `OPENAI_API_KEY` | Required for the floating chat assistant (`/api/chat`), Try Our AI demos (`/api/demo/*`), and AI contact classification |
 | `OPENAI_MODEL` | Optional. Default: `gpt-5.4-mini` |
+| `DEMO_AI_MODEL` | Optional. Model for summarizer & sentiment demos. Default: `gpt-4o-mini` |
+| `CONTACT_CLASSIFY_MODEL` | Optional. Model for inquiry classification + auto-reply. Default: `gpt-4o-mini` |
 | `RESEND_API_KEY` | Optional. If set, contact form + chat lead form send email via [Resend](https://resend.com) |
 | `RESEND_FROM_EMAIL` | Verified sender in Resend (e.g. `Nexus AI <contact@yourdomain.com>`) |
 | `CONTACT_TO_EMAIL` | Inbox for inquiries (default: `memari.majid@hotmail.com`) |

@@ -2,30 +2,48 @@
 
 import { useState } from "react";
 
+const CATEGORY_LABEL: Record<string, string> = {
+  consulting: "IT & AI consulting",
+  workshop: "Workshops & training",
+  careers: "Careers",
+  partnership: "Partnership",
+  general: "General inquiry",
+};
+
 export function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [category, setCategory] = useState<string | null>(null);
+  const [autoReply, setAutoReply] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
     setErrorMsg("");
+    setCategory(null);
+    setAutoReply(null);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, message, source: "contact-form" }),
       });
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        category?: string;
+        autoReply?: string;
+      };
       if (!res.ok) {
         setStatus("error");
         setErrorMsg(typeof data.error === "string" ? data.error : "Something went wrong.");
         return;
       }
       setStatus("success");
+      if (typeof data.category === "string") setCategory(data.category);
+      if (typeof data.autoReply === "string") setAutoReply(data.autoReply);
       setName("");
       setEmail("");
       setMessage("");
@@ -95,7 +113,22 @@ export function ContactForm() {
           {status === "loading" ? "Sending…" : "Send message"}
         </button>
         {status === "success" && (
-          <p className="text-sm text-emerald-400">Thanks — we&apos;ll get back to you soon.</p>
+          <div className="w-full space-y-3 rounded-xl border border-emerald-900/50 bg-emerald-950/20 px-4 py-3 text-left">
+            <p className="text-sm font-medium text-emerald-400">Message received</p>
+            {category && (
+              <p className="text-xs text-zinc-500">
+                Routed as:{" "}
+                <span className="font-medium text-zinc-300">
+                  {CATEGORY_LABEL[category] ?? category}
+                </span>
+              </p>
+            )}
+            {autoReply && (
+              <p className="text-sm leading-relaxed text-zinc-300 border-t border-zinc-800/80 pt-3">
+                {autoReply}
+              </p>
+            )}
+          </div>
         )}
         {status === "error" && <p className="text-sm text-red-400">{errorMsg}</p>}
       </div>
