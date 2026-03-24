@@ -823,7 +823,7 @@ export function HomePageContent() {
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href="mailto:memari.majid@hotmail.com?subject=AI%20Engineer%20Application"
+                  href="mailto:info@nexusaisolution.net?subject=AI%20Engineer%20Application"
                   className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-500 transition hover:scale-105"
                 >
                   Apply Now
@@ -894,9 +894,9 @@ export function HomePageContent() {
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                href: "mailto:memari.majid@hotmail.com",
+                href: "mailto:info@nexusaisolution.net",
                 label: "Email",
-                detail: "memari.majid@hotmail.com",
+                detail: "info@nexusaisolution.net",
                 icon: (
                   <svg className="h-8 w-8 text-sky-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />

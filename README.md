@@ -33,7 +33,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `CONTACT_CLASSIFY_MODEL` | Optional. Model for inquiry classification + auto-reply. Default: `gpt-4o-mini` |
 | `RESEND_API_KEY` | Optional. If set, contact form + chat lead form send email via [Resend](https://resend.com) |
 | `RESEND_FROM_EMAIL` | Verified sender in Resend (e.g. `Nexus AI <contact@yourdomain.com>`) |
-| `CONTACT_TO_EMAIL` | Inbox for inquiries (default: `memari.majid@hotmail.com`) |
+| `CONTACT_TO_EMAIL` | Inbox for inquiries (default: `info@nexusaisolution.net`) |
 
 Without `RESEND_API_KEY`, contact submissions are logged on the server only—configure Resend for production email delivery.
 

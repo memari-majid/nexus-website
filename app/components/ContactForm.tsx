@@ -134,8 +134,8 @@ export function ContactForm() {
       </div>
       <p className="text-xs text-zinc-600">
         Prefer email? Reach us at{" "}
-        <a href="mailto:memari.majid@hotmail.com" className="text-sky-400 hover:underline">
-          memari.majid@hotmail.com
+        <a href="mailto:info@nexusaisolution.net" className="text-sky-400 hover:underline">
+          info@nexusaisolution.net
         </a>
         .
       </p>
