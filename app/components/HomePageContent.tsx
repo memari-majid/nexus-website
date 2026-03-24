@@ -21,6 +21,7 @@ const TRUSTED = [
   "Stanford",
   "Johns Hopkins",
   "UPenn",
+  "USHE",
   "Utah Office of Data Privacy",
   "Utah DHHS",
   "University of Utah",
@@ -30,7 +31,7 @@ const STATS = [
   { value: 50, suffix: "+", label: "Projects Delivered" },
   { value: 10, suffix: "+", label: "Years of Expertise" },
   { value: 500, suffix: "+", label: "Workshop Graduates" },
-  { value: 6, suffix: "", label: "State & University Partners" },
+  { value: 7, suffix: "", label: "State & University Partners" },
 ];
 
 const AI_OFFERINGS = [
@@ -85,6 +86,13 @@ const PROJECTS = [
     description:
       "Multi-agent systems that coordinate specialist models and tools to automate complex business processes with human oversight.",
     icon: "cog",
+  },
+  {
+    title: "Drone AI & 3D Imaging",
+    tagline: "$1M USHE-funded research",
+    description:
+      "Real-time drone imaging for wind turbine maintenance — RGB and thermal cameras, calibrated 3D reconstruction, autonomous path planning, and defect detection. Technical lead during postdoctoral research, with published industry-relevant findings.",
+    icon: "drone",
   },
   {
     title: "Custom AI Solutions",
@@ -195,6 +203,11 @@ function ProjectIcon({ kind }: { kind: string }) {
     gpu: (
       <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Z" />
+      </svg>
+    ),
+    drone: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12h.01M18 12h.01M6 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm16 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM6.34 12H9m6 0h2.66M12 12V9m0 6v-3m0-3a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm0 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
       </svg>
     ),
   };
@@ -682,6 +695,24 @@ export function HomePageContent() {
                     Learning Institute instructor.
                   </p>
                   <p>
+                    As technical lead of a{" "}
+                    <strong className="text-zinc-200">$1 M research initiative</strong>{" "}
+                    funded by the{" "}
+                    <a
+                      href="https://ushe.edu/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sky-400 hover:underline"
+                    >
+                      Utah System of Higher Education (USHE)
+                    </a>
+                    , Dr. Memari designed real-time drone imaging systems for
+                    wind-turbine maintenance during his postdoctoral research —
+                    calibrating drones for accurate 3D reconstruction, applying
+                    RGB and thermal imaging for blade defect detection, and
+                    publishing industry-relevant findings.
+                  </p>
+                  <p>
                     Prior collaborations include Stanford, Johns Hopkins, UPenn,
                     and state agencies including Utah&apos;s Office of Data
                     Privacy and Department of Health &amp; Human Services.
@@ -701,6 +732,7 @@ export function HomePageContent() {
                     big: "NVIDIA",
                     sub: "Ambassador & DLI Certified Instructor",
                   },
+                  { big: "$1M", sub: "USHE-funded drone AI research — technical lead" },
                   { big: "10+", sub: "Years in AI, ML & software engineering" },
                   {
                     big: "Utah",
