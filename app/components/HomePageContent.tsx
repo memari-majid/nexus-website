@@ -141,6 +141,7 @@ const TECH_STACK = [
   "Azure",
   "Docker",
   "Kubernetes",
+  "n8n",
   "PostgreSQL",
   "Vercel",
 ];
@@ -440,6 +441,107 @@ export function HomePageContent() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ============== AGENTIC WORKFLOWS ============== */}
+      <section
+        id="workflows"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24 relative overflow-hidden"
+      >
+        <div className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-full bg-sky-600/5 blur-3xl" aria-hidden="true" />
+        <div className="mx-auto max-w-6xl relative z-10">
+          <Reveal>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              Agentic Automation
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">
+              Automated Workflows Powered by AI
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-500">
+              We design and deploy intelligent automation pipelines using agentic
+              AI and platforms like n8n — connecting your tools, APIs, and AI
+              models into seamless, self-orchestrating workflows that run 24/7.
+            </p>
+          </Reveal>
+
+          <Reveal delay={100}>
+            <div className="mt-12 rounded-2xl border border-zinc-800/60 bg-zinc-900/30 p-4 sm:p-6 overflow-hidden">
+              <Image
+                src="/workflow.svg"
+                alt="Agentic AI workflow automation diagram built with n8n — showing connected nodes for form handling, conditional logic, AI processing, and multi-step orchestration"
+                width={985}
+                height={700}
+                className="w-full h-auto rounded-xl"
+              />
+            </div>
+          </Reveal>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
+            <Reveal delay={120}>
+              <div className="glass-card rounded-2xl p-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 text-sky-400">
+                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-semibold text-zinc-100">
+                  Visual Workflow Design
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-zinc-500">
+                  Drag-and-drop orchestration with n8n — conditional branching,
+                  loops, error handling, and human-in-the-loop approvals.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal delay={180}>
+              <div className="glass-card rounded-2xl p-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 text-sky-400">
+                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-semibold text-zinc-100">
+                  AI-Native Nodes
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-zinc-500">
+                  LLM calls, RAG retrieval, sentiment analysis, and classification
+                  built directly into the pipeline — no glue code needed.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal delay={240}>
+              <div className="glass-card rounded-2xl p-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 text-sky-400">
+                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-semibold text-zinc-100">
+                  Always-On Orchestration
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-zinc-500">
+                  Triggered by webhooks, schedules, or events — your workflows
+                  run autonomously with monitoring, retries, and audit trails.
+                </p>
+              </div>
+            </Reveal>
+          </div>
+
+          <Reveal delay={300}>
+            <div className="mt-10 text-center">
+              <a
+                href="#contact"
+                className="inline-flex rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-500 hover:scale-105"
+              >
+                Automate Your Operations
+              </a>
+              <p className="mt-2 text-xs text-zinc-600">
+                Tell us about your manual processes — we&apos;ll design an
+                AI-powered workflow that runs itself.
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
