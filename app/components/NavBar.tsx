@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: "Government", href: "#government" },
   { label: "About", href: "#about" },
   { label: "Careers", href: "#careers" },
+  { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
 

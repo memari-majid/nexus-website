@@ -3,11 +3,35 @@ import Image from "next/image";
 import Link from "next/link";
 import { AiInsightsTicker } from "@/app/components/AiInsightsTicker";
 import { AiTryDemos } from "@/app/components/AiTryDemos";
+import { AnimatedCounter } from "@/app/components/AnimatedCounter";
 import { ContactForm } from "@/app/components/ContactForm";
+import { FaqAccordion } from "@/app/components/FaqAccordion";
+import { ParticleNetwork } from "@/app/components/ParticleNetwork";
 import { Reveal } from "@/app/components/Reveal";
+import { ScrollToTop } from "@/app/components/ScrollToTop";
+import { Testimonials } from "@/app/components/Testimonials";
+import { NewsletterForm } from "@/app/components/NewsletterForm";
 import { IT_SERVICES } from "@/app/components/home/services-data";
 
-const TRUSTED = ["Stanford", "Johns Hopkins", "UPenn", "Utah Office of Data Privacy", "Utah DHHS", "University of Utah"];
+/* ------------------------------------------------------------------ */
+/*  Data                                                               */
+/* ------------------------------------------------------------------ */
+
+const TRUSTED = [
+  "Stanford",
+  "Johns Hopkins",
+  "UPenn",
+  "Utah Office of Data Privacy",
+  "Utah DHHS",
+  "University of Utah",
+];
+
+const STATS = [
+  { value: 50, suffix: "+", label: "Projects Delivered" },
+  { value: 10, suffix: "+", label: "Years of Expertise" },
+  { value: 500, suffix: "+", label: "Workshop Graduates" },
+  { value: 6, suffix: "", label: "State & University Partners" },
+];
 
 const AI_OFFERINGS = [
   {
@@ -75,24 +99,60 @@ const WORKSHOPS = [
   {
     title: "Fundamentals of Deep Learning",
     duration: "~8 hours (typical DLI workshop)",
-    blurb: "Train neural networks for classification and detection with hands-on PyTorch labs on GPU-accelerated cloud instances.",
+    blurb:
+      "Train neural networks for classification and detection with hands-on PyTorch labs on GPU-accelerated cloud instances.",
   },
   {
     title: "AI on Jetson / Edge",
     duration: "Hands-on lab",
-    blurb: "Build and deploy edge AI prototypes—ideal for robotics and IoT-focused programs.",
+    blurb:
+      "Build and deploy edge AI prototypes—ideal for robotics and IoT-focused programs.",
   },
   {
     title: "RAG & LLM Agents",
     duration: "Applied GenAI",
-    blurb: "Retrieval-augmented generation, prompt patterns, and safe deployment of LLM-powered assistants.",
+    blurb:
+      "Retrieval-augmented generation, prompt patterns, and safe deployment of LLM-powered assistants.",
   },
   {
     title: "Generative AI",
     duration: "Foundations",
-    blurb: "Diffusion and generative fundamentals with practical exercises—aligned with industry demand.",
+    blurb:
+      "Diffusion and generative fundamentals with practical exercises—aligned with industry demand.",
   },
 ];
+
+const TECH_STACK = [
+  "NVIDIA",
+  "OpenAI",
+  "PyTorch",
+  "LangChain",
+  "Python",
+  "Next.js",
+  "AWS",
+  "Azure",
+  "Docker",
+  "Kubernetes",
+  "PostgreSQL",
+  "Vercel",
+];
+
+const FOOTER_LINKS = [
+  { label: "Services", href: "#services" },
+  { label: "AI & ML", href: "#ai-services" },
+  { label: "Projects", href: "#projects" },
+  { label: "Try AI", href: "#try-ai" },
+  { label: "Workshops", href: "#workshops" },
+  { label: "Government", href: "#government" },
+  { label: "About", href: "#about" },
+  { label: "Careers", href: "#careers" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Contact", href: "#contact" },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Icons                                                              */
+/* ------------------------------------------------------------------ */
 
 function ProjectIcon({ kind }: { kind: string }) {
   const map: Record<string, ReactNode> = {
@@ -141,12 +201,21 @@ function ProjectIcon({ kind }: { kind: string }) {
   return <span className="text-sky-400">{map[kind] ?? map.spark}</span>;
 }
 
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
+
 export function HomePageContent() {
   const year = new Date().getFullYear();
 
   return (
     <>
-      <section id="top" className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-6">
+      {/* ============== HERO ============== */}
+      <section
+        id="top"
+        className="relative flex min-h-[92vh] items-center justify-center overflow-hidden px-6"
+      >
+        {/* Background layers */}
         <div className="pointer-events-none absolute inset-0">
           <Image
             src="/nexus-banner.png"
@@ -156,8 +225,17 @@ export function HomePageContent() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-zinc-950/80 to-zinc-950" />
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/40 via-zinc-950/70 to-zinc-950" />
         </div>
+
+        {/* Floating gradient orbs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-sky-600/10 blur-3xl animate-[float_8s_ease-in-out_infinite]" />
+          <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-indigo-600/10 blur-3xl animate-[float_10s_ease-in-out_infinite_2s]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-sky-500/5 blur-3xl animate-[pulse-glow_6s_ease-in-out_infinite]" />
+        </div>
+
+        <ParticleNetwork />
 
         <div className="relative z-10 mx-auto max-w-3xl text-center">
           <Reveal>
@@ -168,26 +246,27 @@ export function HomePageContent() {
           <Reveal delay={100}>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               IT Consulting &<br />
-              <span className="text-sky-400">Digital Services</span>
+              <span className="gradient-text">Digital Services</span>
             </h1>
           </Reveal>
           <Reveal delay={200}>
             <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-400 leading-relaxed">
-              AI-powered IT consulting led by an NVIDIA Ambassador &amp; Principal AI Architect. We turn advanced AI
-              concepts into practical, real-world solutions for your business.
+              AI-powered IT consulting led by an NVIDIA Ambassador &amp; Principal AI
+              Architect. We turn advanced AI concepts into practical, real-world
+              solutions for your business.
             </p>
           </Reveal>
           <Reveal delay={300}>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
                 href="#contact"
-                className="rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-500 hover:shadow-sky-800/40"
+                className="group relative rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-500 hover:shadow-sky-800/40 hover:scale-105"
               >
                 Get in Touch
               </a>
               <a
                 href="#services"
-                className="rounded-xl border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+                className="rounded-xl border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-300 transition hover:border-zinc-500 hover:text-white hover:scale-105"
               >
                 Our Services ↓
               </a>
@@ -198,17 +277,34 @@ export function HomePageContent() {
 
       <AiInsightsTicker />
 
+      {/* ============== STATS ============== */}
+      <section className="border-b border-zinc-800/40 px-6 py-14">
+        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 sm:grid-cols-4">
+          {STATS.map((s, i) => (
+            <Reveal key={s.label} delay={i * 80}>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-sky-400 sm:text-4xl">
+                  <AnimatedCounter end={s.value} suffix={s.suffix} />
+                </p>
+                <p className="mt-1 text-xs font-medium text-zinc-500">{s.label}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ============== TRUSTED ============== */}
       <section className="border-b border-zinc-800/40 px-6 py-10">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-zinc-500 mb-4">
+            <p className="mb-4 text-center text-xs font-medium uppercase tracking-wider text-zinc-500">
               Collaborations & institutions
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {TRUSTED.map((name) => (
                 <span
                   key={name}
-                  className="rounded-full border border-zinc-800/80 bg-zinc-900/40 px-4 py-2 text-xs font-medium text-zinc-400"
+                  className="rounded-full border border-zinc-800/80 bg-zinc-900/40 px-4 py-2 text-xs font-medium text-zinc-400 transition hover:border-sky-800/40 hover:text-zinc-300"
                 >
                   {name}
                 </span>
@@ -218,11 +314,16 @@ export function HomePageContent() {
         </div>
       </section>
 
+      {/* ============== IT SERVICES ============== */}
       <section id="services" className="scroll-mt-20 px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">What We Do</p>
-            <h2 className="text-center text-3xl font-bold sm:text-4xl">IT Consulting Services</h2>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              What We Do
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">
+              IT Consulting Services
+            </h2>
             <p className="mx-auto mt-4 max-w-xl text-center text-zinc-500">
               End-to-end technology consulting to help your business stay ahead.
             </p>
@@ -231,12 +332,14 @@ export function HomePageContent() {
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {IT_SERVICES.map((svc, i) => (
               <Reveal key={svc.title} delay={i * 80}>
-                <div className="group rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6 transition hover:border-sky-800/50 hover:bg-zinc-900/70">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 text-sky-400 transition group-hover:bg-sky-900/40">
+                <div className="glass-card glow-border group rounded-2xl p-6">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 text-sky-400 transition group-hover:bg-sky-900/40 group-hover:scale-110">
                     {svc.icon}
                   </div>
                   <h3 className="text-lg font-semibold text-zinc-100">{svc.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-500">{svc.description}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+                    {svc.description}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -244,25 +347,41 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section id="ai-services" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
-        <div className="mx-auto max-w-6xl">
+      {/* ============== AI SERVICES ============== */}
+      <section
+        id="ai-services"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24 relative overflow-hidden"
+      >
+        <div className="pointer-events-none absolute -top-40 right-0 h-80 w-80 rounded-full bg-indigo-600/5 blur-3xl" aria-hidden="true" />
+        <div className="mx-auto max-w-6xl relative z-10">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">AI & ML</p>
-            <h2 className="text-center text-3xl font-bold sm:text-4xl">AI & Machine Learning Services</h2>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              AI & ML
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">
+              AI & Machine Learning Services
+            </h2>
             <p className="mx-auto mt-4 max-w-xl text-center text-zinc-500">
-              End-to-end AI delivery: models, data pipelines, evaluation, and deployment.
+              End-to-end AI delivery: models, data pipelines, evaluation, and
+              deployment.
             </p>
           </Reveal>
           <div className="mt-14 grid gap-6 sm:grid-cols-2">
             {AI_OFFERINGS.map((item, i) => (
               <Reveal key={item.title} delay={i * 80}>
-                <div className="group rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6 transition hover:border-sky-800/50 hover:bg-zinc-900/70">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40">
+                <div className="glass-card glow-border group rounded-2xl p-6">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 transition group-hover:bg-sky-900/40 group-hover:scale-110">
                     <ProjectIcon kind={item.icon} />
                   </div>
-                  <h3 className="text-lg font-semibold text-zinc-100">{item.title}</h3>
-                  <p className="mt-1 text-sm font-medium text-sky-400">{item.tagline}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-500">{item.description}</p>
+                  <h3 className="text-lg font-semibold text-zinc-100">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-sky-400">
+                    {item.tagline}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+                    {item.description}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -270,25 +389,40 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section id="projects" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
+      {/* ============== PROJECTS ============== */}
+      <section
+        id="projects"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24"
+      >
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">Projects</p>
-            <h2 className="text-center text-3xl font-bold sm:text-4xl">Where We Build</h2>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              Projects
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">
+              Where We Build
+            </h2>
             <p className="mx-auto mt-4 max-w-xl text-center text-zinc-500">
-              Representative initiatives across education, simulation, automation, and custom AI.
+              Representative initiatives across education, simulation,
+              automation, and custom AI.
             </p>
           </Reveal>
           <div className="mt-14 grid gap-6 sm:grid-cols-2">
             {PROJECTS.map((p, i) => (
               <Reveal key={p.title} delay={i * 80}>
-                <div className="group rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6 transition hover:border-sky-800/50 hover:bg-zinc-900/70 hover:shadow-lg hover:shadow-sky-950/20">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 text-sky-400">
+                <div className="glass-card glow-border group rounded-2xl p-6">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-950/40 text-sky-400 transition group-hover:bg-sky-900/40 group-hover:scale-110">
                     <ProjectIcon kind={p.icon} />
                   </div>
-                  <h3 className="text-lg font-semibold text-zinc-100">{p.title}</h3>
-                  <p className="mt-1 text-sm font-medium text-sky-400">{p.tagline}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-500">{p.description}</p>
+                  <h3 className="text-lg font-semibold text-zinc-100">
+                    {p.title}
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-sky-400">
+                    {p.tagline}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+                    {p.description}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -296,32 +430,64 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section id="try-ai" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
-        <div className="mx-auto max-w-6xl">
+      {/* ============== TRY OUR AI ============== */}
+      <section
+        id="try-ai"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24 relative overflow-hidden"
+      >
+        <div className="pointer-events-none absolute -bottom-40 left-0 h-80 w-80 rounded-full bg-sky-600/5 blur-3xl" aria-hidden="true" />
+        <div className="mx-auto max-w-6xl relative z-10">
           <Reveal>
             <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
               Interactive
             </p>
-            <h2 className="text-center text-3xl font-bold sm:text-4xl">Try Our AI</h2>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">
+              Try Our AI
+            </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-500">
-              Quick, privacy-conscious demos powered by the same stack we use for client work — see how we think about
-              language understanding and summarization.
+              Quick, privacy-conscious demos powered by the same stack we use for
+              client work — see how we think about language understanding and
+              summarization.
             </p>
           </Reveal>
           <AiTryDemos />
         </div>
       </section>
 
-      <section id="workshops" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
+      {/* ============== TESTIMONIALS ============== */}
+      <section className="border-t border-zinc-800/40 px-6 py-24 relative overflow-hidden">
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-sky-500/5 blur-3xl" aria-hidden="true" />
+        <div className="mx-auto max-w-6xl relative z-10">
+          <Reveal>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              Testimonials
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl mb-12">
+              What People Are Saying
+            </h2>
+          </Reveal>
+          <Reveal delay={100}>
+            <Testimonials />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ============== WORKSHOPS ============== */}
+      <section
+        id="workshops"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24"
+      >
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
               NVIDIA Deep Learning Institute
             </p>
-            <h2 className="text-center text-3xl font-bold sm:text-4xl">Free NVIDIA Deep Learning Workshops</h2>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">
+              Free NVIDIA Deep Learning Workshops
+            </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-500">
-              Dr. Memari is an NVIDIA DLI Certified Instructor and Ambassador. He delivers hands-on workshops aligned
-              with{" "}
+              Dr. Memari is an NVIDIA DLI Certified Instructor and Ambassador. He
+              delivers hands-on workshops aligned with{" "}
               <Link
                 href="https://www.nvidia.com/en-us/training/"
                 className="text-sky-400 hover:underline"
@@ -330,113 +496,157 @@ export function HomePageContent() {
               >
                 NVIDIA Deep Learning Institute
               </Link>{" "}
-              training—free for students at participating universities, with GPU-accelerated labs and certificates of
-              completion where available.
+              training—free for students at participating universities, with
+              GPU-accelerated labs and certificates of completion where available.
             </p>
           </Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {WORKSHOPS.map((w, i) => (
               <Reveal key={w.title} delay={i * 60}>
-                <div className="h-full rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-5">
-                  <h3 className="text-sm font-semibold text-zinc-100">{w.title}</h3>
+                <div className="glass-card h-full rounded-2xl p-5">
+                  <h3 className="text-sm font-semibold text-zinc-100">
+                    {w.title}
+                  </h3>
                   <p className="mt-1 text-xs text-sky-400">{w.duration}</p>
-                  <p className="mt-2 text-xs text-zinc-500 leading-relaxed">{w.blurb}</p>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-500">
+                    {w.blurb}
+                  </p>
                 </div>
               </Reveal>
             ))}
           </div>
           <Reveal delay={200}>
-            <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-center text-xs text-zinc-500">
-              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">GPU cloud labs</span>
-              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">Industry tools & frameworks</span>
-              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">DLI-style completion</span>
-              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">Real-world use cases</span>
+            <div className="mt-10 grid gap-3 text-center text-xs text-zinc-500 sm:grid-cols-2 lg:grid-cols-4">
+              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">
+                GPU cloud labs
+              </span>
+              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">
+                Industry tools & frameworks
+              </span>
+              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">
+                DLI-style completion
+              </span>
+              <span className="rounded-lg border border-zinc-800/60 bg-zinc-900/30 px-3 py-2">
+                Real-world use cases
+              </span>
             </div>
             <div className="mt-8 flex flex-col items-center gap-2">
               <a
                 href="#contact"
-                className="rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-500"
+                className="rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-500 hover:scale-105"
               >
                 Invite Dr. Memari to Your Campus
               </a>
-              <p className="text-xs text-zinc-600 max-w-md text-center">
-                Available for universities worldwide. Student workshops are offered at no charge to students; logistics
-                vary by institution.
+              <p className="max-w-md text-center text-xs text-zinc-600">
+                Available for universities worldwide. Student workshops are
+                offered at no charge to students; logistics vary by institution.
               </p>
             </div>
           </Reveal>
         </div>
       </section>
 
-      <section id="government" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
+      {/* ============== GOVERNMENT ============== */}
+      <section
+        id="government"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24"
+      >
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">Public sector</p>
-            <h2 className="text-center text-3xl font-bold sm:text-4xl">AI for Government & Public Policy</h2>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              Public sector
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl">
+              AI for Government & Public Policy
+            </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-500">
-              Dr. Memari is Principal AI Architect at the Gary R. Herbert Institute for Public Policy (Nov 2024 -- Present) and
-              leads state-level collaborations with Utah agencies.
+              Dr. Memari is Principal AI Architect at the Gary R. Herbert
+              Institute for Public Policy (Nov 2024 -- Present) and leads
+              state-level collaborations with Utah agencies.
             </p>
           </Reveal>
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            <Reveal delay={80}>
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6">
-                <h3 className="text-lg font-semibold text-sky-400">Utah Office of Data Privacy</h3>
-                <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
-                  AI applied to data governance and privacy management—improving compliance efficiency and strengthening
-                  transparency and public trust.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={120}>
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6">
-                <h3 className="text-lg font-semibold text-sky-400">Utah Department of Health & Human Services</h3>
-                <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
-                  AI-driven solutions that reduce manual review time and expand secure access to data for research and policy
-                  innovation.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={160}>
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6">
-                <h3 className="text-lg font-semibold text-sky-400">Privacy-preserving infrastructure</h3>
-                <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
-                  Helping Utah build a modern, responsible data foundation that supports research while safeguarding
-                  citizens.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={200}>
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6">
-                <h3 className="text-lg font-semibold text-sky-400">Expanding across departments</h3>
-                <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
-                  We are building additional AI solutions for more Utah departments—intelligent automation and
-                  data-driven decision-making at scale.
-                </p>
-              </div>
-            </Reveal>
+            {[
+              {
+                title: "Utah Office of Data Privacy",
+                text: "AI applied to data governance and privacy management—improving compliance efficiency and strengthening transparency and public trust.",
+              },
+              {
+                title: "Utah Department of Health & Human Services",
+                text: "AI-driven solutions that reduce manual review time and expand secure access to data for research and policy innovation.",
+              },
+              {
+                title: "Privacy-preserving infrastructure",
+                text: "Helping Utah build a modern, responsible data foundation that supports research while safeguarding citizens.",
+              },
+              {
+                title: "Expanding across departments",
+                text: "We are building additional AI solutions for more Utah departments—intelligent automation and data-driven decision-making at scale.",
+              },
+            ].map((card, i) => (
+              <Reveal key={card.title} delay={(i + 1) * 80}>
+                <div className="glass-card rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-sky-400">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+                    {card.text}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
           </div>
           <Reveal delay={240}>
             <div className="mt-10 text-center">
               <a
                 href="#contact"
-                className="inline-flex rounded-xl border border-sky-800/50 bg-sky-950/30 px-6 py-3 text-sm font-semibold text-sky-300 transition hover:bg-sky-900/40"
+                className="inline-flex rounded-xl border border-sky-800/50 bg-sky-950/30 px-6 py-3 text-sm font-semibold text-sky-300 transition hover:bg-sky-900/40 hover:scale-105"
               >
                 Bring AI to Your Agency
               </a>
               <p className="mt-2 text-xs text-zinc-600">
-                We partner with agencies to deploy responsible, privacy-preserving AI solutions.
+                We partner with agencies to deploy responsible,
+                privacy-preserving AI solutions.
               </p>
             </div>
           </Reveal>
         </div>
       </section>
 
-      <section id="about" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
+      {/* ============== TECH STACK ============== */}
+      <section className="border-t border-zinc-800/40 px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <Reveal>
+            <p className="mb-6 text-center text-xs font-medium uppercase tracking-wider text-zinc-500">
+              Our Technology Stack
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {TECH_STACK.map((name) => (
+                <span
+                  key={name}
+                  className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 px-4 py-2 text-xs font-medium text-zinc-400 transition hover:border-sky-700/40 hover:text-sky-400 hover:bg-zinc-900/70"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ============== ABOUT ============== */}
+      <section
+        id="about"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24"
+      >
         <div className="mx-auto max-w-4xl">
           <Reveal>
-            <p className="text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">About Us</p>
-            <h2 className="text-3xl font-bold sm:text-4xl">Technology Expertise, Academic Rigor</h2>
+            <p className="text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              About Us
+            </p>
+            <h2 className="text-3xl font-bold sm:text-4xl">
+              Technology Expertise, Academic Rigor
+            </h2>
           </Reveal>
 
           <div className="mt-10 grid gap-10 md:grid-cols-2">
@@ -450,23 +660,31 @@ export function HomePageContent() {
                     className="rounded-full object-cover object-top border-2 border-sky-600/40 shadow-lg shadow-sky-900/20"
                     sizes="160px"
                   />
+                  <div className="absolute -inset-2 rounded-full border border-sky-500/10 animate-[pulse-glow_4s_ease-in-out_infinite]" />
                 </div>
-                <div className="space-y-4 text-zinc-400 text-sm leading-relaxed">
+                <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
                   <p>
-                    <strong className="text-zinc-200">Nexus AI Solutions LLC</strong> is a Utah-based IT &amp; AI consulting firm
-                    founded by <strong className="text-zinc-200">Dr. Majid Memari</strong> — NVIDIA Ambassador, Assistant
-                    Professor at Utah Valley University, and Principal AI Architect at the Gary R. Herbert Institute for Public
-                    Policy.
+                    <strong className="text-zinc-200">
+                      Nexus AI Solutions LLC
+                    </strong>{" "}
+                    is a Utah-based IT &amp; AI consulting firm founded by{" "}
+                    <strong className="text-zinc-200">Dr. Majid Memari</strong>{" "}
+                    — NVIDIA Ambassador, Assistant Professor at Utah Valley
+                    University, and Principal AI Architect at the Gary R. Herbert
+                    Institute for Public Policy.
                   </p>
                   <p>
-                    Dr. Memari holds a Ph.D. in Computer Science from Southern Illinois University and brings 10+ years of
-                    expertise in AI/ML, LLMs, data systems, and software architecture. He serves as an AI Consultant for the
-                    University of Utah&apos;s One-U Responsible AI Initiative and is a certified NVIDIA Deep Learning Institute
-                    instructor.
+                    Dr. Memari holds a Ph.D. in Computer Science from Southern
+                    Illinois University and brings 10+ years of expertise in
+                    AI/ML, LLMs, data systems, and software architecture. He
+                    serves as an AI Consultant for the University of Utah&apos;s
+                    One-U Responsible AI Initiative and is a certified NVIDIA Deep
+                    Learning Institute instructor.
                   </p>
                   <p>
-                    Prior collaborations include Stanford, Johns Hopkins, UPenn, and state agencies including Utah&apos;s Office of
-                    Data Privacy and Department of Health &amp; Human Services.
+                    Prior collaborations include Stanford, Johns Hopkins, UPenn,
+                    and state agencies including Utah&apos;s Office of Data
+                    Privacy and Department of Health &amp; Human Services.
                   </p>
                 </div>
               </div>
@@ -474,79 +692,120 @@ export function HomePageContent() {
 
             <Reveal delay={200}>
               <div className="space-y-4">
-                <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/40 p-5">
-                  <p className="text-2xl font-bold text-sky-400">Ph.D.</p>
-                  <p className="text-xs text-zinc-500 mt-1">Computer Science — Southern Illinois University</p>
-                </div>
-                <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/40 p-5">
-                  <p className="text-2xl font-bold text-sky-400">NVIDIA</p>
-                  <p className="text-xs text-zinc-500 mt-1">Ambassador &amp; DLI Certified Instructor</p>
-                </div>
-                <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/40 p-5">
-                  <p className="text-2xl font-bold text-sky-400">10+</p>
-                  <p className="text-xs text-zinc-500 mt-1">Years in AI, ML &amp; software engineering</p>
-                </div>
-                <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/40 p-5">
-                  <p className="text-2xl font-bold text-sky-400">Utah</p>
-                  <p className="text-xs text-zinc-500 mt-1">Based in Salt Lake City — serving clients nationwide</p>
-                </div>
+                {[
+                  {
+                    big: "Ph.D.",
+                    sub: "Computer Science — Southern Illinois University",
+                  },
+                  {
+                    big: "NVIDIA",
+                    sub: "Ambassador & DLI Certified Instructor",
+                  },
+                  { big: "10+", sub: "Years in AI, ML & software engineering" },
+                  {
+                    big: "Utah",
+                    sub: "Based in Salt Lake City — serving clients nationwide",
+                  },
+                ].map((card) => (
+                  <div
+                    key={card.big}
+                    className="glass-card rounded-xl p-5"
+                  >
+                    <p className="text-2xl font-bold text-sky-400">
+                      {card.big}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">{card.sub}</p>
+                  </div>
+                ))}
               </div>
             </Reveal>
           </div>
         </div>
       </section>
 
-      <section id="careers" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
+      {/* ============== CAREERS ============== */}
+      <section
+        id="careers"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24"
+      >
         <div className="mx-auto max-w-4xl">
           <Reveal>
-            <p className="text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">Careers</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              Careers
+            </p>
             <h2 className="text-3xl font-bold sm:text-4xl">Join Our Team</h2>
             <p className="mt-4 text-zinc-500">
-              We&apos;re building practical AI solutions across EdTech, simulation, agentic automation, and public-sector
-              programs—and we&apos;re hiring engineers who want to ship real impact.
+              We&apos;re building practical AI solutions across EdTech,
+              simulation, agentic automation, and public-sector programs—and
+              we&apos;re hiring engineers who want to ship real impact.
             </p>
           </Reveal>
           <Reveal delay={100}>
-            <div className="mt-10 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-8">
-              <h3 className="text-xl font-semibold text-zinc-100">AI Engineer</h3>
-              <p className="mt-1 text-sm text-sky-400">Utah · Hybrid / Remote considered</p>
+            <div className="glass-card mt-10 rounded-2xl p-8">
+              <h3 className="text-xl font-semibold text-zinc-100">
+                AI Engineer
+              </h3>
+              <p className="mt-1 text-sm text-sky-400">
+                Utah · Hybrid / Remote considered
+              </p>
               <div className="mt-6 space-y-4 text-sm text-zinc-400">
                 <div>
                   <p className="font-medium text-zinc-300">Responsibilities</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5">
-                    <li>Design and ship LLM-powered applications and evaluation pipelines</li>
-                    <li>Build agentic systems and integrations with cloud data services</li>
-                    <li>Collaborate on AI simulation, EdTech, and public-sector projects</li>
+                    <li>
+                      Design and ship LLM-powered applications and evaluation
+                      pipelines
+                    </li>
+                    <li>
+                      Build agentic systems and integrations with cloud data
+                      services
+                    </li>
+                    <li>
+                      Collaborate on AI simulation, EdTech, and public-sector
+                      projects
+                    </li>
                   </ul>
                 </div>
                 <div>
                   <p className="font-medium text-zinc-300">Requirements</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5">
                     <li>Strong Python; experience with LLMs, RAG, and APIs</li>
-                    <li>Familiarity with cloud (AWS/Azure/GCP) and solid ML fundamentals</li>
+                    <li>
+                      Familiarity with cloud (AWS/Azure/GCP) and solid ML
+                      fundamentals
+                    </li>
                   </ul>
                 </div>
                 <div>
                   <p className="font-medium text-zinc-300">Nice to have</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5">
-                    <li>NVIDIA ecosystem (CUDA, RAPIDS, Jetson), multi-agent frameworks</li>
-                    <li>Research publications or open-source contributions</li>
+                    <li>
+                      NVIDIA ecosystem (CUDA, RAPIDS, Jetson), multi-agent
+                      frameworks
+                    </li>
+                    <li>
+                      Research publications or open-source contributions
+                    </li>
                   </ul>
                 </div>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
                   href="mailto:memari.majid@hotmail.com?subject=AI%20Engineer%20Application"
-                  className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-500"
+                  className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-500 transition hover:scale-105"
                 >
                   Apply Now
                 </a>
-                <a href="#contact" className="rounded-lg border border-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-600">
+                <a
+                  href="#contact"
+                  className="rounded-lg border border-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-600 transition"
+                >
                   Apply via contact form
                 </a>
               </div>
               <p className="mt-6 text-xs text-zinc-600">
-                Don&apos;t see your role? We&apos;re always interested in strong builders—{" "}
+                Don&apos;t see your role? We&apos;re always interested in strong
+                builders—{" "}
                 <a href="#contact" className="text-sky-400 hover:underline">
                   reach out
                 </a>
@@ -557,13 +816,42 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section id="contact" className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24">
+      {/* ============== FAQ ============== */}
+      <section
+        id="faq"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24"
+      >
+        <div className="mx-auto max-w-6xl">
+          <Reveal>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              FAQ
+            </p>
+            <h2 className="text-center text-3xl font-bold sm:text-4xl mb-12">
+              Frequently Asked Questions
+            </h2>
+          </Reveal>
+          <Reveal delay={100}>
+            <FaqAccordion />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ============== CONTACT ============== */}
+      <section
+        id="contact"
+        className="scroll-mt-20 border-t border-zinc-800/40 px-6 py-24"
+      >
         <div className="mx-auto max-w-4xl">
           <Reveal>
-            <p className="text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">Get in Touch</p>
-            <h2 className="text-3xl font-bold sm:text-4xl">Let&apos;s Work Together</h2>
+            <p className="text-xs font-medium uppercase tracking-wider text-sky-400 mb-2">
+              Get in Touch
+            </p>
+            <h2 className="text-3xl font-bold sm:text-4xl">
+              Let&apos;s Work Together
+            </h2>
             <p className="mt-4 max-w-lg text-zinc-500">
-              Have a project in mind or need IT or AI consulting? Send a message—we&apos;ll get back to you promptly.
+              Have a project in mind or need IT or AI consulting? Send a
+              message—we&apos;ll get back to you promptly.
             </p>
           </Reveal>
 
@@ -572,86 +860,182 @@ export function HomePageContent() {
           </Reveal>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Reveal delay={80}>
-              <a
-                href="mailto:memari.majid@hotmail.com"
-                className="group flex flex-col items-center rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6 text-center transition hover:border-sky-800/50 hover:bg-zinc-900/70"
-              >
-                <svg className="h-8 w-8 text-sky-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                  />
-                </svg>
-                <p className="text-sm font-medium text-zinc-200">Email</p>
-                <p className="mt-1 text-xs text-zinc-500 group-hover:text-sky-400 transition-colors">memari.majid@hotmail.com</p>
-              </a>
-            </Reveal>
-
-            <Reveal delay={120}>
-              <a
-                href="tel:+18018109152"
-                className="group flex flex-col items-center rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6 text-center transition hover:border-sky-800/50 hover:bg-zinc-900/70"
-              >
-                <svg className="h-8 w-8 text-sky-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
-                  />
-                </svg>
-                <p className="text-sm font-medium text-zinc-200">Phone</p>
-                <p className="mt-1 text-xs text-zinc-500 group-hover:text-sky-400 transition-colors">(801) 810-9152</p>
-              </a>
-            </Reveal>
-
-            <Reveal delay={160}>
-              <a
-                href="https://www.linkedin.com/in/majid-memari"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col items-center rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6 text-center transition hover:border-sky-800/50 hover:bg-zinc-900/70"
-              >
-                <svg className="h-8 w-8 text-sky-400 mb-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                </svg>
-                <p className="text-sm font-medium text-zinc-200">LinkedIn</p>
-                <p className="mt-1 text-xs text-zinc-500 group-hover:text-sky-400 transition-colors">majid-memari</p>
-              </a>
-            </Reveal>
-
-            <Reveal delay={200}>
-              <a
-                href="https://github.com/memari-majid"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col items-center rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6 text-center transition hover:border-sky-800/50 hover:bg-zinc-900/70"
-              >
-                <svg className="h-8 w-8 text-sky-400 mb-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                </svg>
-                <p className="text-sm font-medium text-zinc-200">GitHub</p>
-                <p className="mt-1 text-xs text-zinc-500 group-hover:text-sky-400 transition-colors">memari-majid</p>
-              </a>
-            </Reveal>
+            {[
+              {
+                href: "mailto:memari.majid@hotmail.com",
+                label: "Email",
+                detail: "memari.majid@hotmail.com",
+                icon: (
+                  <svg className="h-8 w-8 text-sky-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                  </svg>
+                ),
+              },
+              {
+                href: "tel:+18018109152",
+                label: "Phone",
+                detail: "(801) 810-9152",
+                icon: (
+                  <svg className="h-8 w-8 text-sky-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                  </svg>
+                ),
+              },
+              {
+                href: "https://www.linkedin.com/in/majid-memari",
+                label: "LinkedIn",
+                detail: "majid-memari",
+                external: true,
+                icon: (
+                  <svg className="h-8 w-8 text-sky-400 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                ),
+              },
+              {
+                href: "https://github.com/memari-majid",
+                label: "GitHub",
+                detail: "memari-majid",
+                external: true,
+                icon: (
+                  <svg className="h-8 w-8 text-sky-400 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                  </svg>
+                ),
+              },
+            ].map((c) => (
+              <Reveal key={c.label} delay={80}>
+                <a
+                  href={c.href}
+                  {...(("external" in c) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="glass-card group flex flex-col items-center rounded-2xl p-6 text-center"
+                >
+                  {c.icon}
+                  <p className="text-sm font-medium text-zinc-200">
+                    {c.label}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500 transition-colors group-hover:text-sky-400">
+                    {c.detail}
+                  </p>
+                </a>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-zinc-800/40 px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 sm:flex-row sm:justify-between">
-          <div className="flex items-center gap-2.5">
-            <Image src="/nexus-logo.png" alt="Nexus AI Solutions" width={28} height={28} className="h-7 w-7 rounded-md object-contain" />
-            <span className="text-sm font-medium">
-              Nexus<span className="text-sky-400"> AI</span> Solutions LLC
-            </span>
+      {/* ============== FOOTER ============== */}
+      <footer className="border-t border-zinc-800/40 px-6 pt-16 pb-10">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Brand */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
+                <Image
+                  src="/nexus-logo.png"
+                  alt="Nexus AI Solutions"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 rounded-md object-contain"
+                />
+                <span className="text-sm font-semibold">
+                  Nexus<span className="text-sky-400"> AI</span> Solutions
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-zinc-500">
+                Utah-based IT & AI consulting. Strategic planning, system
+                integration, and production AI solutions led by Dr. Majid
+                Memari.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Quick Links
+              </p>
+              <ul className="space-y-2">
+                {FOOTER_LINKS.slice(0, 5).map((l) => (
+                  <li key={l.href}>
+                    <a
+                      href={l.href}
+                      className="text-xs text-zinc-500 transition hover:text-sky-400"
+                    >
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Company
+              </p>
+              <ul className="space-y-2">
+                {FOOTER_LINKS.slice(5).map((l) => (
+                  <li key={l.href}>
+                    <a
+                      href={l.href}
+                      className="text-xs text-zinc-500 transition hover:text-sky-400"
+                    >
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Newsletter */}
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Stay Updated
+              </p>
+              <p className="mb-3 text-xs text-zinc-500">
+                Get AI insights and company news delivered to your inbox.
+              </p>
+              <NewsletterForm />
+            </div>
           </div>
-          <p className="text-xs text-zinc-600">
-            © {year} Nexus AI Solutions LLC · Sandy, Utah · Registered in the State of Utah
-          </p>
+
+          {/* Social row + copyright */}
+          <div className="mt-12 flex flex-col items-center gap-4 border-t border-zinc-800/40 pt-8 sm:flex-row sm:justify-between">
+            <div className="flex gap-4">
+              {[
+                {
+                  href: "https://www.linkedin.com/in/majid-memari",
+                  label: "LinkedIn",
+                  d: "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z",
+                },
+                {
+                  href: "https://github.com/memari-majid",
+                  label: "GitHub",
+                  d: "M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z",
+                },
+              ].map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-600 transition hover:text-sky-400"
+                  aria-label={s.label}
+                >
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d={s.d} />
+                  </svg>
+                </a>
+              ))}
+            </div>
+            <p className="text-xs text-zinc-600">
+              © {year} Nexus AI Solutions LLC · Sandy, Utah · Registered in the
+              State of Utah
+            </p>
+          </div>
         </div>
       </footer>
+
+      <ScrollToTop />
     </>
   );
 }
