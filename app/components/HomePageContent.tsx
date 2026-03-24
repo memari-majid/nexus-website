@@ -778,7 +778,7 @@ export function HomePageContent() {
                 AI Engineer
               </h3>
               <p className="mt-1 text-sm text-sky-400">
-                Utah · Hybrid / Remote considered
+                Fully Remote
               </p>
               <div className="mt-6 space-y-4 text-sm text-zinc-400">
                 <div>
