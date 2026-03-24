@@ -9,7 +9,7 @@ import { FaqAccordion } from "@/app/components/FaqAccordion";
 import { ParticleNetwork } from "@/app/components/ParticleNetwork";
 import { Reveal } from "@/app/components/Reveal";
 import { ScrollToTop } from "@/app/components/ScrollToTop";
-import { Testimonials } from "@/app/components/Testimonials";
+import { CollaborationHighlights } from "@/app/components/Testimonials";
 import { LogoStrip } from "@/app/components/LogoStrip";
 import { NewsletterForm } from "@/app/components/NewsletterForm";
 import { PartnerLogoStrip } from "@/app/components/PartnerLogoStrip";
@@ -20,6 +20,7 @@ import { IT_SERVICES } from "@/app/components/home/services-data";
 /* ------------------------------------------------------------------ */
 
 const PARTNER_LOGOS = [
+  { name: "Silicon Slopes", src: "/logos/partners/silicon-slopes.svg" },
   { name: "Stanford University", src: "/logos/partners/stanford.svg" },
   { name: "Johns Hopkins University", src: "/logos/partners/johns-hopkins.svg" },
   { name: "University of Pennsylvania", src: "/logos/partners/upenn.svg" },
@@ -30,10 +31,10 @@ const PARTNER_LOGOS = [
 ];
 
 const STATS = [
-  { value: 50, suffix: "+", label: "Projects Delivered" },
-  { value: 10, suffix: "+", label: "Years of Expertise" },
-  { value: 500, suffix: "+", label: "Workshop Graduates" },
-  { value: 7, suffix: "", label: "State & University Partners" },
+  { value: 200, suffix: "+", label: "GitHub Projects" },
+  { value: 10, suffix: "+", label: "Funded Projects Led" },
+  { value: 50, suffix: "+", label: "Students Mentored" },
+  { value: 10, suffix: "+", label: "AI Courses & Workshops" },
 ];
 
 const AI_OFFERINGS = [
@@ -564,20 +565,20 @@ export function HomePageContent() {
         </div>
       </section>
 
-      {/* ============== TESTIMONIALS ============== */}
+      {/* ============== COLLABORATION HIGHLIGHTS ============== */}
       <section className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24 relative overflow-hidden">
         <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-sky-100/60 dark:bg-sky-500/5 blur-3xl" aria-hidden="true" />
         <div className="mx-auto max-w-6xl relative z-10">
           <Reveal>
             <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              Testimonials
+              Collaboration Highlights
             </p>
             <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl mb-12">
-              What People Are Saying
+              Where We Make an Impact
             </h2>
           </Reveal>
           <Reveal delay={100}>
-            <Testimonials />
+            <CollaborationHighlights />
           </Reveal>
         </div>
       </section>
