@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+const area =
+  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-500 focus:border-sky-600 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500";
+
 export function AiTryDemos() {
   const [sumIn, setSumIn] = useState("");
   const [sumOut, setSumOut] = useState("");
@@ -65,15 +68,17 @@ export function AiTryDemos() {
 
   return (
     <div className="mt-14 grid gap-8 lg:grid-cols-2">
-      <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6">
-        <h3 className="text-lg font-semibold text-zinc-100">Text summarizer</h3>
-        <p className="mt-1 text-sm text-zinc-500">Paste a paragraph or short brief — we return a tight executive summary.</p>
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800/60 bg-zinc-50/80 p-6 dark:bg-zinc-900/40">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Text summarizer</h3>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-500">
+          Paste a paragraph or short brief — we return a tight executive summary.
+        </p>
         <form onSubmit={runSummarize} className="mt-4 space-y-3">
           <textarea
             value={sumIn}
             onChange={(e) => setSumIn(e.target.value)}
             rows={5}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-600 focus:outline-none"
+            className={area}
             placeholder="Paste text to summarize (10+ characters)…"
           />
           <button
@@ -84,23 +89,25 @@ export function AiTryDemos() {
             {sumLoading ? "Summarizing…" : "Summarize"}
           </button>
         </form>
-        {sumErr && <p className="mt-3 text-xs text-amber-400">{sumErr}</p>}
+        {sumErr && <p className="mt-3 text-xs text-amber-700 dark:text-amber-400">{sumErr}</p>}
         {sumOut && (
-          <div className="mt-4 rounded-lg border border-sky-900/40 bg-sky-950/20 px-3 py-2 text-sm text-zinc-300">
+          <div className="mt-4 rounded-lg border border-sky-200 bg-sky-50/80 px-3 py-2 text-sm text-zinc-800 dark:border-sky-900/40 dark:bg-sky-950/20 dark:text-zinc-300">
             {sumOut}
           </div>
         )}
       </div>
 
-      <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-6">
-        <h3 className="text-lg font-semibold text-zinc-100">Sentiment analysis</h3>
-        <p className="mt-1 text-sm text-zinc-500">One sentence — we surface tone, confidence, and a one-line read.</p>
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800/60 bg-zinc-50/80 p-6 dark:bg-zinc-900/40">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Sentiment analysis</h3>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-500">
+          One sentence — we surface tone, confidence, and a one-line read.
+        </p>
         <form onSubmit={runSentiment} className="mt-4 space-y-3">
           <textarea
             value={sentIn}
             onChange={(e) => setSentIn(e.target.value)}
             rows={3}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-600 focus:outline-none"
+            className={area}
             placeholder="e.g. We're excited to launch our new AI pilot next quarter."
           />
           <button
@@ -111,12 +118,12 @@ export function AiTryDemos() {
             {sentLoading ? "Analyzing…" : "Analyze"}
           </button>
         </form>
-        {sentErr && <p className="mt-3 text-xs text-amber-400">{sentErr}</p>}
+        {sentErr && <p className="mt-3 text-xs text-amber-700 dark:text-amber-400">{sentErr}</p>}
         {sentOut && (
-          <div className="mt-4 space-y-2 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-3 text-sm">
-            <p className="font-medium text-zinc-200">Label: {sentOut.label}</p>
-            <p className="text-zinc-500">Confidence: {(sentOut.confidence * 100).toFixed(0)}%</p>
-            <p className="text-zinc-400">{sentOut.brief}</p>
+          <div className="mt-4 space-y-2 rounded-lg border border-zinc-200 bg-white px-3 py-3 text-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+            <p className="font-medium text-zinc-800 dark:text-zinc-200">Label: {sentOut.label}</p>
+            <p className="text-zinc-600 dark:text-zinc-500">Confidence: {(sentOut.confidence * 100).toFixed(0)}%</p>
+            <p className="text-zinc-700 dark:text-zinc-400">{sentOut.brief}</p>
           </div>
         )}
       </div>

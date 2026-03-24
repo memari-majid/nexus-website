@@ -10,6 +10,9 @@ const CATEGORY_LABEL: Record<string, string> = {
   general: "General inquiry",
 };
 
+const inputClass =
+  "w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-500 focus:border-sky-600 focus:outline-none focus:ring-1 focus:ring-sky-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder:text-zinc-500";
+
 export function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,7 +60,7 @@ export function ContactForm() {
     <form onSubmit={onSubmit} className="mt-10 max-w-xl space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="contact-name" className="block text-xs font-medium text-zinc-400 mb-1.5">
+          <label htmlFor="contact-name" className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
             Name
           </label>
           <input
@@ -68,12 +71,12 @@ export function ContactForm() {
             autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-600 focus:outline-none focus:ring-1 focus:ring-sky-600"
+            className={inputClass}
             placeholder="Your name"
           />
         </div>
         <div>
-          <label htmlFor="contact-email" className="block text-xs font-medium text-zinc-400 mb-1.5">
+          <label htmlFor="contact-email" className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
             Email
           </label>
           <input
@@ -84,13 +87,13 @@ export function ContactForm() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-600 focus:outline-none focus:ring-1 focus:ring-sky-600"
+            className={inputClass}
             placeholder="you@company.com"
           />
         </div>
       </div>
       <div>
-        <label htmlFor="contact-message" className="block text-xs font-medium text-zinc-400 mb-1.5">
+        <label htmlFor="contact-message" className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
           Message
         </label>
         <textarea
@@ -100,7 +103,7 @@ export function ContactForm() {
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-600 focus:outline-none focus:ring-1 focus:ring-sky-600"
+          className={inputClass}
           placeholder="Tell us about your project or how we can help..."
         />
       </div>
@@ -113,28 +116,28 @@ export function ContactForm() {
           {status === "loading" ? "Sending…" : "Send message"}
         </button>
         {status === "success" && (
-          <div className="w-full space-y-3 rounded-xl border border-emerald-900/50 bg-emerald-950/20 px-4 py-3 text-left">
-            <p className="text-sm font-medium text-emerald-400">Message received</p>
+          <div className="w-full space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-left dark:border-emerald-900/50 dark:bg-emerald-950/20">
+            <p className="text-sm font-medium text-emerald-800 dark:text-emerald-400">Message received</p>
             {category && (
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-zinc-600 dark:text-zinc-500">
                 Routed as:{" "}
-                <span className="font-medium text-zinc-300">
+                <span className="font-medium text-zinc-800 dark:text-zinc-300">
                   {CATEGORY_LABEL[category] ?? category}
                 </span>
               </p>
             )}
             {autoReply && (
-              <p className="text-sm leading-relaxed text-zinc-300 border-t border-zinc-800/80 pt-3">
+              <p className="border-t border-zinc-200 pt-3 text-sm leading-relaxed text-zinc-700 dark:border-zinc-800/80 dark:text-zinc-300">
                 {autoReply}
               </p>
             )}
           </div>
         )}
-        {status === "error" && <p className="text-sm text-red-400">{errorMsg}</p>}
+        {status === "error" && <p className="text-sm text-red-600 dark:text-red-400">{errorMsg}</p>}
       </div>
-      <p className="text-xs text-zinc-600">
+      <p className="text-xs text-zinc-500 dark:text-zinc-600">
         Prefer email? Reach us at{" "}
-        <a href="mailto:info@nexusaisolution.net" className="text-sky-400 hover:underline">
+        <a href="mailto:info@nexusaisolution.net" className="text-sky-600 hover:underline dark:text-sky-400">
           info@nexusaisolution.net
         </a>
         .

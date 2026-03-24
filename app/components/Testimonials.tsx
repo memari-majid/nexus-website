@@ -42,24 +42,24 @@ export function Testimonials() {
   return (
     <div className="relative mx-auto max-w-2xl text-center">
       <svg
-        className="mx-auto mb-6 h-10 w-10 text-sky-500/30"
+        className="mx-auto mb-6 h-10 w-10 text-sky-400/40 dark:text-sky-500/30"
         fill="currentColor"
         viewBox="0 0 24 24"
       >
         <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C9.591 11.68 11 13.2 11 15c0 1.86-1.567 3.5-3.5 3.5-1.073 0-2.099-.49-2.917-1.179ZM14.583 17.321C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C19.591 11.68 21 13.2 21 15c0 1.86-1.567 3.5-3.5 3.5-1.073 0-2.099-.49-2.917-1.179Z" />
       </svg>
 
-      <div className="min-h-[120px] flex items-center justify-center">
+      <div className="flex min-h-[120px] items-center justify-center">
         <p
           key={active}
-          className="text-lg leading-relaxed text-zinc-300 italic animate-[fadeUp_0.5s_ease-out]"
+          className="text-lg italic leading-relaxed text-zinc-700 dark:text-zinc-300 animate-[fadeUp_0.5s_ease-out]"
         >
           &ldquo;{t.quote}&rdquo;
         </p>
       </div>
 
-      <p className="mt-6 text-sm font-semibold text-zinc-100">{t.name}</p>
-      <p className="text-xs text-sky-400">{t.role}</p>
+      <p className="mt-6 text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</p>
+      <p className="text-xs text-sky-600 dark:text-sky-400">{t.role}</p>
 
       <div className="mt-6 flex justify-center gap-2">
         {TESTIMONIALS.map((_, i) => (
@@ -67,7 +67,7 @@ export function Testimonials() {
             key={i}
             onClick={() => setActive(i)}
             className={`h-2 rounded-full transition-all duration-300 ${
-              i === active ? "w-6 bg-sky-500" : "w-2 bg-zinc-700 hover:bg-zinc-600"
+              i === active ? "w-6 bg-sky-500" : "w-2 bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-700 dark:hover:bg-zinc-600"
             }`}
             aria-label={`Testimonial ${i + 1}`}
           />

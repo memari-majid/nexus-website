@@ -41,13 +41,13 @@ export function AiInsightsTicker() {
   }, [display, full, mode]);
 
   return (
-    <section className="border-b border-zinc-800/40 bg-zinc-950/80 px-6 py-4">
+    <section className="border-b border-zinc-200/80 bg-white/90 px-4 py-4 dark:border-zinc-800/40 dark:bg-zinc-950/80 sm:px-6">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-4">
-        <span className="shrink-0 rounded-full border border-sky-800/50 bg-sky-950/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-sky-400">
+        <span className="shrink-0 rounded-full border border-sky-300 bg-sky-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-sky-700 dark:border-sky-800/50 dark:bg-sky-950/40 dark:text-sky-400">
           AI insight
         </span>
-        <p className="min-h-[3rem] text-center text-sm leading-relaxed text-zinc-400 sm:min-h-0 sm:text-left">
-          <span className="text-zinc-200">{display}</span>
+        <p className="min-h-[3rem] text-center text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:min-h-0 sm:text-left">
+          <span className="text-zinc-800 dark:text-zinc-200">{display}</span>
           <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-sky-500 align-middle" aria-hidden />
         </p>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
+import { useEffect, useRef, useState } from "react";
 
 interface Particle {
   x: number;
@@ -16,12 +17,20 @@ const SPEED = 0.3;
 
 export function ParticleNetwork() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
+    if (!mounted) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    const isDark = resolvedTheme === "dark";
+    const particleRgb = isDark ? "56,189,248" : "2,132,199";
 
     let w = 0;
     let h = 0;
@@ -62,7 +71,7 @@ export function ParticleNetwork() {
 
         ctx!.beginPath();
         ctx!.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-        ctx!.fillStyle = "rgba(56,189,248,0.5)";
+        ctx!.fillStyle = `rgba(${particleRgb},${isDark ? 0.5 : 0.35})`;
         ctx!.fill();
 
         for (let j = i + 1; j < particles.length; j++) {
@@ -74,7 +83,7 @@ export function ParticleNetwork() {
             ctx!.beginPath();
             ctx!.moveTo(a.x, a.y);
             ctx!.lineTo(b.x, b.y);
-            ctx!.strokeStyle = `rgba(56,189,248,${0.15 * (1 - dist / CONNECT_DIST)})`;
+            ctx!.strokeStyle = `rgba(${particleRgb},${(isDark ? 0.15 : 0.12) * (1 - dist / CONNECT_DIST)})`;
             ctx!.lineWidth = 0.6;
             ctx!.stroke();
           }
@@ -87,20 +96,21 @@ export function ParticleNetwork() {
     resize();
     seed();
     draw();
-    window.addEventListener("resize", () => {
+    const onResize = () => {
       resize();
       seed();
-    });
+    };
+    window.addEventListener("resize", onResize);
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [mounted, resolvedTheme]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
+      className="pointer-events-none absolute inset-0"
       aria-hidden="true"
     />
   );
