@@ -2,21 +2,40 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Publicly traded names often cited for AI growth—infrastructure, platforms, data, and security.
+ * (Many “pure” AI labs are private; this list is illustrative, not a recommendation.)
+ */
 const SYMBOLS = [
   {
     symbol: "NVDA",
     displayLabel: "NVIDIA",
-    tagline: "AI & accelerated computing",
+    tagline: "AI GPUs & accelerated computing",
   },
   {
-    symbol: "SOXX",
-    displayLabel: "iShares Semiconductor ETF",
-    tagline: "Global chip demand",
+    symbol: "PLTR",
+    displayLabel: "Palantir",
+    tagline: "AI platforms & decision intelligence",
   },
   {
-    symbol: "QQQ",
-    displayLabel: "Invesco QQQ Trust",
-    tagline: "Nasdaq-100 tech leaders",
+    symbol: "ARM",
+    displayLabel: "Arm Holdings",
+    tagline: "Chip IP for AI & edge devices",
+  },
+  {
+    symbol: "SMCI",
+    displayLabel: "Super Micro",
+    tagline: "AI rack servers & liquid cooling",
+  },
+  {
+    symbol: "NET",
+    displayLabel: "Cloudflare",
+    tagline: "Edge AI & global cloud network",
+  },
+  {
+    symbol: "CRWD",
+    displayLabel: "CrowdStrike",
+    tagline: "AI-native cybersecurity",
   },
 ] as const;
 
@@ -69,27 +88,27 @@ async function fetchYahooQuote(symbol: string) {
 }
 
 export async function GET() {
-  try {
-    const quotes = await Promise.all(
-      SYMBOLS.map(async (cfg) => {
+  const results = await Promise.all(
+    SYMBOLS.map(async (cfg) => {
+      try {
         const q = await fetchYahooQuote(cfg.symbol);
-        return {
-          ...q,
-          displayLabel: cfg.displayLabel,
-          tagline: cfg.tagline,
-        };
-      }),
-    );
-    return NextResponse.json({
-      ok: true as const,
-      updatedAt: Date.now(),
-      quotes,
-    });
-  } catch (err) {
-    console.error("[api/market]", err);
+        return { ...q, displayLabel: cfg.displayLabel, tagline: cfg.tagline };
+      } catch (err) {
+        console.warn("[api/market] quote failed", cfg.symbol, err);
+        return null;
+      }
+    }),
+  );
+  const quotes = results.filter((q): q is NonNullable<typeof q> => q != null);
+  if (quotes.length === 0) {
     return NextResponse.json(
       { ok: false as const, error: "Market data temporarily unavailable." },
       { status: 503 },
     );
   }
+  return NextResponse.json({
+    ok: true as const,
+    updatedAt: Date.now(),
+    quotes,
+  });
 }

@@ -97,18 +97,19 @@ export function AiMarketPulse({ variant = "section" }: AiMarketPulseProps) {
               id={headingId}
               className="mt-1 text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-2xl"
             >
-              AI &amp; tech market snapshot
+              Promising AI companies
             </h3>
           ) : (
             <h2
               id={headingId}
               className="mt-1 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
             >
-              AI &amp; tech market snapshot
+              Promising AI companies
             </h2>
           )}
           <p className="mx-auto mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-500">
-            NVIDIA, semiconductors, and the Nasdaq-100—refreshed about every minute. Not
+            Liquid, AI-focused public equities—infrastructure, platforms, and security. Not a
+            recommendation; many AI leaders are still private. Refreshed about every minute. Not
             investment advice.
           </p>
         </div>
@@ -140,7 +141,7 @@ export function AiMarketPulse({ variant = "section" }: AiMarketPulseProps) {
         )}
 
         {data?.quotes && (
-          <ul className="grid gap-4 sm:grid-cols-3">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data.quotes.map((q) => {
               const up = q.change >= 0;
               return (
