@@ -937,22 +937,52 @@ export function HomePageContent() {
             </div>
           </Reveal>
           <Reveal delay={280}>
-            <div className="mt-10 flex flex-col gap-3 rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-5 py-4 dark:border-zinc-800/60 dark:bg-zinc-900/40 sm:flex-row sm:items-start sm:gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-200/80 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M18 18.72a9.09 9.09 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Silicon Slopes &amp; Utah tech</p>
-                <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  Dr. Memari regularly attends Silicon Slopes events, brings students along, and
-                  helps them build connections with founders, hiring managers, and collaborators—so
-                  they leave with a professional network, not just a grade.
+            <div className="mt-10 flex flex-col gap-4 rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-5 py-4 dark:border-zinc-800/60 dark:bg-zinc-900/40 sm:flex-row sm:items-start sm:gap-5">
+              <a
+                href="https://siliconslopes.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative block h-9 w-40 shrink-0 sm:h-10 sm:w-44"
+              >
+                <Image
+                  src="/logos/siliconslopes.png"
+                  alt="Silicon Slopes — Utah tech community"
+                  fill
+                  sizes="176px"
+                  className="object-contain object-left"
+                />
+              </a>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                  Silicon Slopes &amp; Utah&apos;s AI community
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                  Dr. Memari actively contributes to{" "}
+                  <a
+                    href="https://siliconslopes.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-sky-600 underline decoration-sky-600/30 hover:decoration-sky-600 dark:text-sky-400"
+                  >
+                    Silicon Slopes
+                  </a>
+                  , the nonprofit community helping Utah remain one of the best places to start and
+                  scale a company. He attends events, brings students, and helps them connect with
+                  founders, hiring managers, and collaborators—so they build a real network, not
+                  just a transcript.
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                  He also engages with Utah&apos;s statewide AI ecosystem, including{" "}
+                  <a
+                    href="https://www.aiutah.org/ai-utah-100/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-sky-600 underline decoration-sky-600/30 hover:decoration-sky-600 dark:text-sky-400"
+                  >
+                    AI Utah 100
+                  </a>
+                  —recognizing top AI professionals across Utah and strengthening the community
+                  Dr. Memari helps students join.
                 </p>
               </div>
             </div>
