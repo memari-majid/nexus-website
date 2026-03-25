@@ -954,25 +954,21 @@ export function HomePageContent() {
               </a>
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Silicon Slopes &amp; Utah&apos;s AI community
+                  AI Utah, Silicon Slopes &amp; Utah tech
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  Dr. Memari actively contributes to{" "}
+                  Dr. Memari contributes to{" "}
                   <a
-                    href="https://siliconslopes.com/"
+                    href="https://www.aiutah.org/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-sky-600 underline decoration-sky-600/30 hover:decoration-sky-600 dark:text-sky-400"
                   >
-                    Silicon Slopes
+                    AI Utah
                   </a>
-                  , the nonprofit community helping Utah remain one of the best places to start and
-                  scale a company. He attends events, brings students, and helps them connect with
-                  founders, hiring managers, and collaborators—so they build a real network, not
-                  just a transcript.
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  He also engages with Utah&apos;s statewide AI ecosystem, including{" "}
+                  —Utah&apos;s AI user group and community hub for practitioners, events, companies,
+                  and collaboration. It&apos;s where the statewide AI community meets (including
+                  programs like{" "}
                   <a
                     href="https://www.aiutah.org/ai-utah-100/"
                     target="_blank"
@@ -981,8 +977,21 @@ export function HomePageContent() {
                   >
                     AI Utah 100
                   </a>
-                  —recognizing top AI professionals across Utah and strengthening the community
-                  Dr. Memari helps students join.
+                  ). He shows up, brings students, and helps them plug into that network.
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                  He is also active in{" "}
+                  <a
+                    href="https://siliconslopes.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-sky-600 underline decoration-sky-600/30 hover:decoration-sky-600 dark:text-sky-400"
+                  >
+                    Silicon Slopes
+                  </a>
+                  , the nonprofit helping Utah founders grow—attending events and connecting
+                  learners with founders, hiring managers, and collaborators across the broader
+                  tech ecosystem.
                 </p>
               </div>
             </div>
