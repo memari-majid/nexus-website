@@ -340,10 +340,10 @@ export function HomePageContent() {
       </section>
 
       {/* ============== TRUSTED ============== */}
-      <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-6 py-10">
+      <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-6 py-14 sm:py-16">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="mb-4 text-center text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-500">
+            <p className="mb-8 text-center text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-500">
               Collaborations & institutions
             </p>
             <PartnerLogoStrip items={PARTNER_LOGOS} />

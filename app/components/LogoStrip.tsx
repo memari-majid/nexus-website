@@ -4,19 +4,20 @@ type LogoItem = { name: string; src: string };
 
 export function LogoStrip({ items, className = "" }: { items: LogoItem[]; className?: string }) {
   return (
-    <div className={`flex flex-wrap items-center justify-center gap-x-6 gap-y-8 ${className}`}>
+    <div className={`flex flex-wrap items-center justify-center gap-x-8 gap-y-10 sm:gap-x-10 ${className}`}>
       {items.map((item) => (
         <div
           key={item.name}
-          className="flex h-12 min-w-[100px] max-w-[140px] flex-1 items-center justify-center px-2 sm:h-14 sm:max-w-[160px]"
+          className="flex min-h-[52px] min-w-[120px] max-w-[200px] flex-1 items-center justify-center px-3 sm:min-h-[60px] sm:min-w-[140px] sm:max-w-[220px]"
           title={item.name}
         >
           <Image
             src={item.src}
             alt={`${item.name} logo`}
-            width={160}
-            height={48}
-            className="h-8 w-auto max-w-full object-contain opacity-75 transition hover:opacity-100 dark:brightness-0 dark:invert"
+            width={220}
+            height={64}
+            sizes="(max-width: 640px) 40vw, 180px"
+            className="h-10 w-auto max-h-10 max-w-full object-contain opacity-85 transition hover:opacity-100 sm:h-12 sm:max-h-12 dark:brightness-0 dark:invert"
           />
         </div>
       ))}
