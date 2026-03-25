@@ -18,17 +18,6 @@ import { IT_SERVICES } from "@/app/components/home/services-data";
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
 
-const PARTNER_LOGOS = [
-  { name: "Silicon Slopes", src: "/logos/partners/silicon-slopes.png" },
-  { name: "Stanford University", src: "/logos/partners/stanford.png" },
-  { name: "Johns Hopkins University", src: "/logos/partners/johns-hopkins.png" },
-  { name: "University of Pennsylvania", src: "/logos/partners/upenn.png" },
-  { name: "Utah System of Higher Education", src: "/logos/partners/ushe.svg" },
-  { name: "Utah Office of Data Privacy", src: "/logos/partners/utah-privacy.png" },
-  { name: "Utah Department of Health and Human Services", src: "/logos/partners/utah-dhhs.png" },
-  { name: "University of Utah", src: "/logos/partners/uofu.png" },
-];
-
 const STATS = [
   { value: 200, suffix: "+", label: "Projects" },
   { value: 10, suffix: "+", label: "Funded Projects Led" },
@@ -335,18 +324,6 @@ export function HomePageContent() {
               </div>
             </Reveal>
           ))}
-        </div>
-      </section>
-
-      {/* ============== TRUSTED ============== */}
-      <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-6 py-14 sm:py-16">
-        <div className="mx-auto max-w-6xl">
-          <Reveal>
-            <p className="mb-6 text-center text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-500">
-              Collaborations &amp; institutions
-            </p>
-            <LogoStrip items={PARTNER_LOGOS} variant="color" />
-          </Reveal>
         </div>
       </section>
 
