@@ -1,13 +1,11 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AiInsightsTicker } from "@/app/components/AiInsightsTicker";
 import { AiMarketPulse } from "@/app/components/AiMarketPulse";
 import { AiChatbotShowcase } from "@/app/components/AiChatbotShowcase";
 import { AnimatedCounter } from "@/app/components/AnimatedCounter";
 import { ContactForm } from "@/app/components/ContactForm";
 import { FaqAccordion } from "@/app/components/FaqAccordion";
-import { ParticleNetwork } from "@/app/components/ParticleNetwork";
 import { Reveal } from "@/app/components/Reveal";
 import { ScrollToTop } from "@/app/components/ScrollToTop";
 import { CollaborationHighlights } from "@/app/components/Testimonials";
@@ -125,6 +123,8 @@ const PROJECTS = [
   },
 ];
 
+const FEATURED_PROJECTS = PROJECTS.slice(0, 6);
+
 const WORKSHOPS = [
   {
     title: "Fundamentals of Deep Learning",
@@ -170,18 +170,31 @@ const TECH_LOGOS = [
 
 const FOOTER_LINKS = [
   { label: "Services", href: "#services" },
-  { label: "AI market", href: "#ai-market" },
-  { label: "AI & ML", href: "#ai-services" },
-  { label: "Projects", href: "#projects" },
-  { label: "Try AI", href: "#try-ai" },
-  { label: "Workshops", href: "#workshops" },
-  { label: "Government", href: "#government" },
-  { label: "Community", href: "#community" },
+  { label: "Work", href: "#work" },
+  { label: "Education", href: "#education" },
   { label: "About", href: "#about" },
   { label: "Careers", href: "#careers" },
-  { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
+
+const GOVERNMENT_HIGHLIGHTS = [
+  {
+    title: "Utah Office of Data Privacy",
+    text: "AI applied to data governance and privacy management—improving compliance efficiency and strengthening transparency and public trust.",
+  },
+  {
+    title: "Utah Department of Health & Human Services",
+    text: "AI-driven solutions that reduce manual review time and expand secure access to data for research and policy innovation.",
+  },
+  {
+    title: "Privacy-preserving infrastructure",
+    text: "Helping Utah build a modern, responsible data foundation that supports research while safeguarding citizens.",
+  },
+  {
+    title: "Expanding across departments",
+    text: "We are building additional AI solutions for more Utah departments—intelligent automation and data-driven decision-making at scale.",
+  },
+] as const;
 
 const COMMUNITY_ROLES = [
   {
@@ -391,143 +404,87 @@ export function HomePageContent() {
           <div className="absolute inset-0 bg-gradient-to-b from-zinc-50/90 via-zinc-100/95 to-zinc-50 dark:from-zinc-950/40 dark:via-zinc-950/70 dark:to-zinc-950" />
         </div>
 
-        {/* Floating gradient orbs */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-          <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-sky-600/10 blur-3xl animate-[float_8s_ease-in-out_infinite]" />
-          <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-indigo-600/10 blur-3xl animate-[float_10s_ease-in-out_infinite_2s]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-sky-100/60 dark:bg-sky-500/5 blur-3xl animate-[pulse-glow_6s_ease-in-out_infinite]" />
-        </div>
-
-        <ParticleNetwork />
-
-        <div className="relative z-10 mx-auto min-w-0 max-w-3xl px-1 text-center sm:px-0">
+        <div className="relative z-10 mx-auto min-w-0 max-w-4xl px-4 text-center sm:px-6">
           <Reveal>
-            <p className="mb-4 inline-block rounded-full border border-sky-300 dark:border-sky-800/40 bg-sky-50 dark:bg-sky-950/30 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400">
-              Nexus AI Solutions LLC
+            <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              Nexus AI Solutions
             </p>
           </Reveal>
           <Reveal delay={100}>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl lg:text-6xl">
-              IT Consulting &<br />
-              <span className="gradient-text">Digital Services</span>
+            <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-6xl sm:leading-[1.05]">
+              IT consulting &amp;{" "}
+              <span className="gradient-text">AI that ships</span>
             </h1>
           </Reveal>
           <Reveal delay={200}>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              AI-powered IT consulting led by an NVIDIA Ambassador &amp; Principal AI
-              Architect. We turn advanced AI concepts into practical, real-world
-              solutions for your business.
-            </p>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-zinc-600 dark:text-zinc-500 leading-relaxed">
-              In general, our solutions can be personalized—tutoring, consulting,
-              companionship—and automated or integrated into larger systems, together
-              with the other AI capabilities we deliver.
+            <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Utah-based consulting led by an NVIDIA Ambassador and Principal AI Architect—from
+              strategy and integration to production LLMs, agents, and public-sector AI.
             </p>
           </Reveal>
-          <Reveal delay={300}>
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Reveal delay={280}>
+            <div className="mt-10 flex justify-center">
               <a
                 href="#contact"
-                className="group relative rounded-xl bg-sky-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:shadow-sky-800/40 hover:scale-105 dark:shadow-sky-900/30"
+                className="rounded-full bg-zinc-900 px-8 py-3.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
               >
-                Get in Touch
+                Get in touch
               </a>
-              <a
-                href="#services"
-                className="rounded-xl border border-zinc-300 dark:border-zinc-700 px-4 sm:px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-900 hover:scale-105 dark:hover:text-white"
-              >
-                Our Services ↓
-              </a>
+            </div>
+          </Reveal>
+          <Reveal delay={360}>
+            <div className="mx-auto mt-20 grid max-w-3xl grid-cols-2 gap-10 border-t border-zinc-200/80 pt-16 dark:border-zinc-800/60 sm:grid-cols-4 sm:gap-6">
+              {STATS.map((s) => (
+                <div key={s.label} className="text-center">
+                  <p className="text-3xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+                    <AnimatedCounter end={s.value} suffix={s.suffix} />
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-zinc-500 dark:text-zinc-500">{s.label}</p>
+                </div>
+              ))}
             </div>
           </Reveal>
         </div>
       </section>
 
-      <AiInsightsTicker />
-
-      <AiMarketPulse />
-
-      {/* ============== STATS ============== */}
-      <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-14">
-        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 sm:grid-cols-4">
-          {STATS.map((s, i) => (
-            <Reveal key={s.label} delay={i * 80}>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-sky-600 dark:text-sky-400 sm:text-4xl">
-                  <AnimatedCounter end={s.value} suffix={s.suffix} />
-                </p>
-                <p className="mt-1 text-xs font-medium text-zinc-600 dark:text-zinc-500">{s.label}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ============== IT SERVICES ============== */}
-      <section id="services" className="scroll-mt-20 px-4 sm:px-6 py-24">
+      {/* ============== SERVICES (IT + AI) ============== */}
+      <section id="services" className="scroll-mt-20 border-t border-zinc-200/80 bg-white px-4 py-32 dark:border-zinc-800/40 dark:bg-zinc-950 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              What We Do
+            <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              Capabilities
             </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              IT Consulting Services
+            <h2 className="mt-4 text-center text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              What we do
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-center text-zinc-600 dark:text-zinc-500">
-              End-to-end technology consulting to help your business stay ahead.
+            <p className="mx-auto mt-6 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
+              IT consulting and infrastructure—plus production AI, from LLMs and agents to training
+              and MLOps.
             </p>
           </Reveal>
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {IT_SERVICES.map((svc, i) => (
-              <Reveal key={svc.title} delay={i * 80}>
-                <div className="glass-card glow-border group rounded-2xl p-6">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 transition group-hover:bg-sky-200/50 dark:bg-sky-900/40 group-hover:scale-110">
+              <Reveal key={svc.title} delay={i * 40}>
+                <div className="card group h-full p-6">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 transition dark:bg-zinc-800 dark:text-zinc-300">
                     {svc.icon}
                   </div>
-                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{svc.title}</h3>
+                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{svc.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
                     {svc.description}
                   </p>
                 </div>
               </Reveal>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============== AI SERVICES ============== */}
-      <section
-        id="ai-services"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden"
-      >
-        <div className="pointer-events-none absolute -top-40 right-0 h-80 w-80 rounded-full bg-indigo-200/30 dark:bg-indigo-600/5 blur-3xl" aria-hidden="true" />
-        <div className="mx-auto max-w-6xl relative z-10">
-          <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              AI & ML
-            </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              AI & Machine Learning Services
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-center text-zinc-600 dark:text-zinc-500">
-              End-to-end AI delivery: models, data pipelines, evaluation, and
-              deployment.
-            </p>
-          </Reveal>
-          <div className="mt-14 grid gap-6 sm:grid-cols-2">
             {AI_OFFERINGS.map((item, i) => (
-              <Reveal key={item.title} delay={i * 80}>
-                <div className="glass-card glow-border group rounded-2xl p-6">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 transition group-hover:bg-sky-200/50 dark:bg-sky-900/40 group-hover:scale-110">
+              <Reveal key={item.title} delay={(i + IT_SERVICES.length) * 40}>
+                <div className="card group h-full p-6">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 transition dark:bg-zinc-800 dark:text-zinc-300">
                     <ProjectIcon kind={item.icon} />
                   </div>
-                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1 text-sm font-medium text-sky-600 dark:text-sky-400">
-                    {item.tagline}
-                  </p>
+                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{item.title}</h3>
+                  <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-500">{item.tagline}</p>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
                     {item.description}
                   </p>
@@ -538,35 +495,33 @@ export function HomePageContent() {
         </div>
       </section>
 
-      {/* ============== PROJECTS ============== */}
+      {/* ============== WORK (projects, workflows, demos, market) ============== */}
       <section
-        id="projects"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
+        id="work"
+        className="scroll-mt-20 border-t border-zinc-200/80 px-4 py-32 dark:border-zinc-800/40 sm:px-6"
       >
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              Projects
+            <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              Portfolio
             </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              Where We Build
+            <h2 className="mt-4 text-center text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              Our work
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-center text-zinc-600 dark:text-zinc-500">
-              Representative initiatives across education, simulation, automation,
-              public-sector data, and custom AI.
+            <p className="mx-auto mt-6 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
+              Representative builds across EdTech, simulation, agents, drones, public-sector data, and
+              custom AI.
             </p>
           </Reveal>
-          <div className="mt-14 grid auto-rows-fr gap-6 sm:grid-cols-2">
-            {PROJECTS.map((p, i) => (
-              <Reveal key={p.title} delay={i * 80} className="h-full min-h-0">
-                <div className="glass-card glow-border group flex h-full min-h-[280px] flex-col rounded-2xl p-6 sm:min-h-[260px]">
-                  <div className="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 transition group-hover:bg-sky-200/50 dark:bg-sky-900/40 group-hover:scale-110">
+          <div className="mt-20 grid auto-rows-fr gap-5 sm:grid-cols-2">
+            {FEATURED_PROJECTS.map((p, i) => (
+              <Reveal key={p.title} delay={i * 50} className="h-full min-h-0">
+                <div className="card flex h-full min-h-[240px] flex-col p-6 sm:min-h-[220px]">
+                  <div className="mb-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                     <ProjectIcon kind={p.icon} />
                   </div>
-                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                    {p.title}
-                  </h3>
-                  <p className="mt-1 shrink-0 text-sm font-medium text-sky-600 dark:text-sky-400">
+                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{p.title}</h3>
+                  <p className="mt-1 shrink-0 text-xs font-medium text-zinc-500 dark:text-zinc-500">
                     {p.tagline}
                   </p>
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
@@ -575,175 +530,138 @@ export function HomePageContent() {
                   {"requestAccess" in p && p.requestAccess ? (
                     <Link
                       href="#contact"
-                      className="mt-4 inline-flex text-sm font-semibold text-sky-600 transition hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300"
+                      className="mt-4 inline-flex text-sm font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-600 dark:text-zinc-100 dark:decoration-zinc-600 dark:hover:decoration-zinc-400"
                     >
-                      Request access or demo →
+                      Request access or demo
                     </Link>
                   ) : null}
                 </div>
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ============== AGENTIC WORKFLOWS ============== */}
-      <section
-        id="workflows"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden"
-      >
-        <div className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-full bg-sky-200/40 dark:bg-sky-600/5 blur-3xl" aria-hidden="true" />
-        <div className="mx-auto max-w-6xl relative z-10">
-          <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              Agentic Automation
-            </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              Automated Workflows Powered by AI
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-600 dark:text-zinc-500">
-              We design and deploy intelligent automation pipelines using agentic
-              AI and platforms like n8n — connecting your tools, APIs, and AI
-              models into seamless, self-orchestrating workflows that run 24/7.
-            </p>
-          </Reveal>
+          <div className="mt-32 border-t border-zinc-200/80 pt-24 dark:border-zinc-800/40">
+            <Reveal>
+              <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+                Automation
+              </p>
+              <h3 className="mt-4 text-center text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+                Agentic workflows
+              </h3>
+              <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-600 dark:text-zinc-400">
+                Intelligent pipelines with n8n—tools, APIs, and models orchestrated to run
+                around the clock.
+              </p>
+            </Reveal>
 
-          <Reveal delay={100}>
-            <div className="mt-12 overflow-x-auto rounded-2xl border border-zinc-200 dark:border-zinc-800/60 bg-zinc-100/80 dark:bg-zinc-900/30 p-3 sm:p-6 [-webkit-overflow-scrolling:touch]">
-              <div className="min-w-[min(985px,100%)]">
-                <Image
-                  src="/workflow.svg"
-                  alt="Agentic AI workflow automation diagram built with n8n — showing connected nodes for form handling, conditional logic, AI processing, and multi-step orchestration"
-                  width={985}
-                  height={700}
-                  className="h-auto w-[985px] max-w-none rounded-xl sm:w-full sm:max-w-full"
-                />
+            <Reveal delay={80}>
+              <div className="mt-12 overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-5 [-webkit-overflow-scrolling:touch]">
+                <div className="min-w-[min(985px,100%)]">
+                  <Image
+                    src="/workflow.svg"
+                    alt="Agentic AI workflow automation diagram built with n8n — showing connected nodes for form handling, conditional logic, AI processing, and multi-step orchestration"
+                    width={985}
+                    height={700}
+                    className="h-auto w-[985px] max-w-none rounded-lg sm:w-full sm:max-w-full"
+                  />
+                </div>
               </div>
+            </Reveal>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              <Reveal delay={100}>
+                <div className="card p-5 text-center">
+                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    Visual workflow design
+                  </h4>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    Drag-and-drop with n8n—branching, loops, error handling, and approvals.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={140}>
+                <div className="card p-5 text-center">
+                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">AI-native nodes</h4>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    LLM calls, RAG, sentiment, and classification in the pipeline.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={180}>
+                <div className="card p-5 text-center">
+                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    Always-on orchestration
+                  </h4>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    Webhooks, schedules, monitoring, retries, and audit trails.
+                  </p>
+                </div>
+              </Reveal>
             </div>
-          </Reveal>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-3">
-            <Reveal delay={120}>
-              <div className="glass-card rounded-2xl p-6 text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
-                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
-                  </svg>
-                </div>
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Visual Workflow Design
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  Drag-and-drop orchestration with n8n — conditional branching,
-                  loops, error handling, and human-in-the-loop approvals.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={180}>
-              <div className="glass-card rounded-2xl p-6 text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
-                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
-                  </svg>
-                </div>
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  AI-Native Nodes
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  LLM calls, RAG retrieval, sentiment analysis, and classification
-                  built directly into the pipeline — no glue code needed.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={240}>
-              <div className="glass-card rounded-2xl p-6 text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
-                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
-                  </svg>
-                </div>
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Always-On Orchestration
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  Triggered by webhooks, schedules, or events — your workflows
-                  run autonomously with monitoring, retries, and audit trails.
-                </p>
+            <Reveal delay={220}>
+              <div className="mt-10 text-center">
+                <a
+                  href="#contact"
+                  className="inline-flex rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+                >
+                  Automate your operations
+                </a>
               </div>
             </Reveal>
           </div>
 
-          <Reveal delay={300}>
-            <div className="mt-10 text-center">
-              <a
-                href="#contact"
-                className="inline-flex rounded-xl bg-sky-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:scale-105 dark:shadow-sky-900/30"
-              >
-                Automate Your Operations
-              </a>
-              <p className="mt-2 text-xs text-zinc-600">
-                Tell us about your manual processes — we&apos;ll design an
-                AI-powered workflow that runs itself.
+          <div className="mt-32 border-t border-zinc-200/80 pt-24 dark:border-zinc-800/40">
+            <Reveal>
+              <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+                Interactive
               </p>
+              <h3 className="mt-4 text-center text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+                Try our AI
+              </h3>
+              <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-600 dark:text-zinc-400">
+                Products we ship—AI accounting copilot and a course-grounded teaching assistant.
+              </p>
+            </Reveal>
+            <div className="mt-10">
+              <AiChatbotShowcase />
             </div>
-          </Reveal>
+          </div>
+
+          <div className="mt-32 border-t border-zinc-200/80 pt-24 dark:border-zinc-800/40">
+            <Reveal>
+              <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+                Partners
+              </p>
+              <h3 className="mt-4 text-center text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+                Where we make an impact
+              </h3>
+            </Reveal>
+            <Reveal delay={80}>
+              <div className="mt-12">
+                <CollaborationHighlights />
+              </div>
+            </Reveal>
+          </div>
+
+          <div className="mt-8">
+            <AiMarketPulse variant="embedded" />
+          </div>
         </div>
       </section>
 
-      {/* ============== TRY OUR AI ============== */}
+      {/* ============== EDUCATION & COMMUNITY ============== */}
       <section
-        id="try-ai"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden"
-      >
-        <div className="pointer-events-none absolute -bottom-40 left-0 h-80 w-80 rounded-full bg-sky-200/40 dark:bg-sky-600/5 blur-3xl" aria-hidden="true" />
-        <div className="mx-auto max-w-6xl relative z-10">
-          <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              Interactive
-            </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              Try Our AI
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-600 dark:text-zinc-500">
-              Try real products we ship: an AI accounting copilot and a course-grounded
-              teaching assistant. Open the public apps when configured, or reach out for a
-              walkthrough.
-            </p>
-          </Reveal>
-          <AiChatbotShowcase />
-        </div>
-      </section>
-
-      {/* ============== COLLABORATION HIGHLIGHTS ============== */}
-      <section className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden">
-        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-sky-100/60 dark:bg-sky-500/5 blur-3xl" aria-hidden="true" />
-        <div className="mx-auto max-w-6xl relative z-10">
-          <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              Collaboration Highlights
-            </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl mb-12">
-              Where We Make an Impact
-            </h2>
-          </Reveal>
-          <Reveal delay={100}>
-            <CollaborationHighlights />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ============== WORKSHOPS ============== */}
-      <section
-        id="workshops"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
+        id="education"
+        className="scroll-mt-20 border-t border-zinc-200/80 bg-white px-4 py-32 dark:border-zinc-800/40 dark:bg-zinc-950 sm:px-6"
       >
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
+            <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
               NVIDIA Deep Learning Institute
             </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              Free NVIDIA Deep Learning Workshops
+            <h2 className="mt-4 text-center text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              Workshops &amp; teaching
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
               Dr. Memari is an NVIDIA DLI Certified Instructor and Ambassador. He
@@ -760,14 +678,14 @@ export function HomePageContent() {
               GPU-accelerated labs and certificates of completion where available.
             </p>
           </Reveal>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {WORKSHOPS.map((w, i) => (
               <Reveal key={w.title} delay={i * 60}>
-                <div className="glass-card h-full rounded-2xl p-5">
+                <div className="card h-full p-5">
                   <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                     {w.title}
                   </h3>
-                  <p className="mt-1 text-xs text-sky-600 dark:text-sky-400">{w.duration}</p>
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-500">{w.duration}</p>
                   <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
                     {w.blurb}
                   </p>
@@ -793,9 +711,9 @@ export function HomePageContent() {
             <div className="mt-8 flex flex-col items-center gap-2">
               <a
                 href="#contact"
-                className="rounded-xl bg-sky-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:scale-105 dark:shadow-sky-900/30"
+                className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
               >
-                Invite Dr. Memari to Your Campus
+                Invite Dr. Memari to your campus
               </a>
               <p className="max-w-md text-center text-xs text-zinc-600">
                 Available for universities worldwide. Student workshops are
@@ -804,20 +722,14 @@ export function HomePageContent() {
             </div>
           </Reveal>
         </div>
-      </section>
 
-      {/* ============== COMMUNITY & LEADERSHIP ============== */}
-      <section
-        id="community"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
-      >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto mt-32 max-w-6xl border-t border-zinc-200/80 pt-24 dark:border-zinc-800/40">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
+            <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
               Utah community
             </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              Actively Serving Utah&apos;s AI Community
+            <h2 className="mt-4 text-center text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              Utah &amp; policy
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
               Dr. Memari recruits interns, leads students on real problems at no cost, and
@@ -868,8 +780,8 @@ export function HomePageContent() {
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <a
-                    href="#workshops"
-                    className="inline-flex rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 dark:shadow-sky-900/30"
+                    href="#education"
+                    className="inline-flex rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
                   >
                     Workshop details
                   </a>
@@ -888,8 +800,8 @@ export function HomePageContent() {
           <div className="mt-14 grid gap-6 sm:grid-cols-2">
             {COMMUNITY_ROLES.map((r, i) => (
               <Reveal key={r.org} delay={i * 60}>
-                <div className="glass-card glow-border flex h-full flex-col rounded-2xl p-6">
-                  <div className="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
+                <div className="card flex h-full flex-col p-6">
+                  <div className="mb-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                     <CommunityRoleIcon kind={r.icon} />
                   </div>
                   <p className="text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400">
@@ -1005,20 +917,14 @@ export function HomePageContent() {
             </div>
           </Reveal>
         </div>
-      </section>
 
-      {/* ============== GOVERNMENT ============== */}
-      <section
-        id="government"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
-      >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto mt-32 max-w-6xl border-t border-zinc-200/80 pt-24 dark:border-zinc-800/40">
           <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
+            <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
               Public sector
             </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              AI for Government & Public Policy
+            <h2 className="mt-4 text-center text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              Government &amp; public policy
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
               Dr. Memari is Principal AI Architect at the Gary R. Herbert Institute for Public
@@ -1027,28 +933,11 @@ export function HomePageContent() {
               experience with the same teams he recruits and mentors through Nexus.
             </p>
           </Reveal>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            {[
-              {
-                title: "Utah Office of Data Privacy",
-                text: "AI applied to data governance and privacy management—improving compliance efficiency and strengthening transparency and public trust.",
-              },
-              {
-                title: "Utah Department of Health & Human Services",
-                text: "AI-driven solutions that reduce manual review time and expand secure access to data for research and policy innovation.",
-              },
-              {
-                title: "Privacy-preserving infrastructure",
-                text: "Helping Utah build a modern, responsible data foundation that supports research while safeguarding citizens.",
-              },
-              {
-                title: "Expanding across departments",
-                text: "We are building additional AI solutions for more Utah departments—intelligent automation and data-driven decision-making at scale.",
-              },
-            ].map((card, i) => (
-              <Reveal key={card.title} delay={(i + 1) * 80}>
-                <div className="glass-card rounded-2xl p-6">
-                  <h3 className="text-lg font-semibold text-sky-600 dark:text-sky-400">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+            {GOVERNMENT_HIGHLIGHTS.map((card, i) => (
+              <Reveal key={card.title} delay={(i + 1) * 60}>
+                <div className="card p-6">
+                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
                     {card.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
@@ -1062,9 +951,9 @@ export function HomePageContent() {
             <div className="mt-10 text-center">
               <a
                 href="#contact"
-                className="inline-flex rounded-xl border border-sky-300 dark:border-sky-800/50 bg-sky-50 dark:bg-sky-950/30 px-4 sm:px-6 py-3 text-sm font-semibold text-sky-700 dark:text-sky-300 transition hover:bg-sky-200/50 dark:bg-sky-900/40 hover:scale-105"
+                className="inline-flex rounded-full border border-zinc-300 px-6 py-3 text-sm font-medium text-zinc-900 transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-100 dark:hover:bg-zinc-900"
               >
-                Bring AI to Your Agency
+                Bring AI to your agency
               </a>
               <p className="mt-2 text-xs text-zinc-600">
                 We partner with agencies to deploy responsible,
@@ -1073,14 +962,11 @@ export function HomePageContent() {
             </div>
           </Reveal>
         </div>
-      </section>
 
-      {/* ============== TECH STACK ============== */}
-      <section className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-16">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto mt-24 max-w-6xl border-t border-zinc-200/80 pt-16 dark:border-zinc-800/40">
           <Reveal>
-            <p className="mb-6 text-center text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-500">
-              Our Technology Stack
+            <p className="mb-8 text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
+              Technology we use
             </p>
             <LogoStrip items={TECH_LOGOS} />
           </Reveal>
@@ -1090,125 +976,76 @@ export function HomePageContent() {
       {/* ============== ABOUT ============== */}
       <section
         id="about"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 bg-zinc-50 px-4 py-32 dark:border-zinc-800/40 dark:bg-zinc-900/30 sm:px-6"
       >
         <div className="mx-auto max-w-4xl">
           <Reveal>
-            <p className="text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              About Us
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              About
             </p>
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              Technology Expertise, Academic Rigor
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              Dr. Majid Memari
             </h2>
             <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-500">
-              Nearly 20 years in academia (since 2006)—from engineering and business through
-              CS research, PhD, postdoc, and professor—still focused on students and
-              community.
+              Nearly 20 years in academia—engineering through CS Ph.D., postdoc, and faculty—still
+              focused on students and community.
             </p>
           </Reveal>
 
-          <div className="mt-10 grid gap-10 md:grid-cols-2">
+          <div className="mt-16 grid gap-16 md:grid-cols-2 md:items-start">
             <Reveal delay={100}>
               <div className="space-y-6">
-                <div className="relative mx-auto h-40 w-40">
+                <div className="relative mx-auto h-40 w-40 md:mx-0">
                   <Image
                     src="/majid-memari.png"
                     alt="Dr. Majid Memari"
                     fill
-                    className="rounded-full object-cover object-top border-2 border-sky-400/60 dark:border-sky-600/40 shadow-lg shadow-sky-200/30 dark:shadow-sky-900/20"
+                    className="rounded-full object-cover object-top ring-1 ring-zinc-200 dark:ring-zinc-700"
                     sizes="160px"
                   />
-                  <div className="absolute -inset-2 rounded-full border border-sky-500/10 animate-[pulse-glow_4s_ease-in-out_infinite]" />
                 </div>
                 <div className="space-y-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                   <p>
-                    <strong className="text-zinc-800 dark:text-zinc-200">
-                      Nexus AI Solutions LLC
-                    </strong>{" "}
-                    is a Utah-based IT &amp; AI consulting firm founded by{" "}
-                    <strong className="text-zinc-800 dark:text-zinc-200">Dr. Majid Memari</strong>
-                    . He has spent nearly two decades in academic institutions—
-                    from a bachelor&apos;s in industrial engineering through an MBA, two CS
-                    degrees, a Ph.D. at SIU (including 7+ years building ML systems on
-                    university supercomputers), postdoctoral work leading
-                    USHE-funded drone research, and now assistant professor at UVU. He chose to
-                    stay in education and give back.
+                    <strong className="text-zinc-900 dark:text-zinc-100">Nexus AI Solutions LLC</strong>{" "}
+                    is a Utah-based IT &amp; AI consulting firm. Dr. Memari leads real-world AI
+                    work—government systems, EdTech, drone imaging, synthetic data—and mentors
+                    interns at no cost. He is technical lead on a{" "}
+                    <strong className="text-zinc-900 dark:text-zinc-100">$1M USHE</strong> drone
+                    imaging initiative and collaborates with Utah agencies, Stanford, Johns Hopkins,
+                    and UPenn.
                   </p>
                   <p>
-                    Dr. Memari recruits student interns and leads them through real-world AI
-                    work—government data systems, EdTech, drone imaging, synthetic data—at no
-                    cost to them. He believes the best way to learn AI is to build AI that
-                    matters. He designs courses that bridge academia and industry, takes students
-                    to Silicon Slopes, and connects them with Utah&apos;s tech ecosystem before
-                    they graduate.
-                  </p>
-                  <p>
-                    He gives back through free NVIDIA DLI workshops,{" "}
+                    He gives back through NVIDIA DLI workshops,{" "}
                     <a
                       href="https://rai.utah.edu/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sky-600 dark:text-sky-400 hover:underline"
+                      className="text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-500 dark:text-zinc-100 dark:decoration-zinc-600"
                     >
                       One-U Responsible AI
-                    </a>{" "}
-                    policy advising at the University of Utah, and public-sector AI architecture
-                    for Utah agencies—while mentoring the next generation across industrial
-                    engineering, business, healthcare analytics (e.g. Potentia Analytics),
-                    multimodal ML with Stanford/JHU/UPenn, HPC, and public policy.
-                  </p>
-                  <p>
-                    As technical lead of a{" "}
-                    <strong className="text-zinc-800 dark:text-zinc-200">$1M research initiative</strong>{" "}
-                    funded by the{" "}
-                    <a
-                      href="https://ushe.edu/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sky-600 dark:text-sky-400 hover:underline"
-                    >
-                      Utah System of Higher Education (USHE)
                     </a>
-                    , he designed real-time drone imaging for wind-turbine maintenance—RGB and
-                    thermal imaging, 3D reconstruction, and published industry-relevant results.
-                    Collaborations include Stanford, Johns Hopkins, UPenn, and Utah state
-                    agencies including the Office of Data Privacy and Department of Health
-                    &amp; Human Services.
+                    , and public-sector architecture—connecting students to Silicon Slopes and
+                    Utah&apos;s tech ecosystem.
                   </p>
                 </div>
               </div>
             </Reveal>
 
-            <Reveal delay={200}>
-              <div className="space-y-4">
+            <Reveal delay={160}>
+              <div className="grid grid-cols-2 gap-3">
                 {[
-                  {
-                    big: "~20 yrs",
-                    sub: "In academia — since 2006 (engineering → MBA → CS → PhD → faculty)",
-                  },
-                  {
-                    big: "Ph.D.",
-                    sub: "Computer Science — Southern Illinois University",
-                  },
-                  {
-                    big: "NVIDIA",
-                    sub: "Ambassador & DLI Certified Instructor",
-                  },
-                  { big: "$1M", sub: "USHE-funded drone AI research — technical lead" },
-                  { big: "10+", sub: "Years in applied AI, ML & software engineering" },
-                  {
-                    big: "Utah",
-                    sub: "Based in Salt Lake City — serving clients nationwide",
-                  },
+                  { big: "~20 yrs", sub: "In academia since 2006" },
+                  { big: "Ph.D.", sub: "Computer Science, SIU" },
+                  { big: "NVIDIA", sub: "Ambassador & DLI Instructor" },
+                  { big: "$1M", sub: "USHE drone AI — technical lead" },
                 ].map((card) => (
-                  <div
-                    key={card.big}
-                    className="glass-card rounded-xl p-5"
-                  >
-                    <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">
+                  <div key={card.big} className="card p-4">
+                    <p className="text-xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
                       {card.big}
                     </p>
-                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-500">{card.sub}</p>
+                    <p className="mt-1 text-[11px] leading-snug text-zinc-600 dark:text-zinc-500">
+                      {card.sub}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -1220,28 +1057,27 @@ export function HomePageContent() {
       {/* ============== CAREERS ============== */}
       <section
         id="careers"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 bg-white px-4 py-32 dark:border-zinc-800/40 dark:bg-zinc-950 sm:px-6"
       >
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-3xl">
           <Reveal>
-            <p className="text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
               Careers
             </p>
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">Join Our Team</h2>
-            <p className="mt-4 text-zinc-600 dark:text-zinc-500">
-              We run multiple concurrent AI projects—EdTech, agentic automation,
-              public-sector data, and more—and we&apos;re always hiring interns who
-              want real-world experience, not just coursework.
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              Join the team
+            </h2>
+            <p className="mt-4 text-zinc-600 dark:text-zinc-400">
+              Multiple concurrent AI projects—we hire interns who want production experience, not
+              only coursework.
             </p>
           </Reveal>
           <Reveal delay={100}>
-            <div className="glass-card mt-10 rounded-2xl p-8">
+            <div className="card mt-12 p-8">
               <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
                 AI Engineering Internship
               </h3>
-              <p className="mt-1 text-sm text-sky-600 dark:text-sky-400">
-                Fully online
-              </p>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">Fully online</p>
               <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 If you want <strong className="text-zinc-800 dark:text-zinc-200">real-world AI engineering experience</strong>,
                 reach out—we always have multiple projects in flight and we hire
@@ -1269,13 +1105,13 @@ export function HomePageContent() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
                   href="mailto:info@nexusaisolution.net?subject=AI%20Engineering%20Internship%20Inquiry"
-                  className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-500 transition hover:scale-105"
+                  className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
                 >
                   Reach out
                 </a>
                 <a
                   href="#contact"
-                  className="rounded-lg border border-zinc-300 dark:border-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 transition"
+                  className="rounded-full border border-zinc-300 px-6 py-2.5 text-sm font-medium text-zinc-800 transition hover:border-zinc-400 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
                   Contact form
                 </a>
@@ -1292,57 +1128,51 @@ export function HomePageContent() {
         </div>
       </section>
 
-      {/* ============== FAQ ============== */}
-      <section
-        id="faq"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
-      >
-        <div className="mx-auto max-w-6xl">
-          <Reveal>
-            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              FAQ
-            </p>
-            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl mb-12">
-              Frequently Asked Questions
-            </h2>
-          </Reveal>
-          <Reveal delay={100}>
-            <FaqAccordion />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ============== CONTACT ============== */}
+      {/* ============== CONTACT + FAQ ============== */}
       <section
         id="contact"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 bg-zinc-50 px-4 py-32 dark:border-zinc-800/40 dark:bg-zinc-900/20 sm:px-6"
       >
         <div className="mx-auto max-w-4xl">
           <Reveal>
-            <p className="text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
-              Get in Touch
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              Contact
             </p>
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-              Let&apos;s Work Together
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+              Let&apos;s work together
             </h2>
-            <p className="mt-4 max-w-lg text-zinc-600 dark:text-zinc-500">
-              Have a project in mind or need IT or AI consulting? Send a
-              message—we&apos;ll get back to you promptly.
+            <p className="mt-4 max-w-lg text-zinc-600 dark:text-zinc-400">
+              IT or AI consulting—send a message and we&apos;ll respond promptly.
             </p>
           </Reveal>
 
-          <Reveal delay={80}>
-            <ContactForm />
+          <Reveal delay={60}>
+            <div className="mt-12">
+              <ContactForm />
+            </div>
           </Reveal>
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div id="faq" className="mt-24 scroll-mt-24">
+            <Reveal>
+              <h3 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                Frequently asked questions
+              </h3>
+            </Reveal>
+            <Reveal delay={40}>
+              <div className="mt-8">
+                <FaqAccordion />
+              </div>
+            </Reveal>
+          </div>
+
+          <div className="mt-20 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 href: "mailto:info@nexusaisolution.net",
                 label: "Email",
                 detail: "info@nexusaisolution.net",
                 icon: (
-                  <svg className="h-8 w-8 text-sky-600 dark:text-sky-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <svg className="mb-3 h-8 w-8 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                   </svg>
                 ),
@@ -1352,7 +1182,7 @@ export function HomePageContent() {
                 label: "Phone",
                 detail: "(801) 810-9152",
                 icon: (
-                  <svg className="h-8 w-8 text-sky-600 dark:text-sky-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <svg className="mb-3 h-8 w-8 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
                   </svg>
                 ),
@@ -1363,7 +1193,7 @@ export function HomePageContent() {
                 detail: "majid-memari",
                 external: true,
                 icon: (
-                  <svg className="h-8 w-8 text-sky-600 dark:text-sky-400 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="mb-3 h-8 w-8 text-zinc-500 dark:text-zinc-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
                 ),
@@ -1374,7 +1204,7 @@ export function HomePageContent() {
                 detail: "memari-majid",
                 external: true,
                 icon: (
-                  <svg className="h-8 w-8 text-sky-600 dark:text-sky-400 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="mb-3 h-8 w-8 text-zinc-500 dark:text-zinc-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                   </svg>
                 ),
@@ -1384,13 +1214,13 @@ export function HomePageContent() {
                 <a
                   href={c.href}
                   {...(("external" in c) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                  className="glass-card group flex flex-col items-center rounded-2xl p-6 text-center"
+                  className="card group flex flex-col items-center p-5 text-center"
                 >
                   {c.icon}
                   <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
                     {c.label}
                   </p>
-                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-500 transition-colors group-hover:text-sky-600 dark:text-sky-400">
+                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-500 transition-colors group-hover:text-zinc-900 dark:group-hover:text-zinc-300">
                     {c.detail}
                   </p>
                 </a>
@@ -1401,11 +1231,10 @@ export function HomePageContent() {
       </section>
 
       {/* ============== FOOTER ============== */}
-      <footer className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 pt-16 pb-10">
+      <footer className="border-t border-zinc-200/80 bg-white px-4 py-16 dark:border-zinc-800/40 dark:bg-zinc-950 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Brand */}
-            <div className="space-y-4">
+          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-sm space-y-3">
               <div className="flex items-center gap-2.5">
                 <Image
                   src="/nexus-logo.png"
@@ -1414,68 +1243,47 @@ export function HomePageContent() {
                   height={28}
                   className="h-7 w-7 rounded-md object-contain"
                 />
-                <span className="text-sm font-semibold">
-                  Nexus<span className="text-sky-600 dark:text-sky-400"> AI</span> Solutions
+                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                  Nexus AI Solutions
                 </span>
               </div>
               <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
-                Utah-based IT & AI consulting. Strategic planning, system
-                integration, and production AI solutions led by Dr. Majid
-                Memari.
+                Utah-based IT and AI consulting led by Dr. Majid Memari.
               </p>
             </div>
 
-            {/* Quick Links */}
-            <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Quick Links
-              </p>
-              <ul className="space-y-2">
-                {FOOTER_LINKS.slice(0, 5).map((l) => (
-                  <li key={l.href}>
-                    <a
-                      href={l.href}
-                      className="text-xs text-zinc-600 dark:text-zinc-500 transition hover:text-sky-600 dark:text-sky-400"
-                    >
-                      {l.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <nav
+              aria-label="Footer"
+              className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-zinc-600 dark:text-zinc-400"
+            >
+              {FOOTER_LINKS.map((l) => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className="transition hover:text-zinc-900 dark:hover:text-zinc-100"
+                >
+                  {l.label}
+                </a>
+              ))}
+              <a href="#faq" className="transition hover:text-zinc-900 dark:hover:text-zinc-100">
+                FAQ
+              </a>
+            </nav>
 
-            <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Company
+            <div className="w-full max-w-xs lg:w-auto">
+              <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
+                Newsletter
               </p>
-              <ul className="space-y-2">
-                {FOOTER_LINKS.slice(5).map((l) => (
-                  <li key={l.href}>
-                    <a
-                      href={l.href}
-                      className="text-xs text-zinc-600 dark:text-zinc-500 transition hover:text-sky-600 dark:text-sky-400"
-                    >
-                      {l.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Newsletter */}
-            <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Stay Updated
+              <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-500">
+                AI insights and company updates.
               </p>
-              <p className="mb-3 text-xs text-zinc-600 dark:text-zinc-500">
-                Get AI insights and company news delivered to your inbox.
-              </p>
-              <NewsletterForm />
+              <div className="mt-3">
+                <NewsletterForm />
+              </div>
             </div>
           </div>
 
-          {/* Social row + copyright */}
-          <div className="mt-12 flex flex-col items-center gap-4 border-t border-zinc-200/80 dark:border-zinc-800/40 pt-8 sm:flex-row sm:justify-between">
+          <div className="mt-14 flex flex-col items-center gap-4 border-t border-zinc-200/80 pt-8 dark:border-zinc-800/40 sm:flex-row sm:justify-between">
             <div className="flex gap-4">
               {[
                 {
@@ -1494,7 +1302,7 @@ export function HomePageContent() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-zinc-600 transition hover:text-sky-600 dark:text-sky-400"
+                  className="text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
                   aria-label={s.label}
                 >
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

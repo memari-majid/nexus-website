@@ -6,16 +6,10 @@ import { ThemeToggle } from "@/app/components/ThemeToggle";
 
 const NAV_ITEMS = [
   { label: "Services", href: "#services" },
-  { label: "AI market", href: "#ai-market" },
-  { label: "Projects", href: "#projects" },
-  { label: "Workflows", href: "#workflows" },
-  { label: "Try AI", href: "#try-ai" },
-  { label: "Workshops", href: "#workshops" },
-  { label: "Government", href: "#government" },
-  { label: "Community", href: "#community" },
+  { label: "Work", href: "#work" },
+  { label: "Education", href: "#education" },
   { label: "About", href: "#about" },
   { label: "Careers", href: "#careers" },
-  { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
 

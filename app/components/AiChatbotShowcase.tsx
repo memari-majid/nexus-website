@@ -63,7 +63,7 @@ export function AiChatbotShowcase() {
         return (
           <div
             key={b.title}
-            className="glass-card rounded-2xl border border-zinc-200/80 p-6 dark:border-zinc-800/60"
+            className="card p-6"
           >
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-100/80 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400">

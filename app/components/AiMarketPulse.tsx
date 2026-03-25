@@ -35,7 +35,12 @@ function formatPct(n: number) {
   return `${sign}${n.toFixed(2)}%`;
 }
 
-export function AiMarketPulse() {
+type AiMarketPulseProps = {
+  /** Nested inside another section (no full-bleed band, smaller heading). */
+  variant?: "section" | "embedded";
+};
+
+export function AiMarketPulse({ variant = "section" }: AiMarketPulseProps) {
   const [data, setData] = useState<ApiOk | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,27 +70,46 @@ export function AiMarketPulse() {
     return () => window.clearInterval(id);
   }, [load]);
 
+  const Wrapper = variant === "embedded" ? "div" : "section";
+  const headingId = variant === "embedded" ? "work-market-heading" : "ai-market-heading";
+
   return (
-    <section
-      id="ai-market"
-      className="border-b border-zinc-200/80 bg-gradient-to-b from-zinc-50 to-white px-4 py-10 dark:border-zinc-800/40 dark:from-zinc-950 dark:to-zinc-950 sm:px-6"
-      aria-labelledby="ai-market-heading"
+    <Wrapper
+      {...(variant === "section"
+        ? {
+            id: "ai-market",
+            className:
+              "border-b border-zinc-200/80 bg-gradient-to-b from-zinc-50 to-white px-4 py-10 dark:border-zinc-800/40 dark:from-zinc-950 dark:to-zinc-950 sm:px-6",
+          }
+        : {
+            id: "work-market",
+            className: "mt-20 border-t border-zinc-200/80 pt-16 dark:border-zinc-800/40",
+          })}
+      aria-labelledby={headingId}
     >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 text-center">
-          <p className="text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400">
+        <div className={variant === "embedded" ? "mb-8 text-left sm:text-center" : "mb-6 text-center"}>
+          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
             Live pulse
           </p>
-          <h2
-            id="ai-market-heading"
-            className="mt-1 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
-          >
-            AI &amp; tech market snapshot
-          </h2>
+          {variant === "embedded" ? (
+            <h3
+              id={headingId}
+              className="mt-1 text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-2xl"
+            >
+              AI &amp; tech market snapshot
+            </h3>
+          ) : (
+            <h2
+              id={headingId}
+              className="mt-1 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
+            >
+              AI &amp; tech market snapshot
+            </h2>
+          )}
           <p className="mx-auto mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-500">
-            NVIDIA anchors the AI infrastructure trade; semiconductors and the Nasdaq-100
-            help show how fast the broader AI and tech ecosystem is moving in public
-            markets. Quotes refresh about every minute.
+            NVIDIA, semiconductors, and the Nasdaq-100—refreshed about every minute. Not
+            investment advice.
           </p>
         </div>
 
@@ -121,7 +145,7 @@ export function AiMarketPulse() {
               const up = q.change >= 0;
               return (
                 <li key={q.symbol}>
-                  <div className="glass-card h-full rounded-2xl border border-zinc-200/80 p-5 dark:border-zinc-800/60">
+                  <div className="card h-full p-5">
                     <p className="text-[11px] font-semibold uppercase tracking-wider text-sky-600 dark:text-sky-400">
                       {q.symbol}
                     </p>
@@ -163,6 +187,6 @@ export function AiMarketPulse() {
           </p>
         )}
       </div>
-    </section>
+    </Wrapper>
   );
 }

@@ -12,10 +12,11 @@ Live at [nexusaisolution.net](https://nexusaisolution.net)
 - [Vercel AI SDK](https://sdk.vercel.ai/) + OpenAI (optional chat widget)
 - Deployed on [Vercel](https://vercel.com)
 
-## Theme & responsiveness
+## Theme & layout
 
 - **Dark/light:** `next-themes` with Tailwind v4 class-based `dark:` (toggle in the nav). Default theme is dark.
-- **Mobile:** Hero height, full-screen chat on small viewports, horizontal scroll for the workflow diagram, stacked footer newsletter, `overflow-x-hidden` on the shell.
+- **Homepage:** Consolidated sections (Services, Work, Education, About, Careers, Contact+FAQ) with minimal chrome—solid `.card` surfaces, generous spacing, no glassmorphism.
+- **Mobile:** Hero height, full-screen chat on small viewports, horizontal scroll for the workflow diagram, `overflow-x-hidden` on the shell.
 
 Tech stack logos live under `public/logos/` (see `LogoStrip`).
 
