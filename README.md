@@ -35,7 +35,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Purpose |
 | -------- | ------- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL (SEO, sitemap, JSON-LD). Default: `https://nexusaisolution.net` |
-| `NEXT_PUBLIC_AI_CPA_URL` | Optional. Public URL for the AI CPA app (Try Our AI section). If unset, the section shows “Request access”. |
+| `NEXT_PUBLIC_AI_CPA_URL` | Optional. Public URL for the AI financial assistant app (Try Our AI section). If unset, the section shows “Request access”. |
 | `NEXT_PUBLIC_AI_TA_URL` | Optional. Public URL for the CS 4720R AI teaching assistant. If unset, the section shows “Request access”. |
 | `OPENAI_API_KEY` | Required for the floating chat assistant (`/api/chat`) and AI contact classification |
 | `OPENAI_MODEL` | Optional. Default: `gpt-5.4-mini` |

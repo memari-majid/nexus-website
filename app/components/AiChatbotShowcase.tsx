@@ -23,10 +23,10 @@ export function AiChatbotShowcase() {
 
   const bots: Bot[] = [
     {
-      title: "AI CPA",
-      subtitle: "Accounting copilot",
+      title: "AI Financial Assistant",
+      subtitle: "Finance & bookkeeping",
       description:
-        "Conversational assistant for bookkeeping questions, tax-aware guidance, and financial workflows—built as a full product experience (companies, ledger, documents).",
+        "Conversational assistant for bookkeeping, organized records, and finance workflows—full product experience with companies, ledger, and documents. Not a replacement for licensed professionals where required.",
       url: cpaUrl,
       icon: (
         <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

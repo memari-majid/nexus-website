@@ -92,10 +92,10 @@ const PROJECTS = [
     icon: "wallet",
   },
   {
-    title: "AI CPA",
-    tagline: "Intelligent accounting assistance",
+    title: "AI Financial Assistant",
+    tagline: "Bookkeeping & business finance",
     description:
-      "An AI-powered CPA-style assistant for bookkeeping workflows, tax-aware questions, and financial organization—built for clarity; professional advice where licensing applies.",
+      "An AI assistant for bookkeeping workflows, organized records, and everyday finance questions—built for clarity. It is not a substitute for licensed tax, legal, or investment professionals where those apply.",
     icon: "ledger",
   },
   {
@@ -620,7 +620,7 @@ export function HomePageContent() {
                 Try our AI
               </h3>
               <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-600 dark:text-zinc-400">
-                Products we ship—AI accounting copilot and a course-grounded teaching assistant.
+                Products we ship—an AI financial assistant and a course-grounded teaching assistant.
               </p>
             </Reveal>
             <div className="mt-10">
