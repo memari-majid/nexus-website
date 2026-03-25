@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AiInsightsTicker } from "@/app/components/AiInsightsTicker";
-import { AiTryDemos } from "@/app/components/AiTryDemos";
+import { AiChatbotShowcase } from "@/app/components/AiChatbotShowcase";
 import { AnimatedCounter } from "@/app/components/AnimatedCounter";
 import { ContactForm } from "@/app/components/ContactForm";
 import { FaqAccordion } from "@/app/components/FaqAccordion";
@@ -584,12 +584,12 @@ export function HomePageContent() {
               Try Our AI
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-600 dark:text-zinc-500">
-              Live demos on our stack — structured executive briefs and stakeholder
-              signal reads, not generic “ask ChatGPT” tasks. Each run is a one-off
-              request; we don&apos;t keep your text in this app.
+              Try real products we ship: an AI accounting copilot and a course-grounded
+              teaching assistant. Open the public apps when configured, or reach out for a
+              walkthrough.
             </p>
           </Reveal>
-          <AiTryDemos />
+          <AiChatbotShowcase />
         </div>
       </section>
 

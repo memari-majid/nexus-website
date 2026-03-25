@@ -34,9 +34,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Purpose |
 | -------- | ------- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL (SEO, sitemap, JSON-LD). Default: `https://nexusaisolution.net` |
-| `OPENAI_API_KEY` | Required for the floating chat assistant (`/api/chat`), Try Our AI demos (`/api/demo/*`), and AI contact classification |
+| `NEXT_PUBLIC_AI_CPA_URL` | Optional. Public URL for the AI CPA app (Try Our AI section). If unset, the section shows “Request access”. |
+| `NEXT_PUBLIC_AI_TA_URL` | Optional. Public URL for the CS 4720R AI teaching assistant. If unset, the section shows “Request access”. |
+| `OPENAI_API_KEY` | Required for the floating chat assistant (`/api/chat`) and AI contact classification |
 | `OPENAI_MODEL` | Optional. Default: `gpt-5.4-mini` |
-| `DEMO_AI_MODEL` | Optional. Model for summarizer & sentiment demos. Default: `gpt-4o-mini` |
 | `CONTACT_CLASSIFY_MODEL` | Optional. Model for inquiry classification + auto-reply. Default: `gpt-4o-mini` |
 | `RESEND_API_KEY` | Optional. If set, contact form + chat lead form send email via [Resend](https://resend.com) |
 | `RESEND_FROM_EMAIL` | Verified sender in Resend (e.g. `Nexus AI <contact@yourdomain.com>`) |
