@@ -31,7 +31,7 @@ const HIGHLIGHTS = [
     domain: "Education",
     body: (
       <>
-        Mentored 50+ students; designed, taught, and delivered about 10 Applied AI courses, workshops, and
+        Led 100+ students; designed, taught, and delivered about 10 Applied AI courses, workshops, and
         hands-on training aligned with industry tools and university partners.
       </>
     ),

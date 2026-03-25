@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: "Try AI", href: "#try-ai" },
   { label: "Workshops", href: "#workshops" },
   { label: "Government", href: "#government" },
+  { label: "Community", href: "#community" },
   { label: "About", href: "#about" },
   { label: "Careers", href: "#careers" },
   { label: "FAQ", href: "#faq" },

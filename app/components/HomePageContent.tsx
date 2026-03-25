@@ -21,7 +21,7 @@ import { IT_SERVICES } from "@/app/components/home/services-data";
 const STATS = [
   { value: 200, suffix: "+", label: "Projects" },
   { value: 10, suffix: "+", label: "Funded Projects Led" },
-  { value: 50, suffix: "+", label: "Students Mentored" },
+  { value: 100, suffix: "+", label: "Students Led" },
   { value: 10, suffix: "+", label: "AI Courses & Workshops" },
 ];
 
@@ -174,11 +174,55 @@ const FOOTER_LINKS = [
   { label: "Try AI", href: "#try-ai" },
   { label: "Workshops", href: "#workshops" },
   { label: "Government", href: "#government" },
+  { label: "Community", href: "#community" },
   { label: "About", href: "#about" },
   { label: "Careers", href: "#careers" },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
+
+const COMMUNITY_ROLES = [
+  {
+    org: "Nexus AI Solutions LLC",
+    title: "Founder & CEO",
+    period: "Mar 2026 — Present",
+    description:
+      "Recruits student interns and leads them on real-world AI projects—from architecture to deployment—at no cost to them.",
+    icon: "nexus",
+  },
+  {
+    org: "NVIDIA",
+    title: "Ambassador & DLI Instructor",
+    period: "Nov 2025 — Present",
+    description:
+      "Delivers free hands-on workshops on agentic AI, GPU computing, and applied ML—open to students, faculty, and industry partners.",
+    icon: "nvidia",
+  },
+  {
+    org: "Utah Valley University",
+    title: "Assistant Professor",
+    period: "Jul 2024 — Present",
+    description:
+      "Designs new courses that bridge academia and industry; mentors student teams end-to-end on funded research and production AI systems.",
+    icon: "uvu",
+  },
+  {
+    org: "University of Utah — One-U RAI",
+    title: "AI Consultant, AI Policy SIG",
+    period: "Jan 2025 — Present",
+    description:
+      "Shapes responsible AI strategy across healthcare, education, government, and commercial sectors—bringing student perspectives into policy discussions.",
+    icon: "uou",
+  },
+  {
+    org: "Gary R. Herbert Institute for Public Policy",
+    title: "Principal AI Architect",
+    period: "Nov 2024 — Present",
+    description:
+      "Leads state-level AI for Utah agencies alongside student teams who gain direct public-sector experience.",
+    icon: "herbert",
+  },
+] as const;
 
 /* ------------------------------------------------------------------ */
 /*  Icons                                                              */
@@ -262,6 +306,57 @@ function ProjectIcon({ kind }: { kind: string }) {
     ),
   };
   return <span className="text-sky-600 dark:text-sky-400">{map[kind] ?? map.spark}</span>;
+}
+
+function CommunityRoleIcon({ kind }: { kind: string }) {
+  const map: Record<string, ReactNode> = {
+    nexus: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 21h19.5m-18-18v18m2.25-18v18m9-13.5V3m-9 6.75h6.75m-6.75 3h6.75m-9 0H9m9-3h.375v9.375c0 .621-.504 1.125-1.125 1.125H18.75v-9.375m0 0H21.75m-2.25 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75H9"
+        />
+      </svg>
+    ),
+    nvidia: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Z"
+        />
+      </svg>
+    ),
+    uvu: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
+        />
+      </svg>
+    ),
+    uou: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+        />
+      </svg>
+    ),
+    herbert: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
+        />
+      </svg>
+    ),
+  };
+  return <span className="text-sky-600 dark:text-sky-400">{map[kind] ?? map.nexus}</span>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -704,6 +799,104 @@ export function HomePageContent() {
         </div>
       </section>
 
+      {/* ============== COMMUNITY & LEADERSHIP ============== */}
+      <section
+        id="community"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+      >
+        <div className="mx-auto max-w-6xl">
+          <Reveal>
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
+              Utah community
+            </p>
+            <h2 className="text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+              Actively Serving Utah&apos;s AI Community
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
+              Dr. Memari recruits interns, leads students on real problems at no cost, and
+              shows up where policy, education, and industry meet—so the next generation
+              ships AI that matters.
+            </p>
+          </Reveal>
+          <div className="mt-14 grid gap-6 sm:grid-cols-2">
+            {COMMUNITY_ROLES.map((r, i) => (
+              <Reveal key={r.org} delay={i * 60}>
+                <div className="glass-card glow-border flex h-full flex-col rounded-2xl p-6">
+                  <div className="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
+                    <CommunityRoleIcon kind={r.icon} />
+                  </div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                    {r.org}
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold text-zinc-900 dark:text-zinc-100">{r.title}</h3>
+                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-500">{r.period}</p>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    {r.description}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal delay={200}>
+            <div className="mt-12 rounded-2xl border border-sky-200/80 bg-sky-50/80 px-6 py-8 dark:border-sky-900/40 dark:bg-sky-950/20">
+              <p className="text-xs font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                Bridging academia &amp; industry
+              </p>
+              <h3 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                EdTech innovation &amp; entrepreneurship
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-400">
+                Dr. Memari designs new AI courses to close the gap between what universities
+                teach and what industry needs. One example: an innovation and entrepreneurship
+                course focused on Education Technology. Students discover real problems in K-12
+                and higher education, propose AI-powered solutions, build working prototypes
+                using no-code tools (cloud-hosted n8n), and pitch their EdTech startup to
+                mentors and judges. No programming experience required—co-taught by a computer
+                scientist and an education expert, with mentoring and guest lectures from{" "}
+                <a
+                  href="https://www.uvu.edu/entrepreneurship/"
+                  className="text-sky-600 underline decoration-sky-600/30 hover:decoration-sky-600 dark:text-sky-400"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  UVU&apos;s Baugh Entrepreneurship Institute
+                </a>
+                .
+              </p>
+              <div className="mt-6">
+                <a
+                  href="#contact"
+                  className="inline-flex rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 dark:shadow-sky-900/30"
+                >
+                  Contact us about courses &amp; collaboration
+                </a>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={280}>
+            <div className="mt-10 flex flex-col gap-3 rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-5 py-4 dark:border-zinc-800/60 dark:bg-zinc-900/40 sm:flex-row sm:items-start sm:gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-200/80 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M18 18.72a9.09 9.09 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Silicon Slopes &amp; Utah tech</p>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                  Dr. Memari regularly attends Silicon Slopes events, brings students along, and
+                  helps them build connections with founders, hiring managers, and collaborators—so
+                  they leave with a professional network, not just a grade.
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ============== GOVERNMENT ============== */}
       <section
         id="government"
@@ -718,9 +911,10 @@ export function HomePageContent() {
               AI for Government & Public Policy
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
-              Dr. Memari is Principal AI Architect at the Gary R. Herbert
-              Institute for Public Policy (Nov 2024 -- Present) and leads
-              state-level collaborations with Utah agencies.
+              Dr. Memari is Principal AI Architect at the Gary R. Herbert Institute for Public
+              Policy (Nov 2024 — Present) and leads state-level collaborations with Utah agencies.
+              Students work alongside him on these initiatives—gaining hands-on public-sector AI
+              experience with the same teams he recruits and mentors through Nexus.
             </p>
           </Reveal>
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -796,6 +990,11 @@ export function HomePageContent() {
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">
               Technology Expertise, Academic Rigor
             </h2>
+            <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-500">
+              Nearly 20 years in academia (since 2006)—from engineering and business through
+              CS research, PhD, postdoc, and professor—still focused on students and
+              community.
+            </p>
           </Reveal>
 
           <div className="mt-10 grid gap-10 md:grid-cols-2">
@@ -817,22 +1016,40 @@ export function HomePageContent() {
                       Nexus AI Solutions LLC
                     </strong>{" "}
                     is a Utah-based IT &amp; AI consulting firm founded by{" "}
-                    <strong className="text-zinc-800 dark:text-zinc-200">Dr. Majid Memari</strong>{" "}
-                    — NVIDIA Ambassador, Assistant Professor at Utah Valley
-                    University, and Principal AI Architect at the Gary R. Herbert
-                    Institute for Public Policy.
+                    <strong className="text-zinc-800 dark:text-zinc-200">Dr. Majid Memari</strong>
+                    . He has spent nearly two decades in academic institutions—
+                    from a bachelor&apos;s in industrial engineering through an MBA, two CS
+                    degrees, a Ph.D. at SIU (including 7+ years building ML systems on
+                    university supercomputers), postdoctoral work leading
+                    USHE-funded drone research, and now assistant professor at UVU. He chose to
+                    stay in education and give back.
                   </p>
                   <p>
-                    Dr. Memari holds a Ph.D. in Computer Science from Southern
-                    Illinois University and brings 10+ years of expertise in
-                    AI/ML, LLMs, data systems, and software architecture. He
-                    serves as an AI Consultant for the University of Utah&apos;s
-                    One-U Responsible AI Initiative and is a certified NVIDIA Deep
-                    Learning Institute instructor.
+                    Dr. Memari recruits student interns and leads them through real-world AI
+                    work—government data systems, EdTech, drone imaging, synthetic data—at no
+                    cost to them. He believes the best way to learn AI is to build AI that
+                    matters. He designs courses that bridge academia and industry, takes students
+                    to Silicon Slopes, and connects them with Utah&apos;s tech ecosystem before
+                    they graduate.
+                  </p>
+                  <p>
+                    He gives back through free NVIDIA DLI workshops,{" "}
+                    <a
+                      href="https://rai.utah.edu/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sky-600 dark:text-sky-400 hover:underline"
+                    >
+                      One-U Responsible AI
+                    </a>{" "}
+                    policy advising at the University of Utah, and public-sector AI architecture
+                    for Utah agencies—while mentoring the next generation across industrial
+                    engineering, business, healthcare analytics (e.g. Potentia Analytics),
+                    multimodal ML with Stanford/JHU/UPenn, HPC, and public policy.
                   </p>
                   <p>
                     As technical lead of a{" "}
-                    <strong className="text-zinc-800 dark:text-zinc-200">$1 M research initiative</strong>{" "}
+                    <strong className="text-zinc-800 dark:text-zinc-200">$1M research initiative</strong>{" "}
                     funded by the{" "}
                     <a
                       href="https://ushe.edu/"
@@ -842,16 +1059,11 @@ export function HomePageContent() {
                     >
                       Utah System of Higher Education (USHE)
                     </a>
-                    , Dr. Memari designed real-time drone imaging systems for
-                    wind-turbine maintenance during his postdoctoral research —
-                    calibrating drones for accurate 3D reconstruction, applying
-                    RGB and thermal imaging for blade defect detection, and
-                    publishing industry-relevant findings.
-                  </p>
-                  <p>
-                    Prior collaborations include Stanford, Johns Hopkins, UPenn,
-                    and state agencies including Utah&apos;s Office of Data
-                    Privacy and Department of Health &amp; Human Services.
+                    , he designed real-time drone imaging for wind-turbine maintenance—RGB and
+                    thermal imaging, 3D reconstruction, and published industry-relevant results.
+                    Collaborations include Stanford, Johns Hopkins, UPenn, and Utah state
+                    agencies including the Office of Data Privacy and Department of Health
+                    &amp; Human Services.
                   </p>
                 </div>
               </div>
@@ -861,6 +1073,10 @@ export function HomePageContent() {
               <div className="space-y-4">
                 {[
                   {
+                    big: "~20 yrs",
+                    sub: "In academia — since 2006 (engineering → MBA → CS → PhD → faculty)",
+                  },
+                  {
                     big: "Ph.D.",
                     sub: "Computer Science — Southern Illinois University",
                   },
@@ -869,7 +1085,7 @@ export function HomePageContent() {
                     sub: "Ambassador & DLI Certified Instructor",
                   },
                   { big: "$1M", sub: "USHE-funded drone AI research — technical lead" },
-                  { big: "10+", sub: "Years in AI, ML & software engineering" },
+                  { big: "10+", sub: "Years in applied AI, ML & software engineering" },
                   {
                     big: "Utah",
                     sub: "Based in Salt Lake City — serving clients nationwide",
