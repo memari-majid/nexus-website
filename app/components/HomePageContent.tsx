@@ -946,14 +946,14 @@ export function HomePageContent() {
                 href="https://siliconslopes.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative block h-9 w-40 shrink-0 sm:h-10 sm:w-44"
+                className="relative block h-24 w-24 shrink-0 sm:h-32 sm:w-32"
               >
                 <Image
                   src="/logos/siliconslopes.png"
                   alt="Silicon Slopes — Utah tech community"
                   fill
-                  sizes="176px"
-                  className="object-contain object-left"
+                  sizes="(max-width: 640px) 96px, 128px"
+                  className="object-contain object-center"
                 />
               </a>
               <div className="min-w-0">
