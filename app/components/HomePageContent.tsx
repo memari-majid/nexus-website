@@ -100,6 +100,22 @@ const PROJECTS = [
     icon: "ledger",
   },
   {
+    title: "DataGovAI",
+    tagline: "Utah data governance & public-sector AI",
+    description:
+      "We lead state-level collaborations with the Utah Office of Data Privacy and the Utah Department of Health and Human Services to apply AI in data governance and privacy management. These initiatives improve compliance efficiency, reduce manual review time, and expand secure access to data for research and policy innovation—while strengthening transparency and public trust.",
+    icon: "gov",
+    requestAccess: true,
+  },
+  {
+    title: "Synthetic Data Pipeline",
+    tagline: "Privacy-preserving data for AI & research",
+    description:
+      "Synthetic and governed data pipelines that support training, evaluation, and policy exploration without exposing raw sensitive records—part of helping Utah build a modern, privacy-preserving data infrastructure that enables responsible AI use across government systems.",
+    icon: "pipeline",
+    requestAccess: true,
+  },
+  {
     title: "Custom AI Solutions",
     tagline: "Built for your domain",
     description:
@@ -224,6 +240,24 @@ function ProjectIcon({ kind }: { kind: string }) {
     ledger: (
       <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+      </svg>
+    ),
+    gov: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 21h19.5m-18-18v18m2.25-18v18m9-13.5V3m-9 6.75h6.75m-6.75 3h6.75m-9 0H9m9-3h.375v9.375c0 .621-.504 1.125-1.125 1.125H18.75v-9.375m0 0H21.75m-2.25 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75h-6.75m-6.75 0 12.75H9"
+        />
+      </svg>
+    ),
+    pipeline: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M16.5 6v.75m0 3v.75m0 3v.75m0 3v.75m-9-9v.75m0 3v.75m0 3v.75m0 3v.75m-9-9v.75m0 3v.75m0 3v.75m0 3v.75M3.375 6h17.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125H3.375A1.125 1.125 0 0 1 2.25 16.875v-9.75c0-.621.504-1.125 1.125-1.125Z"
+        />
       </svg>
     ),
   };
@@ -416,8 +450,8 @@ export function HomePageContent() {
               Where We Build
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-center text-zinc-600 dark:text-zinc-500">
-              Representative initiatives across education, simulation,
-              automation, and custom AI.
+              Representative initiatives across education, simulation, automation,
+              public-sector data, and custom AI.
             </p>
           </Reveal>
           <div className="mt-14 grid auto-rows-fr gap-6 sm:grid-cols-2">
@@ -436,6 +470,14 @@ export function HomePageContent() {
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
                     {p.description}
                   </p>
+                  {"requestAccess" in p && p.requestAccess ? (
+                    <Link
+                      href="#contact"
+                      className="mt-4 inline-flex text-sm font-semibold text-sky-600 transition hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300"
+                    >
+                      Request access or demo →
+                    </Link>
+                  ) : null}
                 </div>
               </Reveal>
             ))}
