@@ -20,14 +20,14 @@ import { IT_SERVICES } from "@/app/components/home/services-data";
 /* ------------------------------------------------------------------ */
 
 const PARTNER_LOGOS = [
-  { name: "Silicon Slopes", src: "/logos/partners/silicon-slopes.svg" },
-  { name: "Stanford University", src: "/logos/partners/stanford.svg" },
-  { name: "Johns Hopkins University", src: "/logos/partners/johns-hopkins.svg" },
-  { name: "University of Pennsylvania", src: "/logos/partners/upenn.svg" },
+  { name: "Silicon Slopes", src: "/logos/partners/silicon-slopes.png" },
+  { name: "Stanford University", src: "/logos/partners/stanford.png" },
+  { name: "Johns Hopkins University", src: "/logos/partners/johns-hopkins.png" },
+  { name: "University of Pennsylvania", src: "/logos/partners/upenn.png" },
   { name: "Utah System of Higher Education", src: "/logos/partners/ushe.svg" },
-  { name: "Utah Office of Data Privacy", src: "/logos/partners/utah-privacy.svg" },
-  { name: "Utah Department of Health and Human Services", src: "/logos/partners/utah-dhhs.svg" },
-  { name: "University of Utah", src: "/logos/partners/uofu.svg" },
+  { name: "Utah Office of Data Privacy", src: "/logos/partners/utah-privacy.png" },
+  { name: "Utah Department of Health and Human Services", src: "/logos/partners/utah-dhhs.png" },
+  { name: "University of Utah", src: "/logos/partners/uofu.png" },
 ];
 
 const STATS = [
@@ -343,8 +343,8 @@ export function HomePageContent() {
       <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-6 py-14 sm:py-16">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="mb-8 text-center text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-500">
-              Collaborations & institutions
+            <p className="mb-8 text-center text-sm font-semibold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300 sm:text-base">
+              Collaborations &amp; institutions
             </p>
             <PartnerLogoStrip items={PARTNER_LOGOS} />
           </Reveal>
