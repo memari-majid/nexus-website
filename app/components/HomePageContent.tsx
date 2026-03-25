@@ -397,7 +397,7 @@ export function HomePageContent() {
             src="/nexus-banner.png"
             alt=""
             fill
-            className="object-cover object-center opacity-15"
+            className="object-cover object-center opacity-15 dark:opacity-20"
             priority
             sizes="100vw"
           />
@@ -1002,6 +1002,10 @@ export function HomePageContent() {
                     fill
                     className="rounded-full object-cover object-top ring-1 ring-zinc-200 dark:ring-zinc-700"
                     sizes="160px"
+                  />
+                  <div
+                    className="pointer-events-none absolute -inset-2 animate-[pulse-glow_6s_ease-in-out_infinite] rounded-full border border-zinc-300/20 dark:border-zinc-600/20"
+                    aria-hidden
                   />
                 </div>
                 <div className="space-y-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
