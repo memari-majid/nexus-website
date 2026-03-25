@@ -98,6 +98,20 @@ const PROJECTS = [
     icon: "drone",
   },
   {
+    title: "Personal AI Money Companion",
+    tagline: "Habits, privacy, and support",
+    description:
+      "A personalized AI that builds a private knowledge base from spending and check-ins—serving as a copilot for people strengthening money habits, including compulsive spending and related behavioral challenges.",
+    icon: "wallet",
+  },
+  {
+    title: "AI CPA",
+    tagline: "Intelligent accounting assistance",
+    description:
+      "An AI-powered CPA-style assistant for bookkeeping workflows, tax-aware questions, and financial organization—built for clarity; professional advice where licensing applies.",
+    icon: "ledger",
+  },
+  {
     title: "Custom AI Solutions",
     tagline: "Built for your domain",
     description:
@@ -214,6 +228,16 @@ function ProjectIcon({ kind }: { kind: string }) {
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 12h.01M18 12h.01M6 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm16 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM6.34 12H9m6 0h2.66M12 12V9m0 6v-3m0-3a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm0 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
       </svg>
     ),
+    wallet: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 3V9m0 3a2.25 2.25 0 0 1-2.25 2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 1 3 12V9m0 3a2.25 2.25 0 0 1 2.25-2.25H6.75a3 3 0 1 0 6 0h2.25A2.25 2.25 0 0 1 18 9v3" />
+      </svg>
+    ),
+    ledger: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+      </svg>
+    ),
   };
   return <span className="text-sky-600 dark:text-sky-400">{map[kind] ?? map.spark}</span>;
 }
@@ -271,6 +295,11 @@ export function HomePageContent() {
               AI-powered IT consulting led by an NVIDIA Ambassador &amp; Principal AI
               Architect. We turn advanced AI concepts into practical, real-world
               solutions for your business.
+            </p>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-zinc-600 dark:text-zinc-500 leading-relaxed">
+              In general, our solutions can be personalized—tutoring, consulting,
+              companionship—and automated or integrated into larger systems, together
+              with the other AI capabilities we deliver.
             </p>
           </Reveal>
           <Reveal delay={300}>
