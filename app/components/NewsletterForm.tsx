@@ -26,11 +26,11 @@ export function NewsletterForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@company.com"
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs text-zinc-900 placeholder-zinc-500 outline-none transition focus:border-sky-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200 dark:placeholder-zinc-600"
+        className="w-full min-h-[44px] rounded-lg border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 placeholder-zinc-500 outline-none transition focus:border-sky-600 sm:min-h-0 sm:text-xs dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200 dark:placeholder-zinc-600"
       />
       <button
         type="submit"
-        className="shrink-0 rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
+        className="min-h-[44px] shrink-0 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 sm:min-h-0 sm:px-3 sm:text-xs"
       >
         Join
       </button>

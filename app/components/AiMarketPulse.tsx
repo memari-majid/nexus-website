@@ -177,7 +177,7 @@ export function AiMarketPulse({ variant = "section" }: AiMarketPulseProps) {
         )}
 
         {data && (
-          <p className="mt-6 text-center text-[11px] text-zinc-500 dark:text-zinc-600">
+          <p className="mt-6 break-words px-1 text-center text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-600">
             Informative only—not investment advice. Data via public market feeds; timing
             and delays can vary by exchange. Last fetch:{" "}
             <time dateTime={new Date(data.updatedAt).toISOString()}>

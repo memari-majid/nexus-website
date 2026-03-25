@@ -7,6 +7,8 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* Anchor links (#contact, etc.) land below fixed nav + notch */
+    scroll-padding-top: max(5.5rem, calc(env(safe-area-inset-top) + 3.5rem));
   }
   body {
     overflow-wrap: break-word;

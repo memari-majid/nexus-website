@@ -56,7 +56,7 @@ export function FaqAccordion() {
               </svg>
             </button>
             <div
-              className={`overflow-hidden transition-all duration-300 ${isOpen ? "max-h-60 pb-5" : "max-h-0"}`}
+              className={`overflow-hidden transition-all duration-300 ${isOpen ? "max-h-[min(28rem,70vh)] pb-5" : "max-h-0"}`}
             >
               <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{faq.a}</p>
             </div>

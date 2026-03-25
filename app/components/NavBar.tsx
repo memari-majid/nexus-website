@@ -25,7 +25,7 @@ export function NavBar() {
 
   return (
     <nav
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)] transition-all duration-300 ${
         scrolled
           ? "border-b border-zinc-200/80 bg-white/90 shadow-lg shadow-zinc-900/5 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/90 dark:shadow-black/20"
           : "bg-transparent"
@@ -86,7 +86,7 @@ export function NavBar() {
       </div>
 
       {menuOpen && (
-        <div className="max-h-[70vh] space-y-3 overflow-y-auto border-t border-zinc-200/80 bg-white/95 px-4 pb-4 pt-2 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/95 xl:hidden">
+        <div className="max-h-[min(70vh,calc(100dvh-env(safe-area-inset-top)-5rem))] space-y-3 overflow-y-auto border-t border-zinc-200/80 bg-white/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/95 xl:hidden">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}

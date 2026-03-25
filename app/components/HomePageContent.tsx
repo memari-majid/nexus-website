@@ -389,7 +389,7 @@ export function HomePageContent() {
       {/* ============== HERO ============== */}
       <section
         id="top"
-        className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 sm:min-h-[92vh] sm:px-6"
+        className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4 pb-16 pt-[calc(5.5rem+env(safe-area-inset-top))] sm:min-h-[92vh] sm:px-6 sm:pb-20 sm:pt-[calc(6rem+env(safe-area-inset-top))]"
       >
         {/* Background layers */}
         <div className="pointer-events-none absolute inset-0">
@@ -432,8 +432,8 @@ export function HomePageContent() {
               </a>
             </div>
           </Reveal>
-          <Reveal delay={360}>
-            <div className="mx-auto mt-20 grid max-w-3xl grid-cols-2 gap-10 border-t border-zinc-200/80 pt-16 dark:border-zinc-800/60 sm:grid-cols-4 sm:gap-6">
+            <Reveal delay={360}>
+            <div className="mx-auto mt-16 grid max-w-3xl grid-cols-2 gap-x-4 gap-y-8 border-t border-zinc-200/80 pt-12 dark:border-zinc-800/60 sm:mt-20 sm:grid-cols-4 sm:gap-6 sm:pt-16">
               {STATS.map((s) => (
                 <div key={s.label} className="text-center">
                   <p className="text-3xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50 sm:text-4xl">
@@ -556,13 +556,14 @@ export function HomePageContent() {
 
             <Reveal delay={80}>
               <div className="mt-12 overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-5 [-webkit-overflow-scrolling:touch]">
-                <div className="min-w-[min(985px,100%)]">
+                <div className="inline-block min-w-0 w-full max-w-full sm:inline-block">
                   <Image
                     src="/workflow.svg"
                     alt="Agentic AI workflow automation diagram built with n8n — showing connected nodes for form handling, conditional logic, AI processing, and multi-step orchestration"
                     width={985}
                     height={700}
-                    className="h-auto w-[985px] max-w-none rounded-lg sm:w-full sm:max-w-full"
+                    sizes="(max-width: 640px) 100vw, 985px"
+                    className="h-auto w-full max-w-full rounded-lg sm:w-full"
                   />
                 </div>
               </div>
@@ -1287,7 +1288,7 @@ export function HomePageContent() {
             </div>
           </div>
 
-          <div className="mt-14 flex flex-col items-center gap-4 border-t border-zinc-200/80 pt-8 dark:border-zinc-800/40 sm:flex-row sm:justify-between">
+          <div className="mt-14 flex flex-col items-center gap-4 border-t border-zinc-200/80 pt-8 text-center dark:border-zinc-800/40 sm:flex-row sm:justify-between sm:text-left">
             <div className="flex gap-4">
               {[
                 {
