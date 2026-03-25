@@ -224,6 +224,9 @@ const COMMUNITY_ROLES = [
   },
 ] as const;
 
+const DATA_GOV_SUMMIT_REGISTER = "https://lnkd.in/gRzWnGA3";
+const NVIDIA_TRAINING_URL = "https://www.nvidia.com/en-us/training/";
+
 /* ------------------------------------------------------------------ */
 /*  Icons                                                              */
 /* ------------------------------------------------------------------ */
@@ -817,6 +820,66 @@ export function HomePageContent() {
               shows up where policy, education, and industry meet—so the next generation
               ships AI that matters.
             </p>
+          </Reveal>
+          <Reveal delay={60}>
+            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+              <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/90 p-6 dark:border-emerald-900/50 dark:bg-emerald-950/25">
+                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+                  Upcoming · Data governance
+                </p>
+                <h3 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                  Data Governance Summit 2026
+                </h3>
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Utah Valley University</p>
+                <p className="mt-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-400">
+                  Dr. Memari will be at the summit as one of the AI architects behind{" "}
+                  <strong className="text-zinc-900 dark:text-zinc-100">DataGovAI</strong>, which
+                  will be presented at the event. He looks forward to sharing how AI can help turn
+                  data governance from policy into practice—spanning data governance, privacy,
+                  responsible AI, and digital transformation in the public sector.
+                </p>
+                <a
+                  href={DATA_GOV_SUMMIT_REGISTER}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+                >
+                  Register for the summit
+                </a>
+              </div>
+              <div className="rounded-2xl border border-sky-200/90 bg-white p-6 dark:border-sky-900/40 dark:bg-zinc-900/50">
+                <p className="text-xs font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                  Free on campus · NVIDIA DLI
+                </p>
+                <h3 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                  Hands-on AI workshops for students &amp; faculty
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-400">
+                  As an NVIDIA Deep Learning Institute Certified Instructor, Dr. Memari hosts free
+                  workshops at universities such as UVU—covering LLMs, generative AI, and agentic
+                  AI—with the option to earn an NVIDIA certificate. Similar public online DLI-style
+                  workshops often run about{" "}
+                  <strong className="text-zinc-900 dark:text-zinc-200">$500</strong>; on-campus
+                  sessions are offered at no charge to participants.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <a
+                    href="#workshops"
+                    className="inline-flex rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 dark:shadow-sky-900/30"
+                  >
+                    Workshop details
+                  </a>
+                  <a
+                    href={NVIDIA_TRAINING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex rounded-xl border border-zinc-300 px-5 py-2.5 text-sm font-semibold text-zinc-800 transition hover:border-sky-500 hover:text-sky-700 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-sky-500"
+                  >
+                    More at NVIDIA Training
+                  </a>
+                </div>
+              </div>
+            </div>
           </Reveal>
           <div className="mt-14 grid gap-6 sm:grid-cols-2">
             {COMMUNITY_ROLES.map((r, i) => (
