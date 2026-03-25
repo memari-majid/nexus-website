@@ -398,7 +398,7 @@ export function HomePageContent() {
 
         <ParticleNetwork />
 
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
+        <div className="relative z-10 mx-auto min-w-0 max-w-3xl px-1 text-center sm:px-0">
           <Reveal>
             <p className="mb-4 inline-block rounded-full border border-sky-300 dark:border-sky-800/40 bg-sky-50 dark:bg-sky-950/30 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400">
               Nexus AI Solutions LLC
@@ -426,13 +426,13 @@ export function HomePageContent() {
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
                 href="#contact"
-                className="group relative rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:shadow-sky-800/40 hover:scale-105 dark:shadow-sky-900/30"
+                className="group relative rounded-xl bg-sky-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:shadow-sky-800/40 hover:scale-105 dark:shadow-sky-900/30"
               >
                 Get in Touch
               </a>
               <a
                 href="#services"
-                className="rounded-xl border border-zinc-300 dark:border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-900 hover:scale-105 dark:hover:text-white"
+                className="rounded-xl border border-zinc-300 dark:border-zinc-700 px-4 sm:px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-900 hover:scale-105 dark:hover:text-white"
               >
                 Our Services ↓
               </a>
@@ -444,7 +444,7 @@ export function HomePageContent() {
       <AiInsightsTicker />
 
       {/* ============== STATS ============== */}
-      <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-6 py-14">
+      <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-14">
         <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 sm:grid-cols-4">
           {STATS.map((s, i) => (
             <Reveal key={s.label} delay={i * 80}>
@@ -460,7 +460,7 @@ export function HomePageContent() {
       </section>
 
       {/* ============== IT SERVICES ============== */}
-      <section id="services" className="scroll-mt-20 px-6 py-24">
+      <section id="services" className="scroll-mt-20 px-4 sm:px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="text-center text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2">
@@ -495,7 +495,7 @@ export function HomePageContent() {
       {/* ============== AI SERVICES ============== */}
       <section
         id="ai-services"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24 relative overflow-hidden"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden"
       >
         <div className="pointer-events-none absolute -top-40 right-0 h-80 w-80 rounded-full bg-indigo-200/30 dark:bg-indigo-600/5 blur-3xl" aria-hidden="true" />
         <div className="mx-auto max-w-6xl relative z-10">
@@ -537,7 +537,7 @@ export function HomePageContent() {
       {/* ============== PROJECTS ============== */}
       <section
         id="projects"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-6xl">
           <Reveal>
@@ -586,7 +586,7 @@ export function HomePageContent() {
       {/* ============== AGENTIC WORKFLOWS ============== */}
       <section
         id="workflows"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24 relative overflow-hidden"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden"
       >
         <div className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-full bg-sky-200/40 dark:bg-sky-600/5 blur-3xl" aria-hidden="true" />
         <div className="mx-auto max-w-6xl relative z-10">
@@ -673,7 +673,7 @@ export function HomePageContent() {
             <div className="mt-10 text-center">
               <a
                 href="#contact"
-                className="inline-flex rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:scale-105 dark:shadow-sky-900/30"
+                className="inline-flex rounded-xl bg-sky-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:scale-105 dark:shadow-sky-900/30"
               >
                 Automate Your Operations
               </a>
@@ -689,7 +689,7 @@ export function HomePageContent() {
       {/* ============== TRY OUR AI ============== */}
       <section
         id="try-ai"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24 relative overflow-hidden"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden"
       >
         <div className="pointer-events-none absolute -bottom-40 left-0 h-80 w-80 rounded-full bg-sky-200/40 dark:bg-sky-600/5 blur-3xl" aria-hidden="true" />
         <div className="mx-auto max-w-6xl relative z-10">
@@ -711,7 +711,7 @@ export function HomePageContent() {
       </section>
 
       {/* ============== COLLABORATION HIGHLIGHTS ============== */}
-      <section className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24 relative overflow-hidden">
+      <section className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24 relative overflow-hidden">
         <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-sky-100/60 dark:bg-sky-500/5 blur-3xl" aria-hidden="true" />
         <div className="mx-auto max-w-6xl relative z-10">
           <Reveal>
@@ -731,7 +731,7 @@ export function HomePageContent() {
       {/* ============== WORKSHOPS ============== */}
       <section
         id="workshops"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-6xl">
           <Reveal>
@@ -789,7 +789,7 @@ export function HomePageContent() {
             <div className="mt-8 flex flex-col items-center gap-2">
               <a
                 href="#contact"
-                className="rounded-xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:scale-105 dark:shadow-sky-900/30"
+                className="rounded-xl bg-sky-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/20 transition hover:bg-sky-500 hover:scale-105 dark:shadow-sky-900/30"
               >
                 Invite Dr. Memari to Your Campus
               </a>
@@ -805,7 +805,7 @@ export function HomePageContent() {
       {/* ============== COMMUNITY & LEADERSHIP ============== */}
       <section
         id="community"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-6xl">
           <Reveal>
@@ -901,7 +901,7 @@ export function HomePageContent() {
             ))}
           </div>
           <Reveal delay={200}>
-            <div className="mt-12 rounded-2xl border border-sky-200/80 bg-sky-50/80 px-6 py-8 dark:border-sky-900/40 dark:bg-sky-950/20">
+            <div className="mt-12 rounded-2xl border border-sky-200/80 bg-sky-50/80 px-4 sm:px-6 py-8 dark:border-sky-900/40 dark:bg-sky-950/20">
               <p className="text-xs font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                 Bridging academia &amp; industry
               </p>
@@ -963,7 +963,7 @@ export function HomePageContent() {
       {/* ============== GOVERNMENT ============== */}
       <section
         id="government"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-6xl">
           <Reveal>
@@ -1015,7 +1015,7 @@ export function HomePageContent() {
             <div className="mt-10 text-center">
               <a
                 href="#contact"
-                className="inline-flex rounded-xl border border-sky-300 dark:border-sky-800/50 bg-sky-50 dark:bg-sky-950/30 px-6 py-3 text-sm font-semibold text-sky-700 dark:text-sky-300 transition hover:bg-sky-200/50 dark:bg-sky-900/40 hover:scale-105"
+                className="inline-flex rounded-xl border border-sky-300 dark:border-sky-800/50 bg-sky-50 dark:bg-sky-950/30 px-4 sm:px-6 py-3 text-sm font-semibold text-sky-700 dark:text-sky-300 transition hover:bg-sky-200/50 dark:bg-sky-900/40 hover:scale-105"
               >
                 Bring AI to Your Agency
               </a>
@@ -1029,7 +1029,7 @@ export function HomePageContent() {
       </section>
 
       {/* ============== TECH STACK ============== */}
-      <section className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-16">
+      <section className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-16">
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="mb-6 text-center text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-500">
@@ -1043,7 +1043,7 @@ export function HomePageContent() {
       {/* ============== ABOUT ============== */}
       <section
         id="about"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-4xl">
           <Reveal>
@@ -1173,7 +1173,7 @@ export function HomePageContent() {
       {/* ============== CAREERS ============== */}
       <section
         id="careers"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-4xl">
           <Reveal>
@@ -1248,7 +1248,7 @@ export function HomePageContent() {
       {/* ============== FAQ ============== */}
       <section
         id="faq"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-6xl">
           <Reveal>
@@ -1268,7 +1268,7 @@ export function HomePageContent() {
       {/* ============== CONTACT ============== */}
       <section
         id="contact"
-        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 py-24"
+        className="scroll-mt-20 border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-24"
       >
         <div className="mx-auto max-w-4xl">
           <Reveal>
@@ -1354,7 +1354,7 @@ export function HomePageContent() {
       </section>
 
       {/* ============== FOOTER ============== */}
-      <footer className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-6 pt-16 pb-10">
+      <footer className="border-t border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 pt-16 pb-10">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Brand */}

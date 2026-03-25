@@ -58,7 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="overflow-x-hidden antialiased">
+      <body className="min-w-0 overflow-x-hidden antialiased">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

@@ -46,7 +46,7 @@ export function AiInsightsTicker() {
         <span className="shrink-0 rounded-full border border-sky-300 bg-sky-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-sky-700 dark:border-sky-800/50 dark:bg-sky-950/40 dark:text-sky-400">
           AI insight
         </span>
-        <p className="min-h-[3rem] text-center text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:min-h-0 sm:text-left">
+        <p className="min-h-[3rem] w-full min-w-0 max-w-full break-words text-center text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:min-h-0 sm:text-left">
           <span className="text-zinc-800 dark:text-zinc-200">{display}</span>
           <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-sky-500 align-middle" aria-hidden />
         </p>

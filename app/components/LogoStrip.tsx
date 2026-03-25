@@ -26,7 +26,7 @@ export function LogoStrip({
       {items.map((item) => (
         <div
           key={item.name}
-          className="flex min-h-[52px] min-w-[120px] max-w-[200px] flex-1 items-center justify-center px-3 sm:min-h-[60px] sm:min-w-[140px] sm:max-w-[220px]"
+          className="flex min-h-[52px] min-w-0 max-w-[min(100%,220px)] flex-1 items-center justify-center px-2 sm:min-h-[60px] sm:min-w-[120px] sm:px-3"
           title={item.name}
         >
           <Image

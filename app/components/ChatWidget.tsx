@@ -132,9 +132,9 @@ export function ChatWidget() {
           aria-modal="true"
           aria-labelledby="chat-title"
         >
-          <div className="flex h-full w-full max-w-none flex-col rounded-none border-0 border-zinc-200 bg-white shadow-2xl sm:h-[min(560px,85vh)] sm:max-w-md sm:rounded-2xl sm:border sm:border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-              <div>
+          <div className="flex h-full w-full min-w-0 max-w-[100vw] flex-col rounded-none border-0 border-zinc-200 bg-white shadow-2xl sm:h-[min(560px,85vh)] sm:max-w-md sm:rounded-2xl sm:border sm:border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="flex min-w-0 items-center justify-between gap-2 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
+              <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 id="chat-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                     Nexus AI Assistant
