@@ -1316,8 +1316,7 @@ export function HomePageContent() {
               ))}
             </div>
             <p className="text-xs text-zinc-600">
-              © {year} Nexus AI Solutions LLC · Sandy, Utah · Registered in the
-              State of Utah
+              © {year} Nexus AI Solutions LLC · Utah
             </p>
           </div>
         </div>
