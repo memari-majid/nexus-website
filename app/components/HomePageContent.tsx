@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AiInsightsTicker } from "@/app/components/AiInsightsTicker";
+import { AiMarketPulse } from "@/app/components/AiMarketPulse";
 import { AiChatbotShowcase } from "@/app/components/AiChatbotShowcase";
 import { AnimatedCounter } from "@/app/components/AnimatedCounter";
 import { ContactForm } from "@/app/components/ContactForm";
@@ -169,6 +170,7 @@ const TECH_LOGOS = [
 
 const FOOTER_LINKS = [
   { label: "Services", href: "#services" },
+  { label: "AI market", href: "#ai-market" },
   { label: "AI & ML", href: "#ai-services" },
   { label: "Projects", href: "#projects" },
   { label: "Try AI", href: "#try-ai" },
@@ -442,6 +444,8 @@ export function HomePageContent() {
       </section>
 
       <AiInsightsTicker />
+
+      <AiMarketPulse />
 
       {/* ============== STATS ============== */}
       <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-4 sm:px-6 py-14">
