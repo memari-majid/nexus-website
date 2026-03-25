@@ -941,20 +941,24 @@ export function HomePageContent() {
             </div>
           </Reveal>
           <Reveal delay={280}>
-            <div className="mt-10 flex flex-col gap-4 rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-5 py-4 dark:border-zinc-800/60 dark:bg-zinc-900/40 sm:flex-row sm:items-start sm:gap-5">
+            <div className="mt-10 flex flex-col gap-4 rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-5 py-4 dark:border-zinc-800/60 dark:bg-zinc-900/40 sm:flex-row sm:items-center sm:gap-5">
               <a
                 href="https://siliconslopes.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative block h-24 w-24 shrink-0 sm:h-32 sm:w-32"
+                className="relative block h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900 shadow-sm dark:border-zinc-200 dark:bg-white sm:h-32 sm:w-32"
               >
-                <Image
-                  src="/logos/siliconslopes.png"
-                  alt="Silicon Slopes — Utah tech community"
-                  fill
-                  sizes="(max-width: 640px) 96px, 128px"
-                  className="object-contain object-center"
-                />
+                <span className="absolute inset-2 block">
+                  <span className="relative block h-full w-full">
+                    <Image
+                      src="/logos/siliconslopes.png"
+                      alt="Silicon Slopes — Utah tech community"
+                      fill
+                      sizes="(max-width: 640px) 96px, 128px"
+                      className="object-contain object-center"
+                    />
+                  </span>
+                </span>
               </a>
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
