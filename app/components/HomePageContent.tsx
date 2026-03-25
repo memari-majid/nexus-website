@@ -1229,7 +1229,7 @@ export function HomePageContent() {
           <Reveal delay={100}>
             <div className="glass-card mt-10 rounded-2xl p-8">
               <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-                AI Engineering Intern
+                AI Engineering Internship
               </h3>
               <p className="mt-1 text-sm text-sky-600 dark:text-sky-400">
                 Fully online
@@ -1260,7 +1260,7 @@ export function HomePageContent() {
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href="mailto:info@nexusaisolution.net?subject=AI%20Engineering%20Intern%20Inquiry"
+                  href="mailto:info@nexusaisolution.net?subject=AI%20Engineering%20Internship%20Inquiry"
                   className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-500 transition hover:scale-105"
                 >
                   Reach out
