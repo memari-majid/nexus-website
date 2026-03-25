@@ -17,7 +17,7 @@ Live at [nexusaisolution.net](https://nexusaisolution.net)
 - **Dark/light:** `next-themes` with Tailwind v4 class-based `dark:` (toggle in the nav). Default theme is dark.
 - **Mobile:** Hero height, full-screen chat on small viewports, horizontal scroll for the workflow diagram, stacked footer newsletter, `overflow-x-hidden` on the shell.
 
-Partner and tech logos live under `public/logos/` (see `PartnerLogoStrip` / `LogoStrip`).
+Partner and tech logos live under `public/logos/` (see `LogoStrip`).
 
 ## Development
 

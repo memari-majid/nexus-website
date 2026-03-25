@@ -8,10 +8,11 @@ export const maxDuration = 30;
 
 const DEMO_MODEL = process.env.DEMO_AI_MODEL ?? "gpt-4o-mini";
 
-const sentimentSchema = z.object({
-  label: z.enum(["positive", "neutral", "negative"]),
-  confidence: z.number().min(0).max(1),
-  brief: z.string().max(280),
+const signalSchema = z.object({
+  intent: z.string().max(220),
+  register: z.enum(["collaborative", "neutral", "tense", "enthusiastic", "guarded"]),
+  subtext: z.string().max(320),
+  suggestedOpening: z.string().max(300),
 });
 
 export async function POST(req: Request) {
@@ -40,15 +41,21 @@ export async function POST(req: Request) {
   try {
     const { object } = await generateObject({
       model: openai(DEMO_MODEL),
-      schema: sentimentSchema,
-      prompt: `Classify the sentiment of this short text for a business audience. Be calibrated: marketing copy may be positive without being over-the-top.
+      schema: signalSchema,
+      system: `You read short messages the way a seasoned stakeholder would: intent, emotional register, and what is left unsaid.
 
-Text: """${text.replace(/"/g, "'")}"""`,
+Rules:
+- intent: what they are actually trying to accomplish in one crisp phrase (not "they want to communicate").
+- register: pick the single best fit for tone/stance.
+- subtext: one or two sentences on implications, risk, or unspoken pressure—no moralizing.
+- suggestedOpening: one reply opener (not a full email) that matches their register and advances the conversation—specific and human, not corporate filler.
+- Marketing or upbeat copy can be "enthusiastic" without being naive; calibrate honestly.`,
+      prompt: `Message:\n"""${text.replace(/"/g, "'")}"""`,
     });
 
     return NextResponse.json(object);
   } catch (e) {
     console.error("[demo/sentiment]", e);
-    return NextResponse.json({ error: "Could not analyze sentiment. Try again." }, { status: 502 });
+    return NextResponse.json({ error: "Could not analyze signal. Try again." }, { status: 502 });
   }
 }

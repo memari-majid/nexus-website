@@ -12,7 +12,6 @@ import { ScrollToTop } from "@/app/components/ScrollToTop";
 import { CollaborationHighlights } from "@/app/components/Testimonials";
 import { LogoStrip } from "@/app/components/LogoStrip";
 import { NewsletterForm } from "@/app/components/NewsletterForm";
-import { PartnerLogoStrip } from "@/app/components/PartnerLogoStrip";
 import { IT_SERVICES } from "@/app/components/home/services-data";
 
 /* ------------------------------------------------------------------ */
@@ -31,7 +30,7 @@ const PARTNER_LOGOS = [
 ];
 
 const STATS = [
-  { value: 200, suffix: "+", label: "GitHub Projects" },
+  { value: 200, suffix: "+", label: "Projects" },
   { value: 10, suffix: "+", label: "Funded Projects Led" },
   { value: 50, suffix: "+", label: "Students Mentored" },
   { value: 10, suffix: "+", label: "AI Courses & Workshops" },
@@ -343,10 +342,10 @@ export function HomePageContent() {
       <section className="border-b border-zinc-200/80 dark:border-zinc-800/40 px-6 py-14 sm:py-16">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="mb-8 text-center text-sm font-semibold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300 sm:text-base">
+            <p className="mb-6 text-center text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-500">
               Collaborations &amp; institutions
             </p>
-            <PartnerLogoStrip items={PARTNER_LOGOS} />
+            <LogoStrip items={PARTNER_LOGOS} variant="color" />
           </Reveal>
         </div>
       </section>
@@ -585,9 +584,9 @@ export function HomePageContent() {
               Try Our AI
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-600 dark:text-zinc-500">
-              Quick, privacy-conscious demos powered by the same stack we use for
-              client work — see how we think about language understanding and
-              summarization.
+              Live demos on our stack — structured executive briefs and stakeholder
+              signal reads, not generic “ask ChatGPT” tasks. Each run is a one-off
+              request; we don&apos;t keep your text in this app.
             </p>
           </Reveal>
           <AiTryDemos />
