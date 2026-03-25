@@ -94,7 +94,7 @@ const PROJECTS = [
     title: "Drone AI & 3D Imaging",
     tagline: "$1M USHE-funded research",
     description:
-      "Real-time drone imaging for wind turbine maintenance — RGB and thermal cameras, calibrated 3D reconstruction, autonomous path planning, and defect detection. Technical lead during postdoctoral research, with published industry-relevant findings.",
+      "USHE-funded drone imaging for wind-turbine maintenance—RGB/thermal capture, 3D reconstruction, and path planning. Led as postdoc; published industry-relevant results.",
     icon: "drone",
   },
   {
@@ -444,20 +444,20 @@ export function HomePageContent() {
               automation, and custom AI.
             </p>
           </Reveal>
-          <div className="mt-14 grid gap-6 sm:grid-cols-2">
+          <div className="mt-14 grid auto-rows-fr gap-6 sm:grid-cols-2">
             {PROJECTS.map((p, i) => (
-              <Reveal key={p.title} delay={i * 80}>
-                <div className="glass-card glow-border group rounded-2xl p-6">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 transition group-hover:bg-sky-200/50 dark:bg-sky-900/40 group-hover:scale-110">
+              <Reveal key={p.title} delay={i * 80} className="h-full min-h-0">
+                <div className="glass-card glow-border group flex h-full min-h-[280px] flex-col rounded-2xl p-6 sm:min-h-[260px]">
+                  <div className="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-100/80 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 transition group-hover:bg-sky-200/50 dark:bg-sky-900/40 group-hover:scale-110">
                     <ProjectIcon kind={p.icon} />
                   </div>
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                     {p.title}
                   </h3>
-                  <p className="mt-1 text-sm font-medium text-sky-600 dark:text-sky-400">
+                  <p className="mt-1 shrink-0 text-sm font-medium text-sky-600 dark:text-sky-400">
                     {p.tagline}
                   </p>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
                     {p.description}
                   </p>
                 </div>
