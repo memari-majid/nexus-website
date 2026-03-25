@@ -1182,79 +1182,61 @@ export function HomePageContent() {
             </p>
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-4xl">Join Our Team</h2>
             <p className="mt-4 text-zinc-600 dark:text-zinc-500">
-              We&apos;re building practical AI solutions across EdTech,
-              simulation, agentic automation, and public-sector programs—and
-              we&apos;re hiring engineers who want to ship real impact.
+              We run multiple concurrent AI projects—EdTech, agentic automation,
+              public-sector data, and more—and we&apos;re always hiring interns who
+              want real-world experience, not just coursework.
             </p>
           </Reveal>
           <Reveal delay={100}>
             <div className="glass-card mt-10 rounded-2xl p-8">
               <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-                AI Engineer
+                AI Engineering Intern
               </h3>
               <p className="mt-1 text-sm text-sky-600 dark:text-sky-400">
-                Fully Remote
+                Fully online
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                If you want <strong className="text-zinc-800 dark:text-zinc-200">real-world AI engineering experience</strong>,
+                reach out—we always have multiple projects in flight and we hire
+                interns on a rolling basis. You&apos;ll work alongside Dr. Memari and
+                the team on production-minded tasks: LLMs and RAG, agentic workflows,
+                cloud integrations, and domain projects that ship.
               </p>
               <div className="mt-6 space-y-4 text-sm text-zinc-600 dark:text-zinc-400">
                 <div>
-                  <p className="font-medium text-zinc-700 dark:text-zinc-300">Responsibilities</p>
+                  <p className="font-medium text-zinc-700 dark:text-zinc-300">What you might do</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5">
-                    <li>
-                      Design and ship LLM-powered applications and evaluation
-                      pipelines
-                    </li>
-                    <li>
-                      Build agentic systems and integrations with cloud data
-                      services
-                    </li>
-                    <li>
-                      Collaborate on AI simulation, EdTech, and public-sector
-                      projects
-                    </li>
+                    <li>Contribute to LLM-powered apps, evaluation, and tooling</li>
+                    <li>Help build agentic systems and integrations with cloud data services</li>
+                    <li>Support EdTech, simulation, and public-sector initiatives with mentorship</li>
                   </ul>
                 </div>
                 <div>
-                  <p className="font-medium text-zinc-700 dark:text-zinc-300">Requirements</p>
+                  <p className="font-medium text-zinc-700 dark:text-zinc-300">What we look for</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5">
-                    <li>Strong Python; experience with LLMs, RAG, and APIs</li>
-                    <li>
-                      Familiarity with cloud (AWS/Azure/GCP) and solid ML
-                      fundamentals
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium text-zinc-700 dark:text-zinc-300">Nice to have</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5">
-                    <li>
-                      NVIDIA ecosystem (CUDA, RAPIDS, Jetson), multi-agent
-                      frameworks
-                    </li>
-                    <li>
-                      Research publications or open-source contributions
-                    </li>
+                    <li>Curiosity and follow-through; Python and interest in LLMs/APIs are a plus</li>
+                    <li>Willingness to learn—we pair you with concrete tasks and feedback</li>
                   </ul>
                 </div>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href="mailto:info@nexusaisolution.net?subject=AI%20Engineer%20Application"
+                  href="mailto:info@nexusaisolution.net?subject=AI%20Engineering%20Intern%20Inquiry"
                   className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-500 transition hover:scale-105"
                 >
-                  Apply Now
+                  Reach out
                 </a>
                 <a
                   href="#contact"
                   className="rounded-lg border border-zinc-300 dark:border-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 transition"
                 >
-                  Apply via contact form
+                  Contact form
                 </a>
               </div>
               <p className="mt-6 text-xs text-zinc-600">
-                Don&apos;t see your role? We&apos;re always interested in strong
-                builders—{" "}
+                Not sure if you&apos;re a fit? We still want to hear from you—{" "}
                 <a href="#contact" className="text-sky-600 dark:text-sky-400 hover:underline">
-                  reach out
+                  get in touch
                 </a>
                 .
               </p>
