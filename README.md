@@ -46,6 +46,19 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Without `RESEND_API_KEY`, contact submissions are logged on the server only—configure Resend for production email delivery.
 
+### Deploy (Vercel)
+
+Aligned with **Finance Hub** (`finhub`): same region (**`iad1`**) and explicit **`vercel-build`** in `package.json`.
+
+1. **Import** this Git repo into Vercel (or link an existing **nexus-website** project).
+2. **Root Directory:** leave **empty** (app lives at repo root — unlike `finhub`, which uses **`web/`**).
+3. **Framework:** Next.js (auto). **Build Command:** default uses **`npm run vercel-build`** → **`npm run build`**.
+4. **Environment variables:** Project → **Settings** → **Environment Variables** — set the table above for **Production** (and **Preview** if needed). Use **Shared Variable** on the team when the same value applies to multiple projects.
+5. **Domain:** **Settings** → **Domains** — attach **nexusaisolution.net** / **www** per your DNS.
+6. **CLI:** from **this repo root**, `npx vercel link` once, then `npx vercel deploy --prod` (same pattern as **ai-cpa**; **finhub** deploys from its monorepo root with Root Directory **`web`**).
+
+Cross-repo checklist: **`~/Downloads/finhub/docs/deploy/VERCEL_TEAM_PATTERN.md`**.
+
 ### Scripts
 
 - `npm run dev` — development server
