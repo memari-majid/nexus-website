@@ -71,6 +71,13 @@ const PROJECTS = [
     icon: "shield",
   },
   {
+    title: "Psychological AI Companion",
+    tagline: "Voice-first mental wellness support",
+    description:
+      "A voice-mode AI companion grounded in psychological science—it builds a private profile of each client over time, delivers personalized check-ins, and supports mental wellness through evidence-based conversational techniques customized to the individual.",
+    icon: "heart",
+  },
+  {
     title: "Agentic Workflow Automation",
     tagline: "End-to-end intelligent ops",
     description:
@@ -255,6 +262,11 @@ function ProjectIcon({ kind }: { kind: string }) {
     shield: (
       <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0 0 12 2.714Z" />
+      </svg>
+    ),
+    heart: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
       </svg>
     ),
     cog: (
