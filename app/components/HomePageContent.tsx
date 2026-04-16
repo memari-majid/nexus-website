@@ -71,6 +71,13 @@ const PROJECTS = [
     icon: "shield",
   },
   {
+    title: "Psychological AI Companion",
+    tagline: "Voice-first mental wellness support",
+    description:
+      "A voice-mode AI companion grounded in psychological science—it builds a private profile of each client over time, delivers personalized check-ins, and supports mental wellness through evidence-based conversational techniques customized to the individual.",
+    icon: "heart",
+  },
+  {
     title: "Agentic Workflow Automation",
     tagline: "End-to-end intelligent ops",
     description:
@@ -239,7 +246,6 @@ const COMMUNITY_ROLES = [
   },
 ] as const;
 
-const DATA_GOV_SUMMIT_REGISTER = "https://lnkd.in/gRzWnGA3";
 const NVIDIA_TRAINING_URL = "https://www.nvidia.com/en-us/training/";
 
 /* ------------------------------------------------------------------ */
@@ -256,6 +262,11 @@ function ProjectIcon({ kind }: { kind: string }) {
     shield: (
       <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0 0 12 2.714Z" />
+      </svg>
+    ),
+    heart: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
       </svg>
     ),
     cog: (
@@ -739,31 +750,7 @@ export function HomePageContent() {
             </p>
           </Reveal>
           <Reveal delay={60}>
-            <div className="mt-10 grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/90 p-6 dark:border-emerald-900/50 dark:bg-emerald-950/25">
-                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-                  Upcoming · Data governance
-                </p>
-                <h3 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                  Data Governance Summit 2026
-                </h3>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Utah Valley University</p>
-                <p className="mt-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-400">
-                  Dr. Memari will be at the summit as one of the AI architects behind{" "}
-                  <strong className="text-zinc-900 dark:text-zinc-100">DataGovAI</strong>, which
-                  will be presented at the event. He looks forward to sharing how AI can help turn
-                  data governance from policy into practice—spanning data governance, privacy,
-                  responsible AI, and digital transformation in the public sector.
-                </p>
-                <a
-                  href={DATA_GOV_SUMMIT_REGISTER}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-5 inline-flex rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500"
-                >
-                  Register for the summit
-                </a>
-              </div>
+            <div className="mt-10 mx-auto max-w-xl">
               <div className="rounded-2xl border border-sky-200/90 bg-white p-6 dark:border-sky-900/40 dark:bg-zinc-900/50">
                 <p className="text-xs font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                   Free on campus · NVIDIA DLI
