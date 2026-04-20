@@ -1,15 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 
 const NAV_ITEMS = [
-  { label: "Services", href: "#services" },
-  { label: "Work", href: "#work" },
-  { label: "Education", href: "#education" },
   { label: "About", href: "#about" },
-  { label: "Careers", href: "#careers" },
+  { label: "Work", href: "#work" },
+  { label: "Teaching", href: "#education" },
+  { label: "Mentorship", href: "#mentorship" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -33,16 +31,14 @@ export function NavBar() {
     >
       <div className="mx-auto flex min-w-0 max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 lg:py-4">
         <a href="#top" className="group flex min-h-[44px] min-w-0 shrink-0 items-center gap-2.5">
-          <Image
-            src="/nexus-logo.png"
-            alt="Nexus AI Solutions"
-            width={36}
-            height={36}
-            className="h-9 w-9 shrink-0 rounded-lg object-contain"
-            priority
-          />
+          <span
+            aria-hidden
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-sm"
+          >
+            MM
+          </span>
           <span className="min-w-0 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-            Nexus<span className="text-sky-600 dark:text-sky-400"> AI</span>
+            Majid<span className="text-sky-600 dark:text-sky-400"> Memari</span>
           </span>
         </a>
 
