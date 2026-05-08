@@ -32,8 +32,13 @@ function displayAssistantText(raw: string) {
 }
 
 function formatChatConfigMessage(error: string) {
-  if (error.includes("missing OPENAI_API_KEY")) {
-    return "Chat isn’t configured: add OPENAI_API_KEY to your environment (e.g. Vercel → Project → Settings → Environment Variables), save, then redeploy. You can still reach us via the contact form below.";
+  if (
+    error.includes("OIDC") ||
+    error.includes("AI_GATEWAY_API_KEY") ||
+    error.includes("AI Gateway") ||
+    error.toLowerCase().includes("unauthorized")
+  ) {
+    return "Chat isn’t configured: enable AI Gateway in Vercel → Project → AI Gateway, then run `vercel env pull .env.local` (or redeploy). You can still reach us via the contact form below.";
   }
   return error;
 }
@@ -172,8 +177,9 @@ export function ChatWidget() {
               {messages.length === 0 && (
                 <div className="space-y-3">
                   <p className="text-sm text-zinc-600 dark:text-zinc-500">
-                    Hi — I can answer questions about Nexus AI Solutions, Dr. Memari&apos;s work, NVIDIA workshops,
-                    government AI projects, and open roles. How can I help?
+                    Hi — I can answer questions about Nexus AI Solutions, how our principals divide architecture
+                    versus delivery work, NVIDIA DLI-aligned workshops, public-sector engagements, internships,
+                    and how to engage us commercially. Where should we dive in?
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {QUICK_PROMPTS.map((q) => (

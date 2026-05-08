@@ -27,23 +27,23 @@ const STATS = [
 const AI_OFFERINGS = [
   {
     title: "LLM & RAG Systems",
-    tagline: "Production-ready language models",
+    tagline: "Private knowledge, grounded answers",
     description:
-      "Retrieval-augmented generation, prompt engineering, and secure deployment of large language models for your applications and knowledge bases.",
+      "Retrieval-augmented generation over your documents and data—with chunking, embedding, reranking, evaluation sets, and guardrails so outputs are useful in production, not just impressive in demos.",
     icon: "brain",
   },
   {
     title: "Agentic Automation",
-    tagline: "Multi-agent workflows",
+    tagline: "LangChain / LangGraph tool workflows",
     description:
-      "Orchestrate agents that reason, plan, and execute across tools—document pipelines, onboarding, compliance, and operations.",
+      "Agents that plan, call APIs, retrieve context, and hand off cleanly—paired with tracing, retries, logging, and human oversight for reliable operational automation.",
     icon: "robot",
   },
   {
-    title: "AI Strategy & MLOps",
-    tagline: "From pilot to scale",
+    title: "AI Strategy, evals & MLOps",
+    tagline: "From pilot to production",
     description:
-      "Roadmaps, governance, evaluation, and production ML pipelines—so your AI investments deliver measurable ROI.",
+      "Roadmaps plus LLM observability—test sets, qualitative review loops, latency and cost budgeting, and rollout patterns suited to regulated or high-stakes settings.",
     icon: "chart",
   },
   {
@@ -177,6 +177,7 @@ const TECH_LOGOS = [
 
 const FOOTER_LINKS = [
   { label: "Services", href: "#services" },
+  { label: "Engagement", href: "#engagement" },
   { label: "Work", href: "#work" },
   { label: "Education", href: "#education" },
   { label: "About", href: "#about" },
@@ -205,43 +206,43 @@ const GOVERNMENT_HIGHLIGHTS = [
 
 const COMMUNITY_ROLES = [
   {
-    org: "Nexus AI Solutions LLC",
-    title: "Founder & CEO",
-    period: "Mar 2026 — Present",
+    facet: "Nexus AI Solutions LLC",
+    headline: "Client engagements & intern pipeline",
+    period: "",
     description:
-      "Recruits student interns and leads them on real-world AI projects—from architecture to deployment—at no cost to them.",
+      "The operating umbrella for milestones, statements of work, and outcomes. Nexus recruits student interns onto real architectures and implementations—hands-on mentorship at no internship fee.",
     icon: "nexus",
   },
   {
-    org: "NVIDIA",
-    title: "Ambassador & DLI Instructor",
-    period: "Nov 2025 — Present",
+    facet: "NVIDIA ecosystem",
+    headline: "Ambassador & DLI-aligned instruction",
+    period: "",
     description:
-      "Delivers free hands-on workshops on agentic AI, GPU computing, and applied ML—open to students, faculty, and industry partners.",
+      "Hands-on GPU, generative AI, and agent workshops that mirror Deep Learning Institute standards—delivered campus-side for students/faculty and packaged for cohort clients who want the same caliber of training.",
     icon: "nvidia",
   },
   {
-    org: "Utah Valley University",
-    title: "Assistant Professor",
-    period: "Jul 2024 — Present",
+    facet: "Higher education (Utah)",
+    headline: "Course design & mentorship",
+    period: "",
     description:
-      "Designs new courses that bridge academia and industry; mentors student teams end-to-end on funded research and production AI systems.",
+      "Nexus principals collaborate with Utah campuses to prototype courses and mentor teams bridging industry-grade AI pipelines with classroom rigor—not as a staffing agency, but as specialist architects guiding capstones and pilots.",
     icon: "uvu",
   },
   {
-    org: "University of Utah — One-U RAI",
-    title: "AI Consultant, AI Policy SIG",
-    period: "Jan 2025 — Present",
-    description:
-      "Shapes responsible AI strategy across healthcare, education, government, and commercial sectors—bringing student perspectives into policy discussions.",
+    facet: "Responsible AI (Utah)",
+    headline: "Policy & stakeholder advisory",
+    period: "",
+      description:
+      "Cross-sector facilitation through programs such as Utah's One-U Responsible AI initiative—helps agencies, campuses, and industry align guardrails without slowing pragmatic pilots Nexus can engineer.",
     icon: "uou",
   },
   {
-    org: "Gary R. Herbert Institute for Public Policy",
-    title: "Principal AI Architect",
-    period: "Nov 2024 — Present",
+    facet: "Utah public sector partnerships",
+    headline: "Agency-aligned architecture",
+    period: "",
     description:
-      "Leads state-level AI for Utah agencies alongside student teams who gain direct public-sector experience.",
+      "Nexus-supported collaborations with institutes and agencies (including work anchored at the Herbert Institute for Public Policy) translate policy goals into backlog-ready AI plans and governed delivery milestones.",
     icon: "herbert",
   },
 ] as const;
@@ -429,8 +430,9 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={200}>
             <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Utah-based consulting led by an NVIDIA Ambassador and Principal AI Architect—from
-              strategy and integration to production LLMs, agents, and public-sector AI.
+              Client work is routed through Nexus—Utah-founded IT &amp; AI consulting—with principals who
+              hold NVIDIA DLI credentials and decades of architecture and production-engineering discipline.
+              Engagements are deliberately boutique: discovery, phased build, accountable delivery.
             </p>
           </Reveal>
           <Reveal delay={280}>
@@ -469,8 +471,12 @@ export function HomePageContent() {
               What we do
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-              IT consulting and infrastructure—plus production AI, from LLMs and agents to training
-              and MLOps.
+              IT consulting—from planning and integration to modernization and cybersecurity—paired
+              with production AI we ship under Nexus statements of work: RAG over private data,
+              LangChain/LangGraph agents, AI automation and tool-use systems, LLM evaluation and guardrails,
+              Python/FastAPI AI backends (and modernization that can include regulated-environment{" "}
+              <strong className="text-zinc-800 dark:text-zinc-200">C++/Linux</strong> stacks where it fits),
+              plus NVIDIA DLI–aligned workshops for teams.
             </p>
           </Reveal>
 
@@ -502,6 +508,91 @@ export function HomePageContent() {
                 </div>
               </Reveal>
             ))}
+          </div>
+
+          <div id="engagement" className="mt-24 scroll-mt-24">
+            <Reveal>
+              <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+                Team &amp; fit
+              </p>
+              <h3 className="mt-3 text-center text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+                How we engage—and what we take on
+              </h3>
+              <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                Nexus operates as your <strong className="text-zinc-800 dark:text-zinc-200">vendor of record</strong>
+                —you buy scoped, temporary engagements (discovery + milestones)—not staffing or employment
+                of our principals on your payroll. We allocate and manage delivery; as volume grows Nexus
+                can bring in bench talent under the same statements of work. Contracts, invoices, and IP
+                flow through{" "}
+                <strong className="text-zinc-800 dark:text-zinc-200">Nexus AI Solutions LLC</strong> (Utah).
+              </p>
+            </Reveal>
+
+            <div className="mt-10 grid gap-5 lg:grid-cols-2">
+              <Reveal delay={80}>
+                <div className="card h-full border border-zinc-200/90 p-6 dark:border-zinc-800/70">
+                  <h4 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                    Principals behind Nexus
+                  </h4>
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    <strong className="text-zinc-800 dark:text-zinc-200">Dr. Majid Memari</strong> —
+                    Founder &amp; Principal AI Architect. He owns the technical narrative for client
+                    roadmaps—retrieval/agent architecture, multimodal proofs, evaluations, governance,
+                    Bedrock-era cloud patterns—and the public-sector flavored programs highlighted in our
+                    DataGovAI and government portfolios.
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    <strong className="text-zinc-800 dark:text-zinc-200">Hamid Memari</strong> —
+                    Technical Delivery Lead on Nexus mandates. Hands-on integrations, backends, build
+                    automation, escalation discipline, and production hardening borrowed from regulated
+                    product environments—all tuned for clients who refuse fragile AI veneers.
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    We&apos;re co-located in the{" "}
+                    <strong className="text-zinc-800 dark:text-zinc-200">Salt Lake City</strong>{" "}
+                    area for sharper discovery, whiteboarding, and delivery cadence together.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={120}>
+                <div className="card h-full border border-zinc-200/90 p-6 dark:border-zinc-800/70">
+                  <h4 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                    Project fit &amp; how we start
+                  </h4>
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    We focus on scoped outcomes you can inspect: identifiable knowledge sources,
+                    named integrations (CRMs, ticketing, warehouses, FHIR-ish boundaries), and plain
+                    success criteria—not open-ended requests to build an entire AI product without
+                    shared discovery and boundaries.
+                  </p>
+                  <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    <li>RAG assistants and enterprise document Q&amp;A grounded in private corpora.</li>
+                    <li>Tool-using agents—LangChain, LangGraph—with tracing, approvals, retries.</li>
+                    <li>LLM evaluation, regression sets, hallucination containment, prompting ops.</li>
+                    <li>Python/FastAPI (and adjoining) AI services wired to cloud or hybrid footprints.</li>
+                    <li>Healthcare-<em>adjacent</em> workflow automation and clinical-flavored NLP,
+                    respecting compliance and institutional policies—paired with pragmatic IT uplift
+                    (integration, modernization, hygiene) where it unblocks AI.</li>
+                  </ul>
+                  <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
+                    Most engagements begin with a{" "}
+                    <strong className="text-zinc-800 dark:text-zinc-200">paid discovery sprint</strong>{" "}
+                    (architecture, backlog, risks, latency and cost envelopes) followed by phased
+                    build milestones. Fixed scopes work best after that grounding.
+                  </p>
+                  <p className="mt-4 text-xs leading-relaxed text-zinc-500 dark:text-zinc-500">
+                    We sell{" "}
+                    <strong className="text-zinc-700 dark:text-zinc-400">
+                      discrete SOW packages and phased projects
+                    </strong>
+                    —not open-ended faux headcount or unmanaged on-call. Optional{" "}
+                    <strong className="text-zinc-700 dark:text-zinc-400">follow-on SOWs</strong>
+                    (“phase 2,” sustainment bursts) extend work only when scope is rewritten and signed—
+                    Nexus still runs staffing and accountability under the vendor relationship.
+                  </p>
+                </div>
+              </Reveal>
+            </div>
           </div>
         </div>
       </section>
@@ -676,8 +767,8 @@ export function HomePageContent() {
               Workshops &amp; teaching
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
-              Dr. Memari is an NVIDIA DLI Certified Instructor and Ambassador. He
-              delivers hands-on workshops aligned with{" "}
+              Principals affiliated with Nexus are NVIDIA DLI certified instructors—delivering immersive
+              workshops aligned with{" "}
               <Link
                 href="https://www.nvidia.com/en-us/training/"
                 className="text-sky-600 dark:text-sky-400 hover:underline"
@@ -725,7 +816,7 @@ export function HomePageContent() {
                 href="#contact"
                 className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
               >
-                Invite Dr. Memari to your campus
+                Invite Nexus instructors to campus
               </a>
               <p className="max-w-md text-center text-xs text-zinc-600">
                 Available for universities worldwide. Student workshops are
@@ -744,9 +835,9 @@ export function HomePageContent() {
               Utah &amp; policy
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
-              Dr. Memari recruits interns, leads students on real problems at no cost, and
-              shows up where policy, education, and industry meet—so the next generation
-              ships AI that matters.
+              Nexus funds intern rounds, sponsors classroom-adjacent builds, and shows up wherever
+              Utah policy, campuses, and startups intersect—creating a feeder of practitioners who ship
+              real AI, not slideware.
             </p>
           </Reveal>
           <Reveal delay={60}>
@@ -759,12 +850,12 @@ export function HomePageContent() {
                   Hands-on AI workshops for students &amp; faculty
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-400">
-                  As an NVIDIA Deep Learning Institute Certified Instructor, Dr. Memari hosts free
-                  workshops at universities such as UVU—covering LLMs, generative AI, and agentic
-                  AI—with the option to earn an NVIDIA certificate. Similar public online DLI-style
-                  workshops often run about{" "}
-                  <strong className="text-zinc-900 dark:text-zinc-200">$500</strong>; on-campus
-                  sessions are offered at no charge to participants.
+                  As NVIDIA Deep Learning Institute certified instructors affiliated with Nexus, we host
+                  no-cost cohort sessions on Utah campuses—and similar programs nationally—covering LLMs,
+                  generative AI, and agent stacks with completion artifacts where NVIDIA issues them.
+                  Comparable public trainings often exceed{" "}
+                  <strong className="text-zinc-900 dark:text-zinc-200">$500</strong> per seat; Nexus keeps
+                  these sessions gratis for qualifying student groups universities invite.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <a
@@ -787,16 +878,18 @@ export function HomePageContent() {
           </Reveal>
           <div className="mt-14 grid gap-6 sm:grid-cols-2">
             {COMMUNITY_ROLES.map((r, i) => (
-              <Reveal key={r.org} delay={i * 60}>
+              <Reveal key={r.headline} delay={i * 60}>
                 <div className="card flex h-full flex-col p-6">
                   <div className="mb-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                     <CommunityRoleIcon kind={r.icon} />
                   </div>
                   <p className="text-xs font-medium uppercase tracking-wider text-sky-600 dark:text-sky-400">
-                    {r.org}
+                    {r.facet}
                   </p>
-                  <h3 className="mt-1 text-lg font-semibold text-zinc-900 dark:text-zinc-100">{r.title}</h3>
-                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-500">{r.period}</p>
+                  <h3 className="mt-1 text-lg font-semibold text-zinc-900 dark:text-zinc-100">{r.headline}</h3>
+                  {r.period ? (
+                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-500">{r.period}</p>
+                  ) : null}
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
                     {r.description}
                   </p>
@@ -812,21 +905,15 @@ export function HomePageContent() {
               <h3 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                 EdTech innovation &amp; entrepreneurship
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-400">
-                Dr. Memari designs new AI courses to close the gap between what universities
-                teach and what industry needs. One example: an innovation and entrepreneurship
-                course focused on Education Technology. Students discover real problems in K-12
-                and higher education, propose AI-powered solutions, build working prototypes
-                using no-code tools (cloud-hosted n8n), and pitch their EdTech startup to
-                mentors and judges. No programming experience required—co-taught by a computer
-                scientist and an education expert, with mentoring and guest lectures from{" "}
+                <p className="mt-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-400">
+                Nexus curricula teams blueprint AI-heavy courses aimed at narrowing the canyon between ivory-tower coursework and shipped software. Illustrative effort: innovation + entrepreneurship immersion for aspiring EdTech founders—students source pain from K–12/college ecosystems, scaffold AI-first MVPs hosted on modular automation stacks, then pitch juried panels with mentoring from collegiate entrepreneurship institutes such as Utah&apos;s{" "}
                 <a
                   href="https://www.uvu.edu/entrepreneurship/"
                   className="text-sky-600 underline decoration-sky-600/30 hover:decoration-sky-600 dark:text-sky-400"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  UVU&apos;s Baugh Entrepreneurship Institute
+                  Baugh Entrepreneurship Institute at UVU
                 </a>
                 .
               </p>
@@ -865,7 +952,7 @@ export function HomePageContent() {
                   AI Utah, Silicon Slopes &amp; Utah tech
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  Dr. Memari contributes to{" "}
+                  Nexus supports{" "}
                   <a
                     href="https://www.aiutah.org/"
                     target="_blank"
@@ -885,10 +972,11 @@ export function HomePageContent() {
                   >
                     AI Utah 100
                   </a>
-                  ). He shows up, brings students, and helps them plug into that network.
+                  ). Our leads host office hours alongside student cohorts so talent pipelines intersect
+                  with hiring managers—not just conference badges.
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                  He is also active in{" "}
+                  We stay embedded in{" "}
                   <a
                     href="https://siliconslopes.com/"
                     target="_blank"
@@ -897,9 +985,9 @@ export function HomePageContent() {
                   >
                     Silicon Slopes
                   </a>
-                  , the nonprofit helping Utah founders grow—attending events and connecting
-                  learners with founders, hiring managers, and collaborators across the broader
-                  tech ecosystem.
+                  , the nonprofit powering Utah founders, so Nexus clients indirectly tap that deal-flow
+                  and partner choreography while recruits from our internship bench meet operators face
+                  to face.
                 </p>
               </div>
             </div>
@@ -915,10 +1003,10 @@ export function HomePageContent() {
               Government &amp; public policy
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
-              Dr. Memari is Principal AI Architect at the Gary R. Herbert Institute for Public
-              Policy (Nov 2024 — Present) and leads state-level collaborations with Utah agencies.
-              Students work alongside him on these initiatives—gaining hands-on public-sector AI
-              experience with the same teams he recruits and mentors through Nexus.
+              Nexus architects responsible AI deployments with Utah departments and institutes—typically
+              in concert with collaborators like the Gary R. Herbert Institute for Public Policy—so backlog,
+              procurement, governance, and model risk stay aligned before code ships. Mentor-led student
+              teams rotate through these programs with the same Nexus leads who oversee commercial work.
             </p>
           </Reveal>
           <div className="mt-12 grid gap-5 sm:grid-cols-2">
@@ -975,8 +1063,8 @@ export function HomePageContent() {
               Dr. Majid Memari
             </h2>
             <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-500">
-              Nearly 20 years in academia—engineering through CS Ph.D., postdoc, and faculty—still
-              focused on students and community.
+              Ph.D. Computer Science • Founder of Nexus AI Solutions • Deep-learning generalist bridging
+              research rigor with deployable architectures.
             </p>
           </Reveal>
 
@@ -999,15 +1087,18 @@ export function HomePageContent() {
                 <div className="space-y-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                   <p>
                     <strong className="text-zinc-900 dark:text-zinc-100">Nexus AI Solutions LLC</strong>{" "}
-                    is a Utah-based IT &amp; AI consulting firm. Dr. Memari leads real-world AI
-                    work—government systems, EdTech, drone imaging, synthetic data—and mentors
-                    interns at no cost. He is technical lead on a{" "}
-                    <strong className="text-zinc-900 dark:text-zinc-100">$1M USHE</strong> drone
-                    imaging initiative and collaborates with Utah agencies, Stanford, Johns Hopkins,
-                    and UPenn.
+                    anchors enterprise AI programs for clients and public-sector collaborators.
+                    Founder <strong className="text-zinc-900 dark:text-zinc-100">Dr. Majid Memari</strong>{" "}
+                    architects those initiatives—from synthetic data regimes to UAV inspection stacks—while{" "}
+                    <strong className="text-zinc-900 dark:text-zinc-200">Hamid Memari</strong> anchors the
+                    hands-on integrations and disciplined release rhythms. Nexus also served as technical
+                    lead on a{" "}
+                    <strong className="text-zinc-900 dark:text-zinc-100">$1M USHE</strong>-sponsored drone
+                    intelligence program and routinely collaborates with Utah agencies plus research
+                    collaborators such as Stanford, Johns Hopkins, and the University of Pennsylvania.
                   </p>
                   <p>
-                    He gives back through NVIDIA DLI workshops,{" "}
+                    Responsible AI alliances—like{" "}
                     <a
                       href="https://rai.utah.edu/"
                       target="_blank"
@@ -1016,8 +1107,8 @@ export function HomePageContent() {
                     >
                       One-U Responsible AI
                     </a>
-                    , and public-sector architecture—connecting students to Silicon Slopes and
-                    Utah&apos;s tech ecosystem.
+                    —plus Silicon Slopes and Utah civic tech—keep Nexus honest about safeguards while still
+                    shipping measurable outcomes with clients.
                   </p>
                 </div>
               </div>
@@ -1026,7 +1117,7 @@ export function HomePageContent() {
             <Reveal delay={160}>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { big: "~20 yrs", sub: "In academia since 2006" },
+                  { big: "~20 yrs", sub: "Research-to-production AI grounding" },
                   { big: "Ph.D.", sub: "Computer Science, SIU" },
                   { big: "NVIDIA", sub: "Ambassador & DLI Instructor" },
                   { big: "$1M", sub: "USHE drone AI — technical lead" },
@@ -1073,8 +1164,8 @@ export function HomePageContent() {
               <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 If you want <strong className="text-zinc-800 dark:text-zinc-200">real-world AI engineering experience</strong>,
                 reach out—we always have multiple projects in flight and we hire
-                interns on a rolling basis. You&apos;ll work alongside Dr. Memari and
-                the team on production-minded tasks: LLMs and RAG, agentic workflows,
+                interns on a rolling basis. You&apos;ll work alongside Nexus principals and peer engineers
+                on production-minded tasks: LLMs and RAG, agentic workflows,
                 cloud integrations, and domain projects that ship.
               </p>
               <div className="mt-6 space-y-4 text-sm text-zinc-600 dark:text-zinc-400">

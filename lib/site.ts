@@ -3,7 +3,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nexusaisolu
 export const SITE = {
   name: "Nexus AI Solutions LLC",
   description:
-    "Utah-based IT & AI consulting firm specializing in strategic technology planning, system integration, digital transformation, and AI solutions. Led by Dr. Majid Memari.",
+    "Nexus AI Solutions LLC (Utah) is an independent IT & AI vendor on temporary statements of work: RAG over private data, LangChain/LangGraph agents, AI automation and tool-use, LLM evaluation, FastAPI/Python ML services (plus C++/Linux modernization where appropriate), modernization, integration, security-conscious delivery—Nexus assigns staffing and owns outcomes. Founder & Principal AI Architect: Dr. Majid Memari. Technical Delivery Lead (Salt Lake Metro): Hamid Memari.",
   email: "info@nexusaisolution.net",
   phone: "+18018109152",
   phoneDisplay: "(801) 810-9152",

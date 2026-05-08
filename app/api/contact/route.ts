@@ -5,8 +5,9 @@ import { classifyInquiry, fallbackInquiryResponse, type InquiryCategory } from "
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-/** Smaller / cheaper model for classification (override with CONTACT_CLASSIFY_MODEL). */
-const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "gpt-4o-mini";
+/** Smaller / cheaper model for classification (override with CONTACT_CLASSIFY_MODEL).
+ *  Routed through Vercel AI Gateway — use a `provider/model` slug. */
+const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "openai/gpt-oss-20b";
 
 export async function POST(request: Request) {
   try {
@@ -23,26 +24,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
     }
 
-    const apiKey = process.env.OPENAI_API_KEY?.trim();
     let category: InquiryCategory = "general";
     let autoReply = fallbackInquiryResponse().autoReply;
 
-    if (apiKey) {
-      try {
-        const classified = await classifyInquiry({
-          name,
-          message,
-          apiKey,
-          modelId: CLASSIFY_MODEL,
-        });
-        category = classified.category;
-        autoReply = classified.autoReply;
-      } catch (err) {
-        console.error("[contact] classifyInquiry:", err);
-        const fb = fallbackInquiryResponse();
-        category = fb.category;
-        autoReply = fb.autoReply;
-      }
+    try {
+      const classified = await classifyInquiry({
+        name,
+        message,
+        modelId: CLASSIFY_MODEL,
+      });
+      category = classified.category;
+      autoReply = classified.autoReply;
+    } catch (err) {
+      console.error("[contact] classifyInquiry:", err);
+      const fb = fallbackInquiryResponse();
+      category = fb.category;
+      autoReply = fb.autoReply;
     }
 
     const to = process.env.CONTACT_TO_EMAIL ?? SITE.email;

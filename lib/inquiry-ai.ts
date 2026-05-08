@@ -1,5 +1,4 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import { generateObject } from "ai";
+import { gateway, generateObject } from "ai";
 import { z } from "zod";
 
 const inquirySchema = z.object({
@@ -9,17 +8,16 @@ const inquirySchema = z.object({
 
 export type InquiryCategory = z.infer<typeof inquirySchema>["category"];
 
-export async function classifyInquiry(input: {
-  name: string;
-  message: string;
-  apiKey: string;
-  modelId: string;
-}) {
-  const openai = createOpenAI({ apiKey: input.apiKey });
+export async function classifyInquiry(input: { name: string; message: string; modelId: string }) {
   const { object } = await generateObject({
-    model: openai(input.modelId),
+    model: gateway(input.modelId),
     schema: inquirySchema,
-    prompt: `You are the intake assistant for Nexus AI Solutions LLC (Utah IT & AI consulting, Dr. Majid Memari).
+    providerOptions: {
+      gateway: {
+        tags: ["site:nexus", "feature:contact-classify", `env:${process.env.VERCEL_ENV ?? "dev"}`],
+      },
+    },
+    prompt: `You are the intake assistant for Nexus AI Solutions LLC, Utah—an independent IT & AI vendor on scoped statements-of-work / milestones (Nexus staffs delivery; positioning aligns with https://nexusaisolution.net/ #services and #engagement). Led by principals Dr. Majid Memari and Hamid Memari.
 
 Classify this contact form message into exactly one category:
 - consulting: IT strategy, integration, cloud, security, infrastructure, custom AI builds

@@ -4,12 +4,24 @@ import { useState } from "react";
 
 const FAQS = [
   {
+    q: "What kinds of AI and IT projects do you take on?",
+    a: "We focus on practical, scoped work: retrieval-augmented generation over private documents, LangChain/LangGraph agent workflows, AI automation that calls your tools and APIs, LLM evaluation and guardrails, Python/FastAPI AI backends, and embedding intelligent features into existing products. On the IT side, we advise and deliver around integration, modernization, cloud migration planning, cybersecurity hygiene, and hybrid or on-premises considerations when models and data can't live only in SaaS.",
+  },
+  {
+    q: "Who delivers Nexus client work?",
+    a: "Every statement of work is executed under Nexus AI Solutions LLC. Dr. Majid Memari anchors architecture, multimodal proofs, retrieval/agent systems, evaluations, governance, Bedrock-era cloud footprints, and the public-sector programs highlighted onsite. Hamid Memari leads technical delivery integration, escalation-minded quality, backends, CI hygiene, and production cutovers. Both principals are rooted in Utah's Salt Lake City metro for tighter collaboration—not a revolving cast of subcontractors.",
+  },
+  {
+    q: "Are we employing your team, or hiring Nexus as a vendor?",
+    a: "You're engaging Nexus AI Solutions LLC as an independent business—typically milestone- or deliverable-based statements of work—not putting our principals on your payroll. Nexus assigns who does the work (principals today; vetted bench later as we scale). That keeps IP, invoicing, and responsibility with the company delivering the outcomes you bought.",
+  },
+  {
     q: "What industries do you serve?",
     a: "We work across education, government, healthcare, public safety, and enterprise. Our solutions range from AI-powered EdTech platforms and emergency-services simulation training to privacy-preserving data systems for state agencies.",
   },
   {
     q: "How are the NVIDIA workshops structured?",
-    a: "Dr. Memari delivers full-day, hands-on workshops aligned with NVIDIA Deep Learning Institute standards. Students get GPU-accelerated cloud labs, real-world exercises, and certificates of completion — all free for students at participating universities.",
+    a: "Certified Nexus instructors facilitate full-day immersion labs patterned after NVIDIA Deep Learning Institute pedagogy—GPU-hosted exercises, facilitator checkpoints, and completion artifacts when NVIDIA recognizes the cohort. Students at hosting universities routinely attend at no tuition-style charge.",
   },
   {
     q: "Can you work with our existing tech stack?",
@@ -17,11 +29,11 @@ const FAQS = [
   },
   {
     q: "What does a typical engagement look like?",
-    a: "We start with a discovery session to understand your goals and constraints. From there we propose a phased roadmap — usually starting with a focused proof-of-concept, then iterating toward production deployment with ongoing support.",
+    a: "We prefer to de-risk with a paid discovery sprint: goals, constraints, architecture, backlog, risks, latency and cost envelopes, then a concrete build proposal or milestone plan. Larger builds proceed in phases—with evaluation hooks early—rather than committing to ambiguous fixed scope without shared understanding.",
   },
   {
     q: "Do you offer ongoing support after project delivery?",
-    a: "Yes. We provide post-launch monitoring, model retraining, performance optimization, and on-call engineering support. Many clients retain us for quarterly AI strategy reviews and continuous improvement.",
+    a: "Yes—normally as separate, signed follow-on work: stabilization windows, model/prompt upkeep, retrieval tuning, observability tweaks, docs, or a clearly bounded sustainment sprint. Nexus sells projects and phased SOWs, not pretending to be embedded FTE unless your procurement deliberately buys a capped sustainment engagement with explicit boundaries (never implied 24/7 on-call unless written into the SOW).",
   },
   {
     q: "How do you handle data privacy and compliance?",

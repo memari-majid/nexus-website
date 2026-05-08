@@ -23,8 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Nexus AI Solutions LLC",
-    description:
-      "IT Consulting & Digital Services — AI, system integration, and digital transformation led by Dr. Majid Memari.",
+    description: SITE.description,
     url: SITE_URL,
     siteName: SITE.name,
     type: "website",
@@ -41,8 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Nexus AI Solutions LLC — IT Consulting & Digital Services",
-    description:
-      "Utah-based IT & AI consulting. Strategic planning, integration, and AI solutions.",
+    description: SITE.description,
     images: ["/og-image.png"],
   },
   robots: {

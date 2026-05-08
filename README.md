@@ -1,8 +1,12 @@
 # Nexus AI Solutions — Company Website
 
-Public website for **Nexus AI Solutions LLC**, a Utah-based IT & AI consulting firm.
+Public website for **Nexus AI Solutions LLC**, a Utah IT & AI **vendor**: temporary SOW/project engagements—not client payroll employment (see **`#engagement`** on site).
 
-Live at [nexusaisolution.net](https://nexusaisolution.net)
+Live at **[nexusaisolution.net](https://nexusaisolution.net)**
+
+## Strategy alignment (internal ops repo)
+
+Keep positioning and channel execution aligned with **`../contract/docs/reference/PLAN.md`** (especially **§11** and **§11.1**) and **`../contract/docs/reference/PLATFORM-PLAYBOOK.md`** (especially **§1**, **§3 Upwork positioning**, **§12** profiles). **`lib/site.ts`**, **`#services`**, **`#engagement`**, and **FAQ** are the canonical public copy—in sync with **`PLAN.md` §11.1** (“public-facing source of truth”).
 
 ## Tech Stack
 
@@ -37,14 +41,16 @@ Open [http://localhost:3000](http://localhost:3000).
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL (SEO, sitemap, JSON-LD). Default: `https://nexusaisolution.net` |
 | `NEXT_PUBLIC_AI_CPA_URL` | Optional. Public URL for the AI financial assistant app (Try Our AI section). If unset, the section shows “Request access”. |
 | `NEXT_PUBLIC_AI_TA_URL` | Optional. Public URL for the CS 4720R AI teaching assistant. If unset, the section shows “Request access”. |
-| `OPENAI_API_KEY` | Required for the floating chat assistant (`/api/chat`) and AI contact classification |
-| `OPENAI_MODEL` | Optional. Default: `gpt-5.4-mini` |
-| `CONTACT_CLASSIFY_MODEL` | Optional. Model for inquiry classification + auto-reply. Default: `gpt-4o-mini` |
+| `AI_CHAT_MODEL` | Optional. Model slug for `/api/chat` (Vercel AI Gateway). Default: `openai/gpt-oss-20b` |
+| `CONTACT_CLASSIFY_MODEL` | Optional. Model slug for contact inquiry classification + auto-reply via AI Gateway. Default: `openai/gpt-oss-20b` |
+| `AI_GATEWAY_API_KEY` | Optional fallback for non-Vercel environments. On Vercel, OIDC auth is automatic after enabling AI Gateway in project settings. |
 | `RESEND_API_KEY` | Optional. If set, contact form + chat lead form send email via [Resend](https://resend.com) |
 | `RESEND_FROM_EMAIL` | Verified sender in Resend (e.g. `Nexus AI <contact@yourdomain.com>`) |
 | `CONTACT_TO_EMAIL` | Inbox for inquiries (default: `info@nexusaisolution.net`) |
 
 Without `RESEND_API_KEY`, contact submissions are logged on the server only—configure Resend for production email delivery.
+
+**AI Gateway setup:** in Vercel Dashboard go to **Project → AI Gateway** and enable the gateway. For local dev, run `vercel link` then `vercel env pull .env.local` to provision a short-lived `VERCEL_OIDC_TOKEN` (auto-refreshed on Vercel; valid ~24h locally). No provider-specific API keys are required.
 
 ### Deploy (Vercel)
 

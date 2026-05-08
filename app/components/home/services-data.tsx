@@ -13,7 +13,7 @@ export const IT_SERVICES: {
     ),
     title: "Strategic Technology Planning",
     description:
-      "Align your IT infrastructure with business goals. We assess your current systems, identify gaps, and build a technology roadmap that drives growth.",
+      "Align IT with business outcomes. We assess systems and gaps, then produce a phased roadmap—from integration and modernization priorities to where AI belongs (and where it doesn't).",
   },
   {
     icon: (
@@ -23,7 +23,7 @@ export const IT_SERVICES: {
     ),
     title: "System Integration",
     description:
-      "Connect disparate systems into a unified workflow. From API design to data migration, we make your tools work together seamlessly.",
+      "Unify workflows across apps and data stores—REST and event-driven integrations, APIs, and careful data flows so humans and automation (including AI agents) operate on trustworthy sources.",
   },
   {
     icon: (
@@ -33,7 +33,7 @@ export const IT_SERVICES: {
     ),
     title: "Infrastructure Modernization",
     description:
-      "Upgrade legacy systems to modern, scalable architectures. We help you adopt cloud-native, containerized, and serverless solutions.",
+      "Move from brittle legacy stacks toward cloud-native and serverless patterns where they earn their cost—often as part of shipping a concrete product milestone, not a vague lift-and-shift.",
   },
   {
     icon: (
