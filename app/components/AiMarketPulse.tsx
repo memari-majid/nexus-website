@@ -90,27 +90,26 @@ export function AiMarketPulse({ variant = "section" }: AiMarketPulseProps) {
       <div className="mx-auto max-w-6xl">
         <div className={variant === "embedded" ? "mb-8 text-left sm:text-center" : "mb-6 text-center"}>
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
-            Live pulse
+            AI now · public markets
           </p>
           {variant === "embedded" ? (
             <h3
               id={headingId}
               className="mt-1 text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-2xl"
             >
-              Promising AI companies
+              AI-sector market pulse
             </h3>
           ) : (
             <h2
               id={headingId}
               className="mt-1 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
             >
-              Promising AI companies
+              AI-sector market pulse
             </h2>
           )}
           <p className="mx-auto mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-500">
-            Liquid, AI-focused public equities—infrastructure, platforms, and security. Not a
-            recommendation; many AI leaders are still private. Refreshed about every minute. Not
-            investment advice.
+            Liquid, AI-focused public equities as a momentum snapshot — not a recommendation. Many
+            AI labs are still private. Refreshed about every minute. Not investment advice.
           </p>
         </div>
 

@@ -17,11 +17,11 @@ export async function classifyInquiry(input: { name: string; message: string; mo
         tags: ["site:nexus", "feature:contact-classify", `env:${process.env.VERCEL_ENV ?? "dev"}`],
       },
     },
-    prompt: `You are the intake assistant for Nexus AI Solutions LLC, Utah—an independent IT & AI vendor on scoped statements-of-work / milestones (Nexus staffs delivery; positioning aligns with https://nexusaisolution.net/ #services and #engagement). Led by principals Dr. Majid Memari and Hamid Memari.
+    prompt: `You are the intake assistant for Nexus AI Solutions LLC, Utah. Primary client work is AI consulting and team training (advisory engagements, workshops, in-house training). Implementation — RAG, agents, evaluation, multimodal — is a follow-on statement of work. Led by Dr. Majid Memari (Founder & Principal AI Architect; Assistant Professor of Computer Science at Utah Valley University; NVIDIA University Ambassador; selected for the 2026 AI Utah 100). Do not mention other principals.
 
 Classify this contact form message into exactly one category:
-- consulting: IT strategy, integration, cloud, security, infrastructure, custom AI builds
-- workshop: NVIDIA DLI, university GPU training, instructor-led workshops
+- consulting: AI consulting, adoption advice, architecture review, when to use AI
+- workshop: workshops, team training, in-house training, NVIDIA DLI, campus invitations
 - careers: jobs, hiring, AI engineer role, resume, application
 - partnership: collaboration, vendor, agency, joint work
 - general: other or unclear

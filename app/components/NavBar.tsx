@@ -1,17 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 
 const NAV_ITEMS = [
-  { label: "Services", href: "#services" },
-  { label: "Engagement", href: "#engagement" },
-  { label: "Work", href: "#work" },
-  { label: "Education", href: "#education" },
-  { label: "About", href: "#about" },
-  { label: "Careers", href: "#careers" },
-  { label: "Contact", href: "#contact" },
+  { label: "AI now", href: "/#ai-now" },
+  { label: "Services", href: "/#services" },
+  { label: "Engagement", href: "/#engagement" },
+  { label: "Work", href: "/#work" },
+  { label: "Partners", href: "/#partners" },
+  { label: "Education", href: "/#education" },
+  { label: "About", href: "/about" },
+  { label: "Careers", href: "/#careers" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export function NavBar() {
@@ -33,7 +36,7 @@ export function NavBar() {
       }`}
     >
       <div className="mx-auto flex min-w-0 max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 lg:py-4">
-        <a href="#top" className="group flex min-h-[44px] min-w-0 shrink-0 items-center gap-2.5">
+        <Link href="/" className="group flex min-h-[44px] min-w-0 shrink-0 items-center gap-2.5">
           <Image
             src="/nexus-logo.png"
             alt="Nexus AI Solutions"
@@ -45,25 +48,25 @@ export function NavBar() {
           <span className="min-w-0 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Nexus<span className="text-sky-600 dark:text-sky-400"> AI</span>
           </span>
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-3 xl:flex 2xl:gap-6">
           {NAV_ITEMS.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className="shrink-0 whitespace-nowrap text-sm text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
           <ThemeToggle />
-          <a
-            href="#contact"
+          <Link
+            href="/#contact"
             className="whitespace-nowrap rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-sky-500"
           >
             Get in Touch
-          </a>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 xl:hidden">
@@ -89,22 +92,22 @@ export function NavBar() {
       {menuOpen && (
         <div className="max-h-[min(70vh,calc(100dvh-env(safe-area-inset-top)-5rem))] space-y-3 overflow-y-auto border-t border-zinc-200/80 bg-white/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/95 xl:hidden">
           {NAV_ITEMS.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               onClick={() => setMenuOpen(false)}
               className="block py-2 text-sm text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
-          <a
-            href="#contact"
+          <Link
+            href="/#contact"
             onClick={() => setMenuOpen(false)}
             className="block rounded-lg bg-sky-600 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-sky-500"
           >
             Get in Touch
-          </a>
+          </Link>
         </div>
       )}
     </nav>

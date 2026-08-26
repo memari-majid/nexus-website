@@ -1,6 +1,6 @@
 # Nexus AI Solutions — Company Website
 
-Public website for **Nexus AI Solutions LLC**, a Utah IT & AI **vendor**: temporary SOW/project engagements—not client payroll employment (see **`#engagement`** on site).
+Public website for **Nexus AI Solutions LLC**, a Utah **AI solutions** firm: consulting, workshops/team training, and scoped implementation (RAG, agents, evaluation, multimodal). Temporary SOW/project engagements—not client payroll employment (see **`#engagement`** on site). Founder Dr. Majid Memari was **selected for the 2026 AI Utah 100**. The public site does not list other principals.
 
 Live at **[nexusaisolution.net](https://nexusaisolution.net)**
 
@@ -43,12 +43,18 @@ Open [http://localhost:3000](http://localhost:3000).
 | `NEXT_PUBLIC_AI_TA_URL` | Optional. Public URL for the CS 4720R AI teaching assistant. If unset, the section shows “Request access”. |
 | `AI_CHAT_MODEL` | Optional. Model slug for `/api/chat` (Vercel AI Gateway). Default: `openai/gpt-oss-20b` |
 | `CONTACT_CLASSIFY_MODEL` | Optional. Model slug for contact inquiry classification + auto-reply via AI Gateway. Default: `openai/gpt-oss-20b` |
+| `VOICE_CHAT_MODEL` | Optional. Model slug for `/api/voice/gather`. Defaults to `AI_CHAT_MODEL`. |
 | `AI_GATEWAY_API_KEY` | Optional fallback for non-Vercel environments. On Vercel, OIDC auth is automatic after enabling AI Gateway in project settings. |
+| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` | Twilio request signing. Required in production before the voice engine answers. |
+| `TWILIO_PHONE_NUMBER` | Hidden Twilio number (E.164). **Not** the public Google Voice line. |
+| `VOICE_WEBHOOK` | Public incoming Voice URL, e.g. `https://nexusaisolution.net/api/voice` |
 | `RESEND_API_KEY` | Optional. If set, contact form + chat lead form send email via [Resend](https://resend.com) |
 | `RESEND_FROM_EMAIL` | Verified sender in Resend (e.g. `Nexus AI <contact@yourdomain.com>`) |
 | `CONTACT_TO_EMAIL` | Inbox for inquiries (default: `info@nexusaisolution.net`) |
 
 Without `RESEND_API_KEY`, contact submissions are logged on the server only—configure Resend for production email delivery.
+
+**Phone:** the published `(801) 810-9152` number is **Google Voice**. GV cannot hit Vercel. The AI engine is Twilio TwiML at `/api/voice`. Keep the GV number public and forward it to a hidden Twilio number — checklist in [`docs/PLAN.md`](docs/PLAN.md).
 
 **AI Gateway setup:** in Vercel Dashboard go to **Project → AI Gateway** and enable the gateway. For local dev, run `vercel link` then `vercel env pull .env.local` to provision a short-lived `VERCEL_OIDC_TOKEN` (auto-refreshed on Vercel; valid ~24h locally). No provider-specific API keys are required.
 

@@ -6,10 +6,18 @@ import { SITE, SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Nexus AI Solutions LLC — IT Consulting & Digital Services",
-    template: "%s | Nexus AI Solutions LLC",
+    default: "Nexus AI Solutions — Founded by Majid Memari, Ph.D.",
+    template: "%s | Nexus AI Solutions",
   },
   description: SITE.description,
+  authors: [{ name: "Majid Memari", url: "https://www.majidmemari.com" }],
+  keywords: [
+    "Majid Memari",
+    "Nexus AI Solutions",
+    "Utah AI consulting",
+    "Principal AI Architect",
+    "Utah Valley University",
+  ],
   alternates: {
     canonical: "/",
   },
@@ -22,7 +30,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Nexus AI Solutions LLC",
+    title: "Nexus AI Solutions — Majid Memari, Ph.D.",
     description: SITE.description,
     url: SITE_URL,
     siteName: SITE.name,
@@ -39,13 +47,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nexus AI Solutions LLC — IT Consulting & Digital Services",
+    title: "Nexus AI Solutions — Founded by Majid Memari, Ph.D.",
     description: SITE.description,
     images: ["/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 

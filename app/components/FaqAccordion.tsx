@@ -4,28 +4,28 @@ import { useState } from "react";
 
 const FAQS = [
   {
-    q: "What kinds of AI and IT projects do you take on?",
-    a: "We focus on practical, scoped work: retrieval-augmented generation over private documents, LangChain/LangGraph agent workflows, AI automation that calls your tools and APIs, LLM evaluation and guardrails, Python/FastAPI AI backends, and embedding intelligent features into existing products. On the IT side, we advise and deliver around integration, modernization, cloud migration planning, cybersecurity hygiene, and hybrid or on-premises considerations when models and data can't live only in SaaS.",
+    q: "What do you do for clients?",
+    a: "Our active client work is AI consulting and team training. We advise organizations on how to adopt AI — and when not to — and we train teams through workshops and hands-on sessions. When you need a system built, that is a separate, scoped statement of work: retrieval over private documents, agentic tool-use, evaluation and guardrails, and multimodal vision-language work where it fits.",
+  },
+  {
+    q: "How are workshops and team training structured?",
+    a: "Organizational training is scoped to your team's tools and goals — typically a half-day or full-day workshop, or a short series. NVIDIA Deep Learning Institute sessions use GPU-accelerated labs and DLI-style certificates of completion. Campus student workshops at participating universities are offered at no charge to students.",
   },
   {
     q: "Who delivers Nexus client work?",
-    a: "Every statement of work is executed under Nexus AI Solutions LLC. Dr. Majid Memari anchors architecture, multimodal proofs, retrieval/agent systems, evaluations, governance, Bedrock-era cloud footprints, and the public-sector programs highlighted onsite. Hamid Memari leads technical delivery integration, escalation-minded quality, backends, CI hygiene, and production cutovers. Both principals are rooted in Utah's Salt Lake City metro for tighter collaboration—not a revolving cast of subcontractors.",
+    a: "Every statement of work is executed under Nexus AI Solutions LLC. Dr. Majid Memari — Assistant Professor of Computer Science at Utah Valley University, NVIDIA University Ambassador, and Principal AI Architect at the Gary R. Herbert Institute for Public Policy — leads architecture, retrieval and agent systems, evaluations, and governance. He was selected for the 2026 AI Utah 100. Work is based in Utah's Salt Lake metro — not a revolving cast of subcontractors.",
   },
   {
     q: "Are we employing your team, or hiring Nexus as a vendor?",
-    a: "You're engaging Nexus AI Solutions LLC as an independent business—typically milestone- or deliverable-based statements of work—not putting our principals on your payroll. Nexus assigns who does the work (principals today; vetted bench later as we scale). That keeps IP, invoicing, and responsibility with the company delivering the outcomes you bought.",
+    a: "You're engaging Nexus AI Solutions LLC as an independent business—typically milestone- or deliverable-based statements of work—not putting the founder on your payroll. Nexus assigns who does the work. That keeps IP, invoicing, and responsibility with the company delivering the outcomes you bought.",
   },
   {
     q: "What industries do you serve?",
-    a: "We work across education, government, healthcare, public safety, and enterprise. Our solutions range from AI-powered EdTech platforms and emergency-services simulation training to privacy-preserving data systems for state agencies.",
-  },
-  {
-    q: "How are the NVIDIA workshops structured?",
-    a: "Certified Nexus instructors facilitate full-day immersion labs patterned after NVIDIA Deep Learning Institute pedagogy—GPU-hosted exercises, facilitator checkpoints, and completion artifacts when NVIDIA recognizes the cohort. Students at hosting universities routinely attend at no tuition-style charge.",
+    a: "We work across education, government, healthcare, public safety, and enterprise. Representative work includes AI-powered EdTech, simulation training, and privacy-preserving data systems for state agencies — always as AI solutions, not generic IT operations.",
   },
   {
     q: "Can you work with our existing tech stack?",
-    a: "Absolutely. We integrate with AWS, Azure, GCP, on-prem infrastructure, and hybrid setups. Our team has deep experience with Python, PyTorch, LangChain, Next.js, and modern cloud-native architectures.",
+    a: "Yes, when the stack is in service of an AI system. Typical tools include Python, PyTorch, LangChain / LangGraph, evaluation harnesses, and GPU-accelerated NVIDIA DLI-style labs. Cloud or hybrid hosting is used to run those systems — we do not sell standalone helpdesk, cybersecurity assessments, or lift-and-shift cloud migration.",
   },
   {
     q: "What does a typical engagement look like?",
@@ -37,7 +37,7 @@ const FAQS = [
   },
   {
     q: "How do you handle data privacy and compliance?",
-    a: "Security and privacy are core to every engagement. We build with encryption at rest and in transit, role-based access, audit logging, and compliance with frameworks like HIPAA, FERPA, and state data-privacy regulations.",
+    a: "Security and privacy are core to every AI engagement. We design with encryption at rest and in transit, role-based access, audit logging, and alignment with frameworks like HIPAA, FERPA, and state data-privacy regulations — especially relevant in Utah public-sector work.",
   },
 ];
 

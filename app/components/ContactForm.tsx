@@ -3,8 +3,8 @@
 import { useState } from "react";
 
 const CATEGORY_LABEL: Record<string, string> = {
-  consulting: "IT & AI consulting",
-  workshop: "Workshops & training",
+  consulting: "AI consulting",
+  workshop: "Workshops & team training",
   careers: "Careers",
   partnership: "Partnership",
   general: "General inquiry",

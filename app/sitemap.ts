@@ -1,14 +1,12 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nexusaisolution.net";
+import { INDEXABLE_PATHS, absoluteUrl } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: siteUrl,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1,
-    },
-  ];
+  const now = new Date();
+  return INDEXABLE_PATHS.map((path, i) => ({
+    url: absoluteUrl(path),
+    lastModified: now,
+    changeFrequency: path === "/" ? "weekly" : "monthly",
+    priority: path === "/" ? 1 : 0.8 - i * 0.05,
+  }));
 }

@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AiMarketPulse } from "@/app/components/AiMarketPulse";
 import { AiChatbotShowcase } from "@/app/components/AiChatbotShowcase";
 import { AnimatedCounter } from "@/app/components/AnimatedCounter";
 import { ContactForm } from "@/app/components/ContactForm";
@@ -11,48 +10,21 @@ import { ScrollToTop } from "@/app/components/ScrollToTop";
 import { CollaborationHighlights } from "@/app/components/Testimonials";
 import { LogoStrip } from "@/app/components/LogoStrip";
 import { NewsletterForm } from "@/app/components/NewsletterForm";
-import { IT_SERVICES } from "@/app/components/home/services-data";
+import { AiNowStrip } from "@/app/components/AiNowStrip";
+import { BioCategories } from "@/app/components/BioCategories";
+import { PartnersStrip } from "@/app/components/PartnersStrip";
+import { AI_SERVICES } from "@/app/components/home/services-data";
+import { MAJID } from "@/lib/majid";
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
 
 const STATS = [
-  { value: 200, suffix: "+", label: "Projects" },
-  { value: 10, suffix: "+", label: "Funded Projects Led" },
-  { value: 100, suffix: "+", label: "Students Led" },
-  { value: 10, suffix: "+", label: "AI Courses & Workshops" },
-];
-
-const AI_OFFERINGS = [
-  {
-    title: "LLM & RAG Systems",
-    tagline: "Private knowledge, grounded answers",
-    description:
-      "Retrieval-augmented generation over your documents and data—with chunking, embedding, reranking, evaluation sets, and guardrails so outputs are useful in production, not just impressive in demos.",
-    icon: "brain",
-  },
-  {
-    title: "Agentic Automation",
-    tagline: "LangChain / LangGraph tool workflows",
-    description:
-      "Agents that plan, call APIs, retrieve context, and hand off cleanly—paired with tracing, retries, logging, and human oversight for reliable operational automation.",
-    icon: "robot",
-  },
-  {
-    title: "AI Strategy, evals & MLOps",
-    tagline: "From pilot to production",
-    description:
-      "Roadmaps plus LLM observability—test sets, qualitative review loops, latency and cost budgeting, and rollout patterns suited to regulated or high-stakes settings.",
-    icon: "chart",
-  },
-  {
-    title: "NVIDIA DLI & Training",
-    tagline: "Hands-on GPU education",
-    description:
-      "Workshops aligned with NVIDIA Deep Learning Institute (DLI) standards—delivered in person or virtually for your team.",
-    icon: "gpu",
-  },
+  { value: 4, suffix: "+", label: "Active AI delivery streams" },
+  { value: 8, suffix: "+", label: "AI courses & DLI workshops" },
+  { value: 20, suffix: "+", label: "Student researchers mentored" },
+  { value: 4, suffix: "", label: "Fall 2026 UVU courses" },
 ];
 
 const PROJECTS = [
@@ -86,10 +58,17 @@ const PROJECTS = [
   },
   {
     title: "Drone AI & 3D Imaging",
-    tagline: "$1M USHE-funded research",
+    tagline: "RGB + thermal computer vision",
     description:
-      "USHE-funded drone imaging for wind-turbine maintenance—RGB/thermal capture, 3D reconstruction, and path planning. Led as postdoc; published industry-relevant results.",
+      "Published research on drone RGB/thermal inspection of wind-turbine blades (IEEE Access, Energies, Machines). Continues UVU applied computer-vision work on aerial inspection.",
     icon: "drone",
+  },
+  {
+    title: "GridEye",
+    tagline: "Aerial inspection of the electrical grid",
+    description:
+      "AI-driven aerial inspection and predictive maintenance for electrical-grid infrastructure. Collaboration with the University of Utah, UVU ECE, and PacifiCorp — a joint USHE proposal in development (not a funded award).",
+    icon: "pipeline",
   },
   {
     title: "Personal AI Money Companion",
@@ -130,32 +109,45 @@ const PROJECTS = [
   },
 ];
 
-const FEATURED_PROJECTS = PROJECTS.slice(0, 6);
+const FEATURED_PROJECT_TITLES = [
+  "DataGovAI",
+  "Synthetic Data Pipeline",
+  "Drone AI & 3D Imaging",
+  "GridEye",
+  "AI-Powered EdTech",
+  "Agentic Workflow Automation",
+] as const;
+
+const FEATURED_PROJECTS = FEATURED_PROJECT_TITLES.map((title) => {
+  const project = PROJECTS.find((p) => p.title === title);
+  if (!project) throw new Error(`Missing featured project: ${title}`);
+  return project;
+});
 
 const WORKSHOPS = [
   {
-    title: "Fundamentals of Deep Learning",
-    duration: "~8 hours (typical DLI workshop)",
+    title: "Building Agentic AI Applications with LLMs",
+    duration: "NVIDIA DLI · GPU labs",
     blurb:
-      "Train neural networks for classification and detection with hands-on PyTorch labs on GPU-accelerated cloud instances.",
+      "Tool-using agents, multi-step plans, and GPU-accelerated labs aligned with NVIDIA Deep Learning Institute standards.",
   },
   {
-    title: "AI on Jetson / Edge",
-    duration: "Hands-on lab",
-    blurb:
-      "Build and deploy edge AI prototypes—ideal for robotics and IoT-focused programs.",
-  },
-  {
-    title: "RAG & LLM Agents",
+    title: "RAG over private data",
     duration: "Applied GenAI",
     blurb:
-      "Retrieval-augmented generation, prompt patterns, and safe deployment of LLM-powered assistants.",
+      "Retrieval-augmented generation over your documents — chunking, embeddings, citations, and evaluation before go-live.",
   },
   {
-    title: "Generative AI",
-    duration: "Foundations",
+    title: "Evaluation & guardrails",
+    duration: "Production practice",
     blurb:
-      "Diffusion and generative fundamentals with practical exercises—aligned with industry demand.",
+      "Test sets, review loops, hallucination checks, and latency/cost envelopes for high-stakes settings.",
+  },
+  {
+    title: "Multimodal vision + language",
+    duration: "Applied computer vision",
+    blurb:
+      "Vision-language workflows that match published RGB/thermal inspection research — not a generic CV catalog.",
   },
 ];
 
@@ -176,13 +168,15 @@ const TECH_LOGOS = [
 ];
 
 const FOOTER_LINKS = [
-  { label: "Services", href: "#services" },
-  { label: "Engagement", href: "#engagement" },
-  { label: "Work", href: "#work" },
-  { label: "Education", href: "#education" },
-  { label: "About", href: "#about" },
-  { label: "Careers", href: "#careers" },
-  { label: "Contact", href: "#contact" },
+  { label: "AI now", href: "/#ai-now" },
+  { label: "Services", href: "/#services" },
+  { label: "Engagement", href: "/#engagement" },
+  { label: "Work", href: "/#work" },
+  { label: "Partners", href: "/#partners" },
+  { label: "Education", href: "/#education" },
+  { label: "About", href: "/about" },
+  { label: "Careers", href: "/#careers" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const GOVERNMENT_HIGHLIGHTS = [
@@ -207,10 +201,10 @@ const GOVERNMENT_HIGHLIGHTS = [
 const COMMUNITY_ROLES = [
   {
     facet: "Nexus AI Solutions LLC",
-    headline: "Client engagements & intern pipeline",
+    headline: "AI consulting and team training",
     period: "",
     description:
-      "The operating umbrella for milestones, statements of work, and outcomes. Nexus recruits student interns onto real architectures and implementations—hands-on mentorship at no internship fee.",
+      "Advisory engagements, instructor-led workshops, and in-house team training. Implementation is a follow-on statement of work. Nexus also brings student interns onto real AI projects — hands-on mentorship at no internship fee.",
     icon: "nexus",
   },
   {
@@ -226,7 +220,7 @@ const COMMUNITY_ROLES = [
     headline: "Course design & mentorship",
     period: "",
     description:
-      "Nexus principals collaborate with Utah campuses to prototype courses and mentor teams bridging industry-grade AI pipelines with classroom rigor—not as a staffing agency, but as specialist architects guiding capstones and pilots.",
+      "Nexus collaborates with Utah campuses to prototype courses and mentor teams bridging industry-grade AI pipelines with classroom rigor—not as a staffing agency, but as specialist architects guiding capstones and pilots.",
     icon: "uvu",
   },
   {
@@ -424,16 +418,51 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={100}>
             <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-6xl sm:leading-[1.05]">
-              IT consulting &amp;{" "}
-              <span className="gradient-text">AI that ships</span>
+              AI consulting &amp;{" "}
+              <span className="gradient-text">team training</span>
             </h1>
           </Reveal>
           <Reveal delay={200}>
             <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Client work is routed through Nexus—Utah-founded IT &amp; AI consulting—with principals who
-              hold NVIDIA DLI credentials and decades of architecture and production-engineering discipline.
-              Engagements are deliberately boutique: discovery, phased build, accountable delivery.
+              Active AI work with Utah agencies, campuses, and industry — DataGovAI and
+              privacy-preserving data, drone RGB/thermal inspection, GridEye, and team training.
+              Founder {MAJID.fullName} is {MAJID.jobTitle} at {MAJID.university}. He consults with{" "}
+              {MAJID.clarion} on LLM and agent workflows and was{" "}
+              <a
+                href={MAJID.aiUtah100.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-500 dark:text-zinc-100 dark:decoration-zinc-600"
+              >
+                selected for the 2026 AI Utah 100
+              </a>
+              .
             </p>
+          </Reveal>
+          <Reveal delay={240}>
+            <div
+              id="bio-buckets"
+              className="mx-auto mt-10 grid max-w-3xl gap-3 text-left sm:grid-cols-3"
+            >
+              {[
+                { heading: "Academia", line: "Assistant Professor of Computer Science at UVU — applied AI, ML, and generative AI." },
+                { heading: "Industry", line: "AI consulting and team training through Nexus; Clarion AI Partners; NVIDIA DLI instructor." },
+                { heading: "Community", line: "Herbert Institute and Utah data-privacy work; selected for the 2026 AI Utah 100." },
+              ].map((bucket) => (
+                <Link
+                  key={bucket.heading}
+                  href="/#about"
+                  className="rounded-xl border border-zinc-200/80 bg-white/70 px-4 py-3 dark:border-zinc-800/60 dark:bg-zinc-900/40"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                    {bucket.heading}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                    {bucket.line}
+                  </p>
+                </Link>
+              ))}
+            </div>
           </Reveal>
           <Reveal delay={280}>
             <div className="mt-10 flex justify-center">
@@ -460,7 +489,11 @@ export function HomePageContent() {
         </div>
       </section>
 
-      {/* ============== SERVICES (IT + AI) ============== */}
+      <PartnersStrip voice="we" />
+
+      <AiNowStrip />
+
+      {/* ============== SERVICES ============== */}
       <section id="services" className="scroll-mt-20 border-t border-zinc-200/80 bg-white px-4 py-32 dark:border-zinc-800/40 dark:bg-zinc-950 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <Reveal>
@@ -471,17 +504,14 @@ export function HomePageContent() {
               What we do
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-              IT consulting—from planning and integration to modernization and cybersecurity—paired
-              with production AI we ship under Nexus statements of work: RAG over private data,
-              LangChain/LangGraph agents, AI automation and tool-use systems, LLM evaluation and guardrails,
-              Python/FastAPI AI backends (and modernization that can include regulated-environment{" "}
-              <strong className="text-zinc-800 dark:text-zinc-200">C++/Linux</strong> stacks where it fits),
-              plus NVIDIA DLI–aligned workshops for teams.
+              Our primary client work is {MAJID.clientOffer.label}: {MAJID.clientOffer.summary} When a
+              team is ready to build, we follow with a scoped statement of work — RAG over private
+              data, agentic tool-use, evaluation and guardrails, and multimodal systems.
             </p>
           </Reveal>
 
           <div className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {IT_SERVICES.map((svc, i) => (
+            {AI_SERVICES.map((svc, i) => (
               <Reveal key={svc.title} delay={i * 40}>
                 <div className="card group h-full p-6">
                   <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 transition dark:bg-zinc-800 dark:text-zinc-300">
@@ -490,20 +520,6 @@ export function HomePageContent() {
                   <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{svc.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
                     {svc.description}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-            {AI_OFFERINGS.map((item, i) => (
-              <Reveal key={item.title} delay={(i + IT_SERVICES.length) * 40}>
-                <div className="card group h-full p-6">
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 transition dark:bg-zinc-800 dark:text-zinc-300">
-                    <ProjectIcon kind={item.icon} />
-                  </div>
-                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{item.title}</h3>
-                  <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-500">{item.tagline}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                    {item.description}
                   </p>
                 </div>
               </Reveal>
@@ -521,7 +537,7 @@ export function HomePageContent() {
               <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 Nexus operates as your <strong className="text-zinc-800 dark:text-zinc-200">vendor of record</strong>
                 —you buy scoped, temporary engagements (discovery + milestones)—not staffing or employment
-                of our principals on your payroll. We allocate and manage delivery; as volume grows Nexus
+                of the founder on your payroll. We allocate and manage delivery; as volume grows Nexus
                 can bring in bench talent under the same statements of work. Contracts, invoices, and IP
                 flow through{" "}
                 <strong className="text-zinc-800 dark:text-zinc-200">Nexus AI Solutions LLC</strong> (Utah).
@@ -532,25 +548,26 @@ export function HomePageContent() {
               <Reveal delay={80}>
                 <div className="card h-full border border-zinc-200/90 p-6 dark:border-zinc-800/70">
                   <h4 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                    Principals behind Nexus
+                    Who leads Nexus
                   </h4>
                   <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                    <strong className="text-zinc-800 dark:text-zinc-200">Dr. Majid Memari</strong> —
-                    Founder &amp; Principal AI Architect. He owns the technical narrative for client
-                    roadmaps—retrieval/agent architecture, multimodal proofs, evaluations, governance,
-                    Bedrock-era cloud patterns—and the public-sector flavored programs highlighted in our
-                    DataGovAI and government portfolios.
+                    <strong className="text-zinc-800 dark:text-zinc-200">{MAJID.fullName}</strong> —
+                    {MAJID.roles.nexus}. {MAJID.roles.uvu}; {MAJID.roles.nvidia}. He was{" "}
+                    <a
+                      href={MAJID.aiUtah100.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-zinc-800 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-500 dark:text-zinc-200"
+                    >
+                      selected for the 2026 AI Utah 100
+                    </a>
+                    . He leads {MAJID.clientOffer.label} for clients, and public-sector programs such
+                    as DataGovAI at the Gary R. Herbert Institute for Public Policy.
                   </p>
                   <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                    <strong className="text-zinc-800 dark:text-zinc-200">Hamid Memari</strong> —
-                    Technical Delivery Lead on Nexus mandates. Hands-on integrations, backends, build
-                    automation, escalation discipline, and production hardening borrowed from regulated
-                    product environments—all tuned for clients who refuse fragile AI veneers.
-                  </p>
-                  <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                    We&apos;re co-located in the{" "}
-                    <strong className="text-zinc-800 dark:text-zinc-200">Salt Lake City</strong>{" "}
-                    area for sharper discovery, whiteboarding, and delivery cadence together.
+                    Work is based in Utah&apos;s{" "}
+                    <strong className="text-zinc-800 dark:text-zinc-200">Salt Lake metro</strong>{" "}
+                    for discovery, whiteboarding, and delivery cadence.
                   </p>
                 </div>
               </Reveal>
@@ -566,13 +583,12 @@ export function HomePageContent() {
                     shared discovery and boundaries.
                   </p>
                   <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
-                    <li>RAG assistants and enterprise document Q&amp;A grounded in private corpora.</li>
-                    <li>Tool-using agents—LangChain, LangGraph—with tracing, approvals, retries.</li>
-                    <li>LLM evaluation, regression sets, hallucination containment, prompting ops.</li>
-                    <li>Python/FastAPI (and adjoining) AI services wired to cloud or hybrid footprints.</li>
-                    <li>Healthcare-<em>adjacent</em> workflow automation and clinical-flavored NLP,
-                    respecting compliance and institutional policies—paired with pragmatic IT uplift
-                    (integration, modernization, hygiene) where it unblocks AI.</li>
+                    <li>RAG assistants and document Q&amp;A grounded in private corpora.</li>
+                    <li>Agentic tool-use — LangChain / LangGraph — with tracing, approvals, retries.</li>
+                    <li>LLM evaluation, guardrails, regression sets, and prompting ops.</li>
+                    <li>Multimodal vision + language where it matches the problem (including RGB/thermal).</li>
+                    <li>Healthcare-adjacent workflow automation and NLP, respecting institutional policy —
+                    only as part of an AI system, not as standalone IT operations.</li>
                   </ul>
                   <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
                     Most engagements begin with a{" "}
@@ -611,8 +627,8 @@ export function HomePageContent() {
               Our work
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-              Representative builds across EdTech, simulation, agents, drones, public-sector data, and
-              custom AI.
+              Flagship work: DataGovAI, privacy-preserving synthetic data, wind-turbine RGB/thermal
+              inspection, GridEye, EdTech, and agentic systems.
             </p>
           </Reveal>
           <div className="mt-20 grid auto-rows-fr gap-5 sm:grid-cols-2">
@@ -733,12 +749,12 @@ export function HomePageContent() {
 
           <div className="mt-32 border-t border-zinc-200/80 pt-24 dark:border-zinc-800/40">
             <Reveal>
-              <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-                Partners
-              </p>
-              <h3 className="mt-4 text-center text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-                Where we make an impact
-              </h3>
+            <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              Impact
+            </p>
+            <h3 className="mt-4 text-center text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+              Where we make an impact
+            </h3>
             </Reveal>
             <Reveal delay={80}>
               <div className="mt-12">
@@ -747,9 +763,6 @@ export function HomePageContent() {
             </Reveal>
           </div>
 
-          <div className="mt-8">
-            <AiMarketPulse variant="embedded" />
-          </div>
         </div>
       </section>
 
@@ -764,11 +777,11 @@ export function HomePageContent() {
               NVIDIA Deep Learning Institute
             </p>
             <h2 className="mt-4 text-center text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-              Workshops &amp; teaching
+              Workshops &amp; team training
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-center text-zinc-600 dark:text-zinc-500">
-              Principals affiliated with Nexus are NVIDIA DLI certified instructors—delivering immersive
-              workshops aligned with{" "}
+              We train teams in-house and on campus. Sessions include organizational workshops and
+              NVIDIA DLI–aligned labs from{" "}
               <Link
                 href="https://www.nvidia.com/en-us/training/"
                 className="text-sky-600 dark:text-sky-400 hover:underline"
@@ -776,9 +789,9 @@ export function HomePageContent() {
                 rel="noopener noreferrer"
               >
                 NVIDIA Deep Learning Institute
-              </Link>{" "}
-              training—free for students at participating universities, with
-              GPU-accelerated labs and certificates of completion where available.
+              </Link>
+              . Student workshops at participating universities are offered at no charge to students.
+              Organizational training is scoped to your tools and goals.
             </p>
           </Reveal>
           <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -816,11 +829,11 @@ export function HomePageContent() {
                 href="#contact"
                 className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
               >
-                Invite Nexus instructors to campus
+                Book a workshop or team training
               </a>
               <p className="max-w-md text-center text-xs text-zinc-600">
-                Available for universities worldwide. Student workshops are
-                offered at no charge to students; logistics vary by institution.
+                Campus student workshops remain free for students at participating
+                universities. Organizational training is scoped separately.
               </p>
             </div>
           </Reveal>
@@ -962,17 +975,16 @@ export function HomePageContent() {
                     AI Utah
                   </a>
                   —Utah&apos;s AI user group and community hub for practitioners, events, companies,
-                  and collaboration. It&apos;s where the statewide AI community meets (including
-                  programs like{" "}
+                  and collaboration. Dr. Memari was{" "}
                   <a
                     href="https://www.aiutah.org/ai-utah-100/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-sky-600 underline decoration-sky-600/30 hover:decoration-sky-600 dark:text-sky-400"
                   >
-                    AI Utah 100
+                    selected for the 2026 AI Utah 100
                   </a>
-                  ). Our leads host office hours alongside student cohorts so talent pipelines intersect
+                  . Our leads host office hours alongside student cohorts so talent pipelines intersect
                   with hiring managers—not just conference badges.
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-500">
@@ -1063,8 +1075,7 @@ export function HomePageContent() {
               Dr. Majid Memari
             </h2>
             <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-500">
-              Ph.D. Computer Science • Founder of Nexus AI Solutions • Deep-learning generalist bridging
-              research rigor with deployable architectures.
+              Academia · Industry · Community · Founder of Nexus AI Solutions
             </p>
           </Reveal>
 
@@ -1084,43 +1095,27 @@ export function HomePageContent() {
                     aria-hidden
                   />
                 </div>
-                <div className="space-y-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  <p>
-                    <strong className="text-zinc-900 dark:text-zinc-100">Nexus AI Solutions LLC</strong>{" "}
-                    anchors enterprise AI programs for clients and public-sector collaborators.
-                    Founder <strong className="text-zinc-900 dark:text-zinc-100">Dr. Majid Memari</strong>{" "}
-                    architects those initiatives—from synthetic data regimes to UAV inspection stacks—while{" "}
-                    <strong className="text-zinc-900 dark:text-zinc-200">Hamid Memari</strong> anchors the
-                    hands-on integrations and disciplined release rhythms. Nexus also served as technical
-                    lead on a{" "}
-                    <strong className="text-zinc-900 dark:text-zinc-100">$1M USHE</strong>-sponsored drone
-                    intelligence program and routinely collaborates with Utah agencies plus research
-                    collaborators such as Stanford, Johns Hopkins, and the University of Pennsylvania.
-                  </p>
-                  <p>
-                    Responsible AI alliances—like{" "}
-                    <a
-                      href="https://rai.utah.edu/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-500 dark:text-zinc-100 dark:decoration-zinc-600"
-                    >
-                      One-U Responsible AI
-                    </a>
-                    —plus Silicon Slopes and Utah civic tech—keep Nexus honest about safeguards while still
-                    shipping measurable outcomes with clients.
-                  </p>
-                </div>
+                <BioCategories />
+                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Academic profile:{" "}
+                  <a
+                    href={MAJID.personalSite}
+                    className="text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-500 dark:text-zinc-100 dark:decoration-zinc-600"
+                  >
+                    majidmemari.com
+                  </a>
+                  .
+                </p>
               </div>
             </Reveal>
 
             <Reveal delay={160}>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { big: "~20 yrs", sub: "Research-to-production AI grounding" },
-                  { big: "Ph.D.", sub: "Computer Science, SIU" },
-                  { big: "NVIDIA", sub: "Ambassador & DLI Instructor" },
-                  { big: "$1M", sub: "USHE drone AI — technical lead" },
+                  { big: "Ph.D.", sub: "Computer Science, SIU Carbondale" },
+                  { big: "UVU", sub: "Assistant Professor of Computer Science" },
+                  { big: "NVIDIA", sub: "University Ambassador & DLI Instructor" },
+                  { big: "2026", sub: "Selected for the 2026 AI Utah 100" },
                 ].map((card) => (
                   <div key={card.big} className="card p-4">
                     <p className="text-xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
@@ -1164,7 +1159,7 @@ export function HomePageContent() {
               <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 If you want <strong className="text-zinc-800 dark:text-zinc-200">real-world AI engineering experience</strong>,
                 reach out—we always have multiple projects in flight and we hire
-                interns on a rolling basis. You&apos;ll work alongside Nexus principals and peer engineers
+                interns on a rolling basis. You&apos;ll work alongside the Nexus team and peer engineers
                 on production-minded tasks: LLMs and RAG, agentic workflows,
                 cloud integrations, and domain projects that ship.
               </p>
@@ -1225,7 +1220,8 @@ export function HomePageContent() {
               Let&apos;s work together
             </h2>
             <p className="mt-4 max-w-lg text-zinc-600 dark:text-zinc-400">
-              IT or AI consulting—send a message and we&apos;ll respond promptly.
+              AI consulting, workshops, or team training — send a message and we&apos;ll respond
+              promptly.
             </p>
           </Reveal>
 
@@ -1331,7 +1327,8 @@ export function HomePageContent() {
                 </span>
               </div>
               <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-500">
-                Utah-based IT and AI consulting led by Dr. Majid Memari.
+                Utah AI consulting and team training. Founder {MAJID.fullName} — {MAJID.jobTitle},{" "}
+                {MAJID.university}. He was selected for the 2026 AI Utah 100.
               </p>
             </div>
 
@@ -1340,17 +1337,17 @@ export function HomePageContent() {
               className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-zinc-600 dark:text-zinc-400"
             >
               {FOOTER_LINKS.map((l) => (
-                <a
+                <Link
                   key={l.href}
                   href={l.href}
                   className="transition hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                   {l.label}
-                </a>
+                </Link>
               ))}
-              <a href="#faq" className="transition hover:text-zinc-900 dark:hover:text-zinc-100">
+              <Link href="/#faq" className="transition hover:text-zinc-900 dark:hover:text-zinc-100">
                 FAQ
-              </a>
+              </Link>
             </nav>
 
             <div className="w-full max-w-xs lg:w-auto">
