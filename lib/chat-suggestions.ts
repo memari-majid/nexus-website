@@ -1,0 +1,156 @@
+/**
+ * Follow-up chips for Nex. The model is asked to emit `SUGGESTIONS: a | b | c`.
+ * This module sanitizes that line and fills in useful defaults when it is
+ * missing or generic, so visitors always get a next step they can tap.
+ */
+
+export const OPENING_CHIPS = [
+  "Schedule the NVIDIA workshop",
+  "What's covered in the workshop?",
+  "We're a university",
+] as const;
+
+const GENERIC = [
+  "tell me more",
+  "anything else",
+  "learn more",
+  "thanks",
+  "thank you",
+  "ok",
+  "okay",
+  "got it",
+  "sounds good",
+  "what else",
+  "more info",
+  "more information",
+  "yes",
+  "no",
+  "sure",
+  "cool",
+  "interesting",
+];
+
+function norm(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function isGeneric(s: string): boolean {
+  const n = norm(s);
+  return n.length < 2 || GENERIC.includes(n);
+}
+
+function alreadyUsed(s: string, used: readonly string[]): boolean {
+  const n = norm(s);
+  return used.some((u) => {
+    const un = norm(u);
+    return un === n || un.includes(n) || n.includes(un);
+  });
+}
+
+/** Keep three short, unused, non-fluff chips. */
+export function sanitizeSuggestions(
+  chips: readonly string[],
+  used: readonly string[] = [],
+): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of chips) {
+    const s = raw.replace(/\s+/g, " ").trim();
+    if (s.length < 2 || s.length > 42) continue;
+    if (isGeneric(s) || alreadyUsed(s, used)) continue;
+    const key = norm(s);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(s);
+    if (out.length === 3) break;
+  }
+  return out;
+}
+
+function pick(pool: readonly string[], used: readonly string[]): string[] {
+  return sanitizeSuggestions(pool, used);
+}
+
+/**
+ * Contextual chips when the model forgets the marker or only emits fluff.
+ * Match on the last assistant turn (and last user turn) so the tap continues
+ * the conversation instead of restarting it.
+ */
+export function fallbackSuggestions(opts: {
+  lastAssistant?: string;
+  lastUser?: string;
+  used?: readonly string[];
+}): string[] {
+  const used = opts.used ?? [];
+  const a = `${opts.lastAssistant ?? ""} ${opts.lastUser ?? ""}`.toLowerCase();
+
+  if (/filed|on the way|inbox|follow up by email|request is in/.test(a)) {
+    return pick(
+      ["What should people prepare?", "How many people can join?", "What's covered?"],
+      used,
+    );
+  }
+
+  if (/name and email|your name|your email|email address/.test(a)) {
+    return [];
+  }
+
+  if (/how many|headcount|participants|people/.test(a)) {
+    return pick(["About 15 people", "About 25 people", "About 40 people"], used);
+  }
+
+  if (/in person or|on site or|remote|online or/.test(a)) {
+    return pick(["In person", "Remote", "Not sure yet"], used);
+  }
+
+  if (/industry or academia|company or|university or/.test(a)) {
+    return pick(["We're a company", "We're a university", "We're a lab"], used);
+  }
+
+  if (/when|six weeks|date|schedule|lead time/.test(a) && /workshop|cohort|host/.test(a)) {
+    return pick(["In about two months", "This quarter", "Just exploring for now"], used);
+  }
+
+  if (/free|academia|university|campus|ambassador/.test(a)) {
+    return pick(["We're a university", "Schedule a campus workshop", "What's covered?"], used);
+  }
+
+  if (/consult|adopt|when not to|scoping/.test(a)) {
+    return pick(
+      ["When should we skip AI?", "Would the workshop help?", "Schedule a scoping chat"],
+      used,
+    );
+  }
+
+  if (/workshop|nvidia|dli|agentic|certificate/.test(a)) {
+    return pick(
+      ["Schedule the workshop", "What's covered?", "Do we need our own GPUs?"],
+      used,
+    );
+  }
+
+  return pick(
+    [
+      "Schedule the NVIDIA workshop",
+      "What's covered in the workshop?",
+      "How does consulting work?",
+    ],
+    used,
+  );
+}
+
+/** Prefer model chips; fall back to contextual defaults. */
+export function resolveSuggestions(
+  modelChips: readonly string[],
+  context: {
+    lastAssistant?: string;
+    lastUser?: string;
+    used?: readonly string[];
+  },
+): string[] {
+  const used = context.used ?? [];
+  const fromModel = sanitizeSuggestions(modelChips, used);
+  if (fromModel.length >= 2) return fromModel;
+  const fallback = fallbackSuggestions({ ...context, used: [...used, ...fromModel] });
+  return sanitizeSuggestions([...fromModel, ...fallback], used);
+}

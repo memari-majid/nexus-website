@@ -10,7 +10,7 @@ Restore the company site after the Vercel project was removed.
 
 | Track | Status | Notes |
 |---|---|---|
-| **Vercel project** | Recreated | `nexus-website` on `memari-majids-projects`, GitHub `memari-majid/nexus-website`, production branch `main`. Latest site work lives on `nvidia-green-redesign` and is merged to `main` for GitHub production deploys. |
+| **Vercel project** | Tuned 2026-09-12 | `nexus-website` on `memari-majids-projects`, GitHub `memari-majid/nexus-website`, production branch `main`, Node **24.x**, region **iad1**. Skew protection 12h; Git fork protection on. WAF rate limits: `/api/chat` 30/min/IP, `/api/contact` 10/min/IP. `vercel.json` enables Fluid Compute + security headers. Preview now has the same public/config env as production (OIDC covers AI Gateway). **Majid must confirm in a terminal** (paid): `vercel project update nexus-website --fluid-compute on --function-cpu standard` and enable Web Analytics + Speed Insights if he wants those dashboards. |
 | **Domain** | Attached | `nexusaisolution.net` + `www` — DNS is still on Cloudflare (`sreeni` / `valentin.ns.cloudflare.com`), not Vercel nameservers |
 | **Env** | Production + development | Site URL, AI CPA URL, models, contact inbox, AI Gateway key. Preview-all-branches add is blocked by CLI in this environment |
 | **Pages** | Live 2026-09-12 | `/` · `/about` (team index) · `/about/<slug>` ×3 (per-person, one shared template from `lib/people.ts`) · `/nvidia-dli-workshops` · `/contact`. All in `sitemap.xml`. Nav is four links: Training · Consulting · About · Contact, plus the chat CTA. |

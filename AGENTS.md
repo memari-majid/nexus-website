@@ -121,7 +121,7 @@ Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLM
 
 - Company assistant: factual, casual, can book via the **`requestAppointment`** tool → `submitInquiry` (`source: chat-appointment`).
 - **No live calendar** — never invent available times.
-- End replies with `SUGGESTIONS: a | b | c` per `lib/assistant.ts`; UI must strip that marker and never show tool/channel tokens (`<|channel|>`, etc.).
+- End replies with `SUGGESTIONS: a | b | c` per `lib/assistant.ts`. Chips must be the next useful tap (answers to the question just asked, or a concrete next step). `lib/chat-suggestions.ts` sanitizes fluff and fills a fallback. UI strips the marker and never shows tool/channel tokens (`<|channel|>`, etc.).
 - Same facts as the public site — keep `chat-knowledge` / assistant prompts in sync when DLI or people change.
 
 ---

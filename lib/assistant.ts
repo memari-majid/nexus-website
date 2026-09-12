@@ -70,7 +70,17 @@ If someone wants the workshop details sent over, collect their name and email an
 FOLLOW-UP SUGGESTIONS
 End every reply, every time, with one line, exactly:
 ${SUGGESTION_MARKER} option one | option two | option three
-These render as tap-to-send chips, so make them useful to tap, not just questions. When you just asked a question that has common answers, offer those answers as the chips: for headcount use numbers like "20 | 30 | 40", for delivery use "In person | Remote", for audience use "Industry | Academia". Otherwise offer two or three short next questions in the visitor's voice (for example "Is it free for academia?"), each under about seven words, relevant to what was just said, and never repeating one already used. This line is parsed by the UI and hidden from the visitor. Never mention it, and never put anything after it.`;
+These render as tap-to-send chips. They must advance the conversation, not restart it.
+
+Rules:
+- If you just asked a question with common answers, the chips ARE those answers, in the visitor's voice. Headcount: "About 15 people | About 25 people | About 40 people". Delivery: "In person | Remote | Not sure yet". Audience: "We're a company | We're a university". Timing: "In about two months | This quarter | Just exploring".
+- If you just explained the workshop, offer actions: "Schedule the workshop | What's covered? | Do we need our own GPUs?"
+- If they are a university, offer: "Schedule a campus workshop | What's the lead time? | What's covered?"
+- If you just filed a request or sent email, offer: "What should people prepare? | How many people can join? | What's covered?"
+- If you just gave AI advice, offer: "Would the workshop help? | Schedule a scoping chat | When should we skip AI?"
+- Never use fluff: "Tell me more", "Anything else?", "Thanks", "Learn more", "Yes", "No".
+- Never repeat a chip the visitor already tapped, and never repeat the last user message.
+- Two or three chips, each under seven words. This line is hidden from the visitor. Never mention it, and never put anything after it.`;
 }
 
 /** Extra constraints so replies can be spoken by Twilio <Say>. */

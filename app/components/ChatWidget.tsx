@@ -6,12 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { SUGGESTION_MARKER } from "@/lib/assistant";
 import { OPEN_CHAT_EVENT } from "@/lib/chat-events";
-
-const QUICK_PROMPTS = [
-  "Schedule the NVIDIA workshop",
-  "Is it free for academia?",
-  "Can you host it for my team?",
-];
+import { OPENING_CHIPS, resolveSuggestions } from "@/lib/chat-suggestions";
 
 function textFromMessage(m: { parts: { type: string; text?: string }[] }) {
   return m.parts
@@ -131,9 +126,23 @@ export function ChatWidget() {
   }
 
   const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+  const lastUser = [...messages].reverse().find((m) => m.role === "user");
+  const usedChips = messages
+    .filter((m) => m.role === "user")
+    .map((m) => textFromMessage(m))
+    .filter(Boolean);
   const suggestions =
     !busy && lastAssistant
-      ? splitSuggestions(stripControlTokens(textFromMessage(lastAssistant))).suggestions
+      ? resolveSuggestions(
+          splitSuggestions(stripControlTokens(textFromMessage(lastAssistant))).suggestions,
+          {
+            lastAssistant: splitSuggestions(
+              displayAssistantText(textFromMessage(lastAssistant)),
+            ).body,
+            lastUser: lastUser ? textFromMessage(lastUser) : undefined,
+            used: usedChips,
+          },
+        )
       : [];
 
   return (
@@ -206,7 +215,7 @@ export function ChatWidget() {
                     workshop, and get it scheduled right here. What are you working on?
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {QUICK_PROMPTS.map((q) => (
+                    {OPENING_CHIPS.map((q) => (
                       <button
                         key={q}
                         type="button"

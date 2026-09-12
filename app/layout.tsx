@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { PAGE_COPY } from "@/lib/seo";
@@ -86,6 +88,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="min-w-0 overflow-x-hidden antialiased">
         <ThemeProvider>{children}</ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
