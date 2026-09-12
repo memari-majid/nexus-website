@@ -15,6 +15,7 @@ const FOOTER_LINKS = [
   { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "Consulting", href: "/#consulting" },
   { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 /** Shared section shell: eyebrow, headline, one supporting line. */

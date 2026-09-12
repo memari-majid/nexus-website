@@ -10,10 +10,10 @@ Restore the company site after the Vercel project was removed.
 
 | Track | Status | Notes |
 |---|---|---|
-| **Vercel project** | Recreated | `nexus-website` on `memari-majids-projects`, GitHub `memari-majid/nexus-website`, production branch `main` |
+| **Vercel project** | Recreated | `nexus-website` on `memari-majids-projects`, GitHub `memari-majid/nexus-website`, production branch `main`. Latest site work lives on `nvidia-green-redesign` and is merged to `main` for GitHub production deploys. |
 | **Domain** | Attached | `nexusaisolution.net` + `www` — DNS is still on Cloudflare (`sreeni` / `valentin.ns.cloudflare.com`), not Vercel nameservers |
 | **Env** | Production + development | Site URL, AI CPA URL, models, contact inbox, AI Gateway key. Preview-all-branches add is blocked by CLI in this environment |
-| **Pages** | Live 2026-09-12 | `/` · `/about` (team index) · `/about/<slug>` ×3 (per-person, one shared template from `lib/people.ts`) · `/nvidia-dli-workshops` · `/contact`. All in `sitemap.xml`. Nav is four links: Consulting · Training · About · Contact. |
+| **Pages** | Live 2026-09-12 | `/` · `/about` (team index) · `/about/<slug>` ×3 (per-person, one shared template from `lib/people.ts`) · `/nvidia-dli-workshops` · `/contact`. All in `sitemap.xml`. Nav is four links: Training · Consulting · About · Contact, plus the chat CTA. |
 | **Design** | Sleek pass 2026-09-12 | Apple-like: one idea per section, generous space, short declarative copy, **no trailing periods in headlines**. Homepage = hero + Consulting + Training + Team + footer only. Depth (workshop outline, NVIDIA verification links, collaborations) lives on inner pages, not the homepage. Removed: stats grid, partners strip, AI-now, portfolio, careers, FAQ accordion, market widgets, `/api/news`, `/api/market`. |
 | **People** | Live 2026-09-12 | `lib/people.ts` is the one registry (homepage row, `/about`, per-person pages, JSON-LD). **Majid Memari, PhD — Founder & CEO**; **Hamid Memari — CTO**; **Mohammad JN, PhD — CFO** (display name shortened; legal name `Mohammad Jafarinejad` stays in structured data). Portraits are cropped from **one studio group shot** (master outside the repo at `~/Downloads/team-headshots-source.png`) into square `public/team-*.jpg` (640×640, head-and-shoulders, q88) — reuse that recipe; never copy a photo from LinkedIn. |
 | **Naming & affiliations** | Policy 2026-09-12 | Full rules in [`AGENTS.md`](../AGENTS.md). Name style: postnominal **"Majid Memari, PhD"** — never a `Dr.` prefix, never `Ph.D.` with periods. **Omit current UVU faculty title** on this commercial site (conflict of interest); teaching stays generic ("university level"). **Prior research may be named**: Penn (postdoc); Stanford / Johns Hopkins as collaborations through that appointment (not employers); U of Utah One-U RAI; SIU for PhD. Degree = PhD in CS with doctoral research in generative AI — not “PhD in LLMs.” Experience as **start year** ("since 2015"); **no** citation totals. Verifiable credentials (NVIDIA, AI Utah 100) stay. |
@@ -126,9 +126,12 @@ Until a hidden Twilio number is linked **and** its forwarding is ON, incoming 80
 
 ## Next
 
-1. **Search Console** — verify the property, submit `sitemap.xml`, and request indexing for `/nvidia-dli-workshops` and the three `/about/<slug>` pages. Nothing else moves ranking until this is done.
-2. Commit and push the working tree — everything since 2026-09-10 is deployed to production but **not yet committed to git**.
-3. Confirm the NVIDIA logo usage and the "free for US universities" offer against the terms of the Certified Instructor / Ambassador agreements.
-4. Decide whether the street address should stay public — it is in the footer, `/contact`, and `PostalAddress` schema.
-5. Enable **AI Gateway** if chat / contact classifier / voice 503s; add Resend keys if voice messages should email.
-6. Add a hidden Twilio answering number and link it in GV (checklist above) so the assistant can pick up 801.
+Owner clicks only (agents cannot finish these):
+
+1. **Search Console** — verify the property, submit `sitemap.xml`, and request indexing for `/nvidia-dli-workshops` and the three `/about/<slug>` pages.
+2. Confirm the NVIDIA logo usage and the "free for US universities" offer against the terms of the Certified Instructor / Ambassador agreements.
+3. Decide whether the street address should stay public — it is in the footer, `/contact`, and `PostalAddress` schema.
+4. Enable **AI Gateway** if chat / contact classifier / voice 503s; add Resend keys if voice messages should email.
+5. Add a hidden Twilio answering number and link it in GV (checklist above) so the assistant can pick up 801.
+
+Done in-repo (2026-09-12): missing modules committed so GitHub/Vercel builds resolve; Contact restored in nav and footer; Node engine pinned to `22.x`.

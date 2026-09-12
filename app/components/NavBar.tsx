@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "Consulting", href: "/#consulting" },
   { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function NavBar() {
