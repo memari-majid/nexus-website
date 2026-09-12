@@ -1,0 +1,192 @@
+# AGENTS — How to update nexusaisolution.net
+
+Instructions for AI assistants working in this repo. **Read this before editing copy, people, NVIDIA/DLI content, or chat prompts.**
+
+| | |
+|---|---|
+| **Live** | https://nexusaisolution.net |
+| **Repo** | https://github.com/memari-majid/nexus-website |
+| **Ops plan (one file)** | [`docs/PLAN.md`](docs/PLAN.md) — status, deploy, SEO clicks, phone |
+| **Positioning (do not duplicate)** | `../contract/docs/reference/PLAN.md` §11 / §11.1 |
+
+Do not invent a second master plan. Extend `docs/PLAN.md` for site-ops status; put standing editorial rules here.
+
+---
+
+## Product (what the site is)
+
+**Nexus AI Solutions LLC** sells **AI consulting and training**. Implementation is follow-on, not the homepage pitch.
+
+| Offer | Source of truth | Notes |
+|-------|-----------------|-------|
+| Consulting | Homepage `#consulting`, `lib/site.ts`, `lib/faq.ts` | Advise on adopting AI — and when not to |
+| NVIDIA DLI workshop | `lib/dli.ts` → `/nvidia-dli-workshops` | NVIDIA owns product; Nexus hosts & teaches |
+| Custom Nexus training | `lib/training.ts` | **Not** an NVIDIA workshop; **no** DLI certificate |
+
+Nav (keep four links unless the owner asks otherwise): **Consulting** → `/#consulting` · **Training** → `/nvidia-dli-workshops` · **About** → `/about` · **Contact** → `/contact`.
+
+Homepage should stay sparse: hero + Consulting + Training + Team + footer. Depth belongs on inner pages.
+
+---
+
+## Edit map (change facts once)
+
+| If you need to change… | Edit this file first | Then check |
+|------------------------|----------------------|------------|
+| Company name, email, phone, address, tagline | `lib/site.ts` | Footer, contact, SEO, JSON-LD |
+| Founder bio / credentials / name style | `lib/majid.ts` | `lib/people.ts` pulls it |
+| CTO | `lib/hamid.ts` | `lib/people.ts` |
+| CFO | `lib/mohammad.ts` | `lib/people.ts` |
+| Who appears on team / about / schema | `lib/people.ts` | `lib/team.ts`, `/about`, `/about/[person]` |
+| NVIDIA workshop facts, delivery model, free academia | `lib/dli.ts` | Training page, FAQ, chat knowledge, homepage teaser |
+| Custom (non-NVIDIA) training | `lib/training.ts` | Do not mix into DLI copy |
+| FAQ answers | `lib/faq.ts` | FAQ JSON-LD in SEO |
+| Chat / voice personality & facts | `lib/assistant.ts`, `lib/chat-knowledge.ts` | `/api/chat`, `/api/voice/*` |
+| Metadata & structured data | `lib/seo.ts` | Titles, Organization, Person, Course |
+| Homepage layout / sections | `app/components/HomePageContent.tsx` | Keep Apple-sparse |
+| Chat UI | `app/components/ChatWidget.tsx` | Sanitize model output; no tool/channel leaks |
+| NVIDIA mark | `app/components/NvidiaLogo.tsx`, `NvidiaBadge.tsx` | Trademark notice on every page that shows the mark |
+
+**Do not** hardcode person names, workshop titles, or NVIDIA claims in random components. Read from the libs above.
+
+---
+
+## Hard policies (do not break)
+
+### 1. Founder naming
+
+- Correct: **`Majid Memari, PhD`**
+- Never: `Dr. Majid Memari`, `Dr. Majid Memari, PhD`, or `Ph.D.` with periods
+
+### 2. Collaborations vs pedigree
+
+- `lib/collaborations.ts` = **current Nexus** university/public work — stay generic (no campus names).
+- Founder prior research in `lib/majid.ts` may name Penn / Stanford / Johns Hopkins / One-U RAI / SIU under §3 below. Do not scrub those bios because of the collaborations policy.
+
+### 3. Current employer (conflict of interest)
+
+- **Do not publish** his current UVU faculty title, UVU course list, or UVU directory link on this commercial site.
+- Teaching may be described generically (“teaches at the university level”).
+- Personal site / LinkedIn may carry employment detail — this site must not.
+
+### 4. Prior research institutions (named, carefully)
+
+Allowed and encouraged when accurate: **Penn** (postdoc appointment), **Stanford** and **Johns Hopkins** (collaborations **through** that Penn appointment — **not** employers), **University of Utah One-U Responsible AI**, **SIU Carbondale** (PhD).
+
+- Never write Stanford/JHU as employers, appointments, or Nexus sponsors.
+- Degree: **PhD in Computer Science** with doctoral research in generative AI — never “PhD in Generative AI” or “PhD in LLMs.”
+- Present-day work leads with **LLMs, agents, retrieval, evaluation**. Do not backdate LLMs into the doctorate.
+
+### 5. Experience & metrics
+
+- Use **start years** (“in applied AI since 2015”), never running “X years of experience.”
+- **No** Google Scholar citation totals or publication counts (they go stale).
+- Do not invent grants, awards, partners, or revenue. AI Utah 100 (2026) = **honoree**, not winner/#1.
+
+### 6. NVIDIA credentials & language
+
+Public titles only:
+
+- **DLI Certified Instructor**
+- **University Ambassador**
+
+Never: NVIDIA partner, NVIDIA-sponsored, NVIDIA-endorsed, or any implication that NVIDIA endorses Nexus.
+
+Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLMs*** (8h). Do not list other NVIDIA catalog courses as Nexus offerings (linking to NVIDIA’s catalog as theirs is fine).
+
+### 7. NVIDIA delivery model (lock this)
+
+| Who | Does |
+|-----|------|
+| **NVIDIA** | Pricing, purchase, curriculum/content, cloud GPU VMs, assessment, certificate |
+| **Nexus** | Hosts and teaches (in person or online); helps participants succeed |
+
+- Customer needs **no** local GPUs / special compute.
+- Nexus has **no control** over price, content, assessment, or certificate.
+- **Never quote a dollar price** for the DLI workshop.
+- Chat must never invent that Nexus sells seats or requires client hardware.
+- **Free for any US university** (students/faculty/researchers), **six weeks’ notice**, via Ambassador program. Never publish Ambassador program cost or projected profit.
+- Custom training (`lib/training.ts`) ≠ DLI; no DLI certificate language there.
+- Every page showing the NVIDIA mark must include the trademark notice (`TRADEMARK_NOTICE` / `TRADEMARK_SHORT`).
+- Re-check NVIDIA URLs before editing the Resources link list (sibling paths 404 easily). Do not frame those links as “verify our claims.”
+
+### 8. Design / copy voice
+
+- Apple-like: one idea per section, short declarative lines, generous space.
+- **No trailing periods in headlines.**
+- Sky primary; NVIDIA green `#76b900` only for NVIDIA accents.
+- Prefer editing existing sections over adding new homepage chrome (stats, partner strips, news widgets, etc.).
+
+### 9. Chat / voice assistant
+
+- Company assistant: factual, casual, can book via the **`requestAppointment`** tool → `submitInquiry` (`source: chat-appointment`).
+- **No live calendar** — never invent available times.
+- End replies with `SUGGESTIONS: a | b | c` per `lib/assistant.ts`; UI must strip that marker and never show tool/channel tokens (`<|channel|>`, etc.).
+- Same facts as the public site — keep `chat-knowledge` / assistant prompts in sync when DLI or people change.
+
+---
+
+## People & headshots
+
+| Person | Role | Display name | Photo |
+|--------|------|--------------|-------|
+| Majid Memari, PhD | Founder & CEO | `Majid Memari, PhD` | `public/team-majid-memari.jpg` |
+| Hamid Memari | CTO | `Hamid Memari` | `public/team-hamid-memari.jpg` |
+| Mohammad JN, PhD | CFO | Short UI name; legal `Mohammad Jafarinejad` in schema | `public/team-mohammad-jafarinejad.jpg` |
+
+- Registry: `lib/people.ts` (`displayName` vs `schemaName`).
+- Group master (outside repo): `~/Downloads/team-headshots-source.png`.
+- Recipe: crop three panels → **640×640 JPEG q88**, head-and-shoulders. Do not scrape LinkedIn photos.
+- Set `nvidiaCertified: true` only for the person who holds the NVIDIA instructor cert.
+
+---
+
+## Deploy checklist
+
+```bash
+cd /home/majid/Downloads/Sites/nexus-website
+./node_modules/.bin/tsc --noEmit && npm run build
+npx vercel deploy --prod --yes   # or push main after owner commits
+```
+
+- Vercel project: `nexus-website` on `memari-majids-projects`, region `iad1`.
+- **Do not commit or push unless the owner asks.** Large working trees may already be live via CLI deploy but uncommitted — ask first.
+- After content that affects SEO: remind owner to verify Search Console / request indexing (see `docs/PLAN.md`).
+
+---
+
+## Common tasks (recipes)
+
+### Update a bio sentence
+
+1. Edit `lib/majid.ts` / `hamid.ts` / `mohammad.ts`.
+2. Confirm `lib/people.ts` still maps the right fields.
+3. Grep for any leftover hardcoded string.
+4. Skim chat knowledge / FAQ if the fact is customer-facing.
+
+### Change DLI workshop copy
+
+1. Edit **only** `lib/dli.ts`.
+2. Update FAQ / assistant / chat-knowledge if they paraphrase the same fact.
+3. Never invent a second workshop or a price.
+
+### Add a team member
+
+1. Add `lib/<name>.ts` with facts.
+2. Register in `lib/people.ts` (slug, role, photo, links, schema names).
+3. Add `public/team-*.jpg` (same crop recipe).
+4. Confirm `/about` and `/about/<slug>` pick them up from the registry — avoid one-off page forks.
+
+### Soften or strengthen academia language
+
+- Current employer → stay generic (policy §2).
+- Prior research → name institutions per policy §3.
+- If unsure, prefer under-claiming over over-claiming.
+
+---
+
+## Integrity
+
+- Mark planned work vs shipped claims in `docs/PLAN.md`.
+- Do not fabricate IRB, grants, partnerships, or metrics.
+- Prefer small, accurate edits over marketing inflation.

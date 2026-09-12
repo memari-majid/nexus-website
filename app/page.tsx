@@ -1,7 +1,11 @@
+import type { Metadata } from "next";
 import { ChatWidget } from "@/app/components/ChatWidget";
 import { HomePageContent } from "@/app/components/HomePageContent";
 import { JsonLd } from "@/app/components/JsonLd";
 import { NavBar } from "@/app/components/NavBar";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata("home", "/");
 
 export default function HomePage() {
   return (

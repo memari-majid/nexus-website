@@ -1,12 +1,16 @@
 # Nexus AI Solutions — Company Website
 
-Public website for **Nexus AI Solutions LLC**, a Utah **AI solutions** firm: consulting, workshops/team training, and scoped implementation (RAG, agents, evaluation, multimodal). Temporary SOW/project engagements—not client payroll employment (see **`#engagement`** on site). Founder Dr. Majid Memari was **selected for the 2026 AI Utah 100**. The public site does not list other principals.
+Public website for **Nexus AI Solutions LLC**. The offer is **AI consulting and training** (advisory work, workshops, in-house sessions). Implementation is follow-on. Leadership: **Majid Memari, PhD** (Founder & CEO; **2026 AI Utah 100 honoree**), **Hamid Memari** (CTO), **Mohammad JN, PhD** (CFO).
 
 Live at **[nexusaisolution.net](https://nexusaisolution.net)**
 
+## For AI assistants
+
+**How to update this site** (edit map, NVIDIA/DLI rules, naming, people, deploy): **[`AGENTS.md`](./AGENTS.md)**. Site-ops status: **[`docs/PLAN.md`](./docs/PLAN.md)**.
+
 ## Strategy alignment (internal ops repo)
 
-Keep positioning and channel execution aligned with **`../contract/docs/reference/PLAN.md`** (especially **§11** and **§11.1**) and **`../contract/docs/reference/PLATFORM-PLAYBOOK.md`** (especially **§1**, **§3 Upwork positioning**, **§12** profiles). **`lib/site.ts`**, **`#services`**, **`#engagement`**, and **FAQ** are the canonical public copy—in sync with **`PLAN.md` §11.1** (“public-facing source of truth”).
+Keep positioning and channel execution aligned with **`../contract/docs/reference/PLAN.md`** (especially **§11** and **§11.1**) and **`../contract/docs/reference/PLATFORM-PLAYBOOK.md`**. Canonical public copy: **`lib/site.ts`**, homepage **`#consulting` / `#training`**, and **`lib/faq.ts`**.
 
 ## Tech Stack
 
@@ -19,10 +23,8 @@ Keep positioning and channel execution aligned with **`../contract/docs/referenc
 ## Theme & layout
 
 - **Dark/light:** `next-themes` with Tailwind v4 class-based `dark:` (toggle in the nav). Default theme is dark.
-- **Homepage:** Consolidated sections (Services, Work, Education, About, Careers, Contact+FAQ) with minimal chrome—solid `.card` surfaces, generous spacing, no glassmorphism.
-- **Mobile:** Hero height, full-screen chat on small viewports, horizontal scroll for the workflow diagram, `overflow-x-hidden` on the shell.
-
-Tech stack logos live under `public/logos/` (see `LogoStrip`).
+- **Homepage:** Sparse Apple-like layout — hero + Consulting + Training + Team + footer. Depth on inner pages (`/nvidia-dli-workshops`, `/about`). No trailing periods in headlines.
+- **Mobile:** Full-screen chat on small viewports; `overflow-x-hidden` on the shell.
 
 ## Development
 
@@ -40,7 +42,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | -------- | ------- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL (SEO, sitemap, JSON-LD). Default: `https://nexusaisolution.net` |
 | `NEXT_PUBLIC_AI_CPA_URL` | Optional. Public URL for the AI financial assistant app (Try Our AI section). If unset, the section shows “Request access”. |
-| `NEXT_PUBLIC_AI_TA_URL` | Optional. Public URL for the CS 4720R AI teaching assistant. If unset, the section shows “Request access”. |
+| `NEXT_PUBLIC_AI_TA_URL` | Optional. Public URL for the AI Entrepreneurship teaching assistant. If unset, the section shows “Request access”. |
 | `AI_CHAT_MODEL` | Optional. Model slug for `/api/chat` (Vercel AI Gateway). Default: `openai/gpt-oss-20b` |
 | `CONTACT_CLASSIFY_MODEL` | Optional. Model slug for contact inquiry classification + auto-reply via AI Gateway. Default: `openai/gpt-oss-20b` |
 | `VOICE_CHAT_MODEL` | Optional. Model slug for `/api/voice/gather`. Defaults to `AI_CHAT_MODEL`. |

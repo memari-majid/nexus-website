@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   const result = await submitInquiry({
     name: "Phone caller",
     phone: from || undefined,
-    message: `Voice assistant message for Dr. Majid Memari (do not transfer; he will call back if he wants).\nCaller ID: ${from || "unknown"}\nTranscript:\n${speech}`,
+    message: `Voice assistant message for Majid Memari (do not transfer; he will call back if he wants).\nCaller ID: ${from || "unknown"}\nTranscript:\n${speech}`,
     source: "voice-assistant",
   });
 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
   return twiml(
     hangup(
-      "Thank you. I have sent your message to Dr. Memari. He will call you back if he wants to continue. Goodbye.",
+      "Thank you. I have sent your message to Majid Memari. He will call you back if he wants to continue. Goodbye.",
     ),
   );
 }

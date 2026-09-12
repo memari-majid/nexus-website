@@ -1,22 +1,35 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
+import { PAGE_COPY } from "@/lib/seo";
 import { SITE, SITE_URL } from "@/lib/site";
+
+/** One title for the default, Open Graph, and Twitter cards. */
+const DEFAULT_TITLE = PAGE_COPY.home.title;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Nexus AI Solutions — Founded by Majid Memari, Ph.D.",
+    default: DEFAULT_TITLE,
     template: "%s | Nexus AI Solutions",
   },
   description: SITE.description,
   authors: [{ name: "Majid Memari", url: "https://www.majidmemari.com" }],
   keywords: [
-    "Majid Memari",
     "Nexus AI Solutions",
+    "NVIDIA DLI workshop",
+    "NVIDIA Deep Learning Institute training",
+    "NVIDIA Certified Instructor",
+    "NVIDIA University Ambassador",
+    "generative AI workshop for teams",
+    "agentic AI training",
     "Utah AI consulting",
-    "Principal AI Architect",
-    "Utah Valley University",
+    "AI team training",
+    "AI Solution Architect",
+    "Gen AI",
+    "RAG",
+    "AI agents",
+    "Majid Memari",
   ],
   alternates: {
     canonical: "/",
@@ -30,7 +43,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Nexus AI Solutions — Majid Memari, Ph.D.",
+    title: DEFAULT_TITLE,
     description: SITE.description,
     url: SITE_URL,
     siteName: SITE.name,
@@ -47,7 +60,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nexus AI Solutions — Founded by Majid Memari, Ph.D.",
+    title: DEFAULT_TITLE,
     description: SITE.description,
     images: ["/og-image.png"],
   },
