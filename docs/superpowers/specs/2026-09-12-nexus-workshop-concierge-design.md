@@ -149,7 +149,17 @@ empty; for a workshop the bot fills them:
 - The tool result note stays: confirm briefly **by email**, never invent a
   calendar slot and never promise a phone call.
 
-### Component 4 — "Email me the NVIDIA details" action (new tool `emailWorkshopInfo`)
+**Routing — workshop requests go to Majid's personal inbox.** Workshop
+scheduling requests (`source: "chat-workshop"`) are emailed to
+**`memari.majid@hotmail.com`** so Majid can request the workshop from NVIDIA and
+plan delivery. Implementation: route by source in `submitInquiry` — workshop
+requests to `WORKSHOP_TO_EMAIL` (default `memari.majid@hotmail.com`), other
+inquiries to `CONTACT_TO_EMAIL ?? SITE.email`. Prefer an env var
+(`WORKSHOP_TO_EMAIL`) over hard-coding the personal address in the repo. The
+request email must include the structured fields (audience, when, delivery,
+headcount) so it is actionable without follow-up. The visitor still gets the
+branded auto-confirmation (Component 2); the personal address is never shown
+on the site.
 
 New chat tool the bot calls when a visitor asks to be sent information (or when
 the bot offers and they accept).
