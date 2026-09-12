@@ -214,6 +214,31 @@ Remove the call-first framing so the UI matches the no-call flow:
   need…" with scheduling-first copy (tell me when, in person or remote, and how
   many, and I'll get it scheduled).
 
+### Component 7 — Basic AI consulting, backed by a larger LLM (Vercel AI Gateway)
+
+The chat should give **basic AI consulting** — short, practical answers to
+"should we use AI for X", "what fits our stack", "where do agents/RAG help vs.
+not" — alongside scheduling. This is an upgrade from the current small model
+(`openai/gpt-oss-20b`) to a **larger LLM via Vercel AI Gateway**.
+
+- **Model:** keep it env-driven — `AI_CHAT_MODEL` (already read in
+  `app/api/chat/route.ts`). Set the default to a strong general model **enabled
+  on the project's Vercel AI Gateway** (e.g. a current Claude/GPT-class model
+  slug). Do not hard-code a model the gateway can't route.
+- **Prompt:** add a short "basic consulting" section to `nexusChatSystem()` —
+  give genuinely useful, vendor-neutral, brief advice on AI adoption; be honest
+  about when **not** to use AI; never invent specific ROI/metrics/timelines;
+  steer deeper/paid scoping toward the workshop + a filed request. Keep the
+  NVIDIA-first framing and all existing guardrails.
+- **Cost / abuse guardrails (must hold):** a larger model on a **public**
+  endpoint costs more per message and is abusable. Keep answers brief (the
+  existing "two or three short sentences" rule helps), keep `stopWhen` bounded,
+  and add basic **rate limiting / length caps** (e.g. per-IP throttle on
+  `/api/chat`) before shipping the larger model. Flag cost monitoring via the
+  existing AI Gateway tags.
+- **Scope discipline:** consulting stays *basic* — a helpful first answer, not a
+  full engagement. Deep work routes to a filed request / the workshop.
+
 ## Data flow
 
 ```
