@@ -37,17 +37,37 @@ function splitSuggestions(raw: string): { body: string; suggestions: string[] } 
   return { body, suggestions };
 }
 
-/** Some error paths surface JSON in assistant text; normalize for display. */
+const HARMONY_FINAL = "<|channel|>final<|message|>";
+
+/**
+ * Some gateway models (notably gpt-oss "harmony" format) leak channel control
+ * tokens and spill their hidden analysis/draft channels before the final
+ * answer — e.g. `...enroll.<|channel|>final<|message|>Here's what I need`.
+ * Keep only the final channel and strip any stray control tokens so raw markup
+ * and duplicated drafts never reach the visitor, even mid-stream.
+ */
+function stripControlTokens(raw: string): string {
+  let t = raw;
+  const i = t.lastIndexOf(HARMONY_FINAL);
+  if (i !== -1) t = t.slice(i + HARMONY_FINAL.length);
+  return t
+    .replace(/<\|channel\|>\s*\w+\s*<\|message\|>/g, "") // channel headers incl. name
+    .replace(/<\|[^|]*\|>/g, "") // any remaining control tokens
+    .trimStart();
+}
+
+/** Strip control tokens, then normalize the JSON some error paths surface. */
 function displayAssistantText(raw: string) {
-  const t = raw.trim();
-  if (!t.startsWith("{") || !t.includes('"error"')) return raw;
+  const cleaned = stripControlTokens(raw);
+  const t = cleaned.trim();
+  if (!t.startsWith("{") || !t.includes('"error"')) return cleaned;
   try {
     const j = JSON.parse(t) as { error?: string };
     if (typeof j.error === "string") return formatChatConfigMessage(j.error);
   } catch {
     /* ignore */
   }
-  return raw;
+  return cleaned;
 }
 
 function formatChatConfigMessage(error: string) {
@@ -112,7 +132,9 @@ export function ChatWidget() {
 
   const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
   const suggestions =
-    !busy && lastAssistant ? splitSuggestions(textFromMessage(lastAssistant)).suggestions : [];
+    !busy && lastAssistant
+      ? splitSuggestions(stripControlTokens(textFromMessage(lastAssistant))).suggestions
+      : [];
 
   return (
     <>
