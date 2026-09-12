@@ -165,14 +165,14 @@ export function ChatWidget() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 id="chat-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    Nexus AI Assistant
+                    Nex
                   </h2>
                   <span className="inline-flex items-center rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-700 dark:border-brand-900/50 dark:bg-brand-950/40 dark:text-brand-400">
-                    Powered by AI
+                    Nexus AI assistant
                   </span>
                 </div>
                 <p className="text-xs text-zinc-600 dark:text-zinc-500">
-                  Ask anything, or book a call right here
+                  Ask about AI, or get the NVIDIA workshop scheduled
                 </p>
               </div>
               <div className="flex gap-2">
@@ -202,8 +202,8 @@ export function ChatWidget() {
               {messages.length === 0 && (
                 <div className="space-y-3">
                   <p className="text-sm text-zinc-600 dark:text-zinc-500">
-                    Hi — I can help with AI consulting, NVIDIA DLI workshops, and custom training. Want
-                    to set up a call? Tell me what you need and I&apos;ll get it booked.
+                    Hey, I&apos;m Nex. I can talk through AI for your team, explain the NVIDIA DLI
+                    workshop, and get it scheduled right here. What are you working on?
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {QUICK_PROMPTS.map((q) => (
