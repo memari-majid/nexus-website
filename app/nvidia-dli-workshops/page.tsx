@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChatWidget } from "@/app/components/ChatWidget";
 import { NavBar } from "@/app/components/NavBar";
 import { NvidiaLogo, TRADEMARK_NOTICE } from "@/app/components/NvidiaLogo";
+import { ScheduleButton } from "@/app/components/ScheduleButton";
 import { DLI } from "@/lib/dli";
 import { MAJID } from "@/lib/majid";
 import {
@@ -68,7 +69,7 @@ export default function NvidiaDliPage() {
         <p className="mt-5 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
           We host official{" "}
           <a
-            className="text-sky-600 underline dark:text-sky-400"
+            className="text-brand-700 underline dark:text-brand-400"
             href={DLI.catalogUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -77,7 +78,7 @@ export default function NvidiaDliPage() {
           </a>{" "}
           workshops for industry teams and academic institutions, taught by an NVIDIA{" "}
           <a
-            className="text-sky-600 underline dark:text-sky-400"
+            className="text-brand-700 underline dark:text-brand-400"
             href="https://www.nvidia.com/en-us/learn/certified-instructor-program/"
             target="_blank"
             rel="noopener noreferrer"
@@ -86,7 +87,7 @@ export default function NvidiaDliPage() {
           </a>{" "}
           and{" "}
           <a
-            className="text-sky-600 underline dark:text-sky-400"
+            className="text-brand-700 underline dark:text-brand-400"
             href="https://www.nvidia.com/en-us/training/educator-programs/university-ambassador-program/"
             target="_blank"
             rel="noopener noreferrer"
@@ -163,11 +164,9 @@ export default function NvidiaDliPage() {
             {DLI.academia.text} Scheduling and lab access run through NVIDIA&apos;s University
             Ambassador Program, which is why the lead time matters.
           </p>
-          <p className="mt-4 text-sm">
-            <Link className="text-sky-600 underline dark:text-sky-400" href="/contact">
-              Request a campus workshop
-            </Link>
-          </p>
+          <div className="mt-6">
+            <ScheduleButton>Request a campus workshop</ScheduleButton>
+          </div>
         </Section>
 
         <Section title="Who it is for">
@@ -188,7 +187,7 @@ export default function NvidiaDliPage() {
           </p>
           <p className="mt-4 text-sm">
             <a
-              className="text-sky-600 underline dark:text-sky-400"
+              className="text-brand-700 underline dark:text-brand-400"
               href={DLI.instructorDirectory}
               target="_blank"
               rel="me noopener noreferrer"
@@ -196,7 +195,7 @@ export default function NvidiaDliPage() {
               NVIDIA Certified Instructor Directory
             </a>
             {" · "}
-            <Link className="text-sky-600 underline dark:text-sky-400" href="/about/majid-memari">
+            <Link className="text-brand-700 underline dark:text-brand-400" href="/about/majid-memari">
               Full bio
             </Link>
           </p>
@@ -223,9 +222,7 @@ export default function NvidiaDliPage() {
         </section>
 
         <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <Link href="/contact" className="btn-primary">
-            Request a private workshop
-          </Link>
+          <ScheduleButton>Schedule the workshop</ScheduleButton>
           <Link
             href="/#training"
             className="text-sm text-zinc-800 underline decoration-zinc-300 underline-offset-4 dark:text-zinc-200 dark:decoration-zinc-600"
