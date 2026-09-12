@@ -4,17 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
+import { openChat } from "@/lib/chat-events";
 
 const NAV_ITEMS = [
-  { label: "AI now", href: "/#ai-now" },
-  { label: "Services", href: "/#services" },
-  { label: "Engagement", href: "/#engagement" },
-  { label: "Work", href: "/#work" },
-  { label: "Partners", href: "/#partners" },
-  { label: "Education", href: "/#education" },
+  { label: "Training", href: "/nvidia-dli-workshops" },
+  { label: "Consulting", href: "/#consulting" },
   { label: "About", href: "/about" },
-  { label: "Careers", href: "/#careers" },
-  { label: "Contact", href: "/#contact" },
 ];
 
 export function NavBar() {
@@ -46,7 +41,7 @@ export function NavBar() {
             priority
           />
           <span className="min-w-0 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-            Nexus<span className="text-sky-600 dark:text-sky-400"> AI</span>
+            Nexus<span className="text-brand-600 dark:text-brand-400"> AI</span>
           </span>
         </Link>
 
@@ -61,12 +56,13 @@ export function NavBar() {
             </Link>
           ))}
           <ThemeToggle />
-          <Link
-            href="/#contact"
-            className="whitespace-nowrap rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-sky-500"
+          <button
+            type="button"
+            onClick={openChat}
+            className="btn-primary btn-compact"
           >
-            Get in Touch
-          </Link>
+            Schedule the workshop
+          </button>
         </div>
 
         <div className="flex items-center gap-2 xl:hidden">
@@ -101,13 +97,16 @@ export function NavBar() {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/#contact"
-            onClick={() => setMenuOpen(false)}
-            className="block rounded-lg bg-sky-600 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-sky-500"
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              openChat();
+            }}
+            className="btn-primary block w-full"
           >
-            Get in Touch
-          </Link>
+            Schedule the workshop
+          </button>
         </div>
       )}
     </nav>
