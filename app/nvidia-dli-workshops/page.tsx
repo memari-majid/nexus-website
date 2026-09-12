@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChatWidget } from "@/app/components/ChatWidget";
 import { NavBar } from "@/app/components/NavBar";
-import { NvidiaLogo, TRADEMARK_NOTICE } from "@/app/components/NvidiaLogo";
+import { NvidiaLogo, TRADEMARK_SHORT } from "@/app/components/NvidiaLogo";
 import { ScheduleButton } from "@/app/components/ScheduleButton";
 import { DLI } from "@/lib/dli";
 import { MAJID } from "@/lib/majid";
@@ -232,7 +232,7 @@ export default function NvidiaDliPage() {
         </div>
 
         <p className="mt-14 border-t border-zinc-200 pt-8 text-xs leading-relaxed text-zinc-500 dark:border-zinc-800 dark:text-zinc-500">
-          {TRADEMARK_NOTICE}
+          {TRADEMARK_SHORT}
         </p>
       </main>
       <ChatWidget />
