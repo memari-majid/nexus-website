@@ -4,6 +4,13 @@
 **Status:** Design — awaiting review
 **Scope:** `Sites/nexus-website`
 
+> **Cross-reference (redesign decision 6):** the traditional contact **form**
+> and the displayed email/phone are being retired — the chat is the **only**
+> communication channel. The inquiry/email **backend** in this spec
+> (`submitInquiry`, classify, Resend) stays: it now serves the chat tools only.
+> The in-chat email fallback becomes a quiet last resort, not a promoted CTA.
+> See `2026-09-12-nexus-website-redesign-design.md`.
+
 ## Problem
 
 The site chat and contact pipeline are functional but under-automated:

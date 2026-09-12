@@ -35,6 +35,41 @@ headline offer with a self-serve, automated scheduling path (no phone call).
    keep it to U.S. **academic institutions** (the scope NVIDIA's University
    Ambassador program supports) — don't broaden so far it over-claims who gets
    it free.
+5. **Positioning: community contribution, NVIDIA-first, Utah.** See below.
+6. **Contact = the chatbot.** The smart, automated chat is the **only**
+   communication channel shown. Remove the traditional contact form and the
+   displayed **email + phone**. See "Communication" below.
+
+## Positioning & voice
+
+The site reads as **bringing NVIDIA's training to the Utah community**, not as a
+firm selling a service. Priority of message:
+
+1. **The workshop is NVIDIA's.** Lead with it: NVIDIA's curriculum, cloud GPU
+   labs, assessment, and certificate. Nexus's role is to **host and teach** it
+   as a certified instructor / University Ambassador — nothing more.
+2. **Free for academia.** The academic workshop is offered at **no cost**
+   (University Ambassador program) — the clearest expression of the
+   community-contribution mission. Make this the emotional centerpiece.
+3. **Industry: we host NVIDIA workshops.** For companies and teams, Nexus
+   **hosts** NVIDIA's workshop (seats purchased through NVIDIA at NVIDIA's
+   rate); framed as bringing world-class NVIDIA training to local industry.
+4. **Utah focus (for now).** Lead geographically with **Utah** — Utah academic
+   institutions, Utah teams, the Utah tech community. Nexus is Utah-based
+   (Sandy, UT). Keep copy Utah-first; other regions are not the current target.
+
+**Accuracy guardrails (must hold):**
+
+- Use **mission / community-minded / gives-back** framing and emphasize the
+  free academic offer + NVIDIA-owned product. Do **not** state that Nexus is a
+  non-profit or "makes no profit" as a literal claim — Nexus AI Solutions is an
+  **LLC**, and that wording would be misleading unless legally true.
+- Keep the existing reality intact: Nexus is the **hosting / contracting party**;
+  NVIDIA sets price/content and is never a "partner" or endorser of Nexus.
+- The free offer stays scoped to what the Ambassador program supports (U.S.
+  academic institutions); "focus on Utah" is a **targeting/emphasis** choice,
+  not a restriction of eligibility — unless the owner wants it limited to Utah
+  (open default below).
 
 ## Goals
 
@@ -102,10 +137,12 @@ green. Verified pairings are encoded as the tokens above.
   (opens the concierge chat / links to the workshop page), matching the no-call
   direction. Scrolled-state blur/border stays.
 - **Footer** (in `HomePageContent.tsx`): keep the short trademark notice
-  (decision 1); green link hovers; keep `NvidiaBadge`.
+  (decision 1); green link hovers; keep `NvidiaBadge`. **Drop the email/phone
+  line** (decision 6); keep the address (open default).
 - **ChatWidget** (`app/components/ChatWidget.tsx`): accent sky → green; the
-  "Powered by AI" pill and send button adopt green; quick-prompt/copy updates
-  come from the concierge spec.
+  "Powered by AI" pill and send button adopt green; remove the "Prefer a form?"
+  link; add the quiet `info@` reliability fallback (see §6); quick-prompt/copy
+  updates come from the concierge spec.
 
 ### 3. Homepage (`HomePageContent.tsx`)
 
@@ -144,12 +181,31 @@ Ambassador; Nexus AI Solutions is independent and not endorsed by NVIDIA."*
 `TRADEMARK_NOTICE` (full form) stays as-is. `NvidiaTrademark` keeps rendering on
 every page that shows the mark.
 
-### 6. Communication path
+### 6. Communication — the chatbot is the channel (decision 6)
 
-The redesign does not re-implement comms; it **surfaces** the concierge from the
-related spec: the hero/nav/workshop CTAs all route to the scheduling chat, which
-collects audience / when (≥6 wks) / in-person-or-remote / headcount (≤40) and
-auto-confirms by email. No phone-call CTA anywhere.
+All visitor communication runs through the smart/automated chat (see the
+concierge spec). The redesign doesn't re-implement comms; it makes the chat the
+front door:
+
+- **Every CTA opens the chat.** "Schedule the workshop" in the hero, nav, and
+  workshop page opens the concierge, which collects audience / when (≥6 wks) /
+  in-person-or-remote / headcount (≤40) and auto-confirms **by email to the
+  visitor** (the visitor gives their email inside the chat; it's collected, not
+  displayed as a contact method). No phone-call CTA anywhere.
+- **No traditional contact UI.** Remove the contact **form** and the displayed
+  **email + phone**. The `/contact` route is repurposed into a chat-first page
+  ("Talk to our assistant") rather than a form — or retired and redirected to
+  the chat; decided in the follow-up scope that covers `/contact`.
+- **Footer:** drop the `mailto:`/phone line. Keep the **address** (Sandy, UT)
+  for local trust + Utah SEO (open default — remove if you'd rather). Keep the
+  trademark notice and `NvidiaBadge`.
+- **ChatWidget:** remove the "Prefer a form? Contact page" link. **Reliability
+  fallback (recommended):** when the chat can't load (AI Gateway not
+  configured, JS disabled, API error), show one quiet line with the `info@`
+  address so a visitor is never stranded. If the owner insists on chat-only,
+  the fallback is omitted — flagged as an open default.
+- **Nav "Contact"** item becomes "Schedule" / opens the chat instead of the
+  contact page.
 
 ## Non-goals
 
@@ -171,11 +227,15 @@ auto-confirms by email. No phone-call CTA anywhere.
 ## Files touched
 
 - **Changed:** `app/globals.css` (green scale + button/link/accent repoint),
-  `app/components/NavBar.tsx` (accent + CTA), `app/components/HomePageContent.tsx`
-  (NVIDIA-first hero, reorder, workshop card, footer), `app/components/ChatWidget.tsx`
-  (accent), `app/nvidia-dli-workshops/page.tsx` (palette + CTA),
+  `app/components/NavBar.tsx` (accent + CTA, "Contact"→"Schedule"),
+  `app/components/HomePageContent.tsx` (NVIDIA-first/community/Utah hero,
+  reorder, workshop card, footer drops email/phone),
+  `app/components/ChatWidget.tsx` (green accent, remove form link, add `info@`
+  fallback), `app/nvidia-dli-workshops/page.tsx` (palette + chat CTA),
   `app/components/NvidiaLogo.tsx` (`TRADEMARK_SHORT` copy).
 - **Possibly:** `app/components/NvidiaBadge.tsx` (prominence/variant for the hero).
+- **Follow-up scope** (not this pass): repurpose/retire `/contact` +
+  `ContactForm` into a chat-first page, roll palette to `/about` + `/about/[person]`.
 
 ## Verification
 
@@ -190,3 +250,10 @@ auto-confirms by email. No phone-call CTA anywhere.
 - Primary CTA label: **"Schedule the workshop"**.
 - Green primary buttons use **near-black text** (required for AA on green).
 - Consulting is demoted below Training on the homepage.
+- Contact is **chatbot-only**, but the ChatWidget keeps **one quiet `info@`
+  fallback** for when chat can't load (recommended). Set to pure chat-only to
+  drop it.
+- Footer keeps the **Sandy, UT address** (local trust + Utah SEO); email/phone
+  removed.
+- "Focus on Utah" is a messaging/targeting emphasis, **not** a restriction of
+  who is eligible for the free academic workshop.
