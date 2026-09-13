@@ -41,11 +41,21 @@ Homepage should stay sparse: hero + Consulting + Training + Team + footer. Depth
 | NVIDIA workshop facts, delivery model | `lib/dli.ts` | Training page, FAQ, chat knowledge, homepage teaser |
 | Custom (non-NVIDIA) training | `lib/training.ts` | Do not mix into DLI copy |
 | FAQ answers | `lib/faq.ts` | FAQ JSON-LD in SEO |
-| Chat / voice personality & facts | `lib/assistant.ts`, `lib/chat-knowledge.ts` | `/api/chat`, `/api/voice/*` |
+| Chat / voice personality & facts | `lib/assistant.ts` (prompt), `lib/chat-tools.ts` (tools), `lib/chat-chips.ts` (chips) | `/api/chat`, `/api/voice/*` |
 | Metadata & structured data | `lib/seo.ts` | Titles, Organization, Person, Course |
 | Homepage layout / sections | `app/components/HomePageContent.tsx` | Keep Apple-sparse |
 | Chat UI | `app/components/ChatWidget.tsx` | Sanitize model output; no tool/channel leaks |
 | NVIDIA mark | `app/components/NvidiaLogo.tsx`, `NvidiaBadge.tsx` | Credential badge / mark only — no legal trademark paragraph |
+| How Dr. MJ works page (`/how-it-works`) | `app/how-it-works/page.tsx` | `lib/seo.ts` (`PAGE_COPY.howItWorks`, `INDEXABLE_PATHS`, `HOW_IT_WORKS_BREADCRUMBS`), footer link in `HomePageContent.tsx`. Publishes model list prices and the bake-off, never the limit or budget constants |
+| Picker models, list prices, default model | `lib/chat-models.ts` | `/how-it-works` price table, widget picker, `evals/bakeoff.ts`, `AI_CHAT_MODEL` allowlist |
+| Rate limits, daily allowance, soft and hard budgets | `lib/chat-limits.ts` | `lib/rate-limit.ts` (server only, never imported by a client component), `/api/chat`, owner checklist in `README.md` |
+| Agent tools: `recommendWorkshop`, `assessReadiness`, `draftConsultingBrief`, `handOffToMajid`, `emailBriefToVisitor`, `emailWorkshopInfo` | `lib/chat-tools.ts` | Tool cards in `ChatWidget.tsx`, tool rules in `lib/assistant.ts`, `evals/tool-smoke.ts`, tool list on `/how-it-works` |
+| Consulting brief fields and caps | `lib/brief-schema.ts` | `BriefCard` in `ChatWidget.tsx`, brief email template, `findBrief` in `lib/chat-tools.ts` |
+| Readiness snapshot dimensions and scoring | `lib/readiness.ts` | Readiness card in `ChatWidget.tsx` |
+| Follow-up chips | `lib/chat-chips.ts` | `lib/assistant.ts` (prompt) and `lib/chat-suggestions.ts` (fallback) both import it |
+| Per-reply stats (model, time to first token, tokens, cost) | `lib/chat-metadata.ts` | Stats row in `ChatWidget.tsx`, `chat.usage` log line |
+| Visitor email templates (brief, NVIDIA one-pager) | `lib/workshop-email.ts`, `lib/email.ts` | Fixed templates only, scrubbed fields, `WORKSHOP_TO_EMAIL` as CC and reply-to |
+| Prompt punctuation | `lib/plain-punctuation.ts` | Every rendered system prompt passes through it; `lib/prompt-punctuation.test.ts`; sweep copy for U+2014 and U+2013 before shipping |
 
 **Do not** hardcode person names, workshop titles, or NVIDIA claims in random components. Read from the libs above.
 
@@ -120,10 +130,11 @@ Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLM
 
 ### 9. Chat / voice assistant
 
-- Company assistant: factual, casual, can book via the **`requestAppointment`** tool → `submitInquiry` (`source: chat-appointment`).
+- Company assistant: Dr. MJ, an AI consultant agent (consulting only, no booking, no scheduling form). The hand-off to the founder is the approval-gated **`handOffToMajid`** tool → `submitInquiry` (`source: chat-handoff`, no visitor auto-reply). Email tools are approval-gated fixed templates and report "sent" or "not sent" honestly; never claim an email went out when it did not. Public teardown: `/how-it-works`.
+- No em dashes or en dashes in any copy the model or a visitor can read (prompt, tool descriptions, card copy, emails, pages); the model mirrors prompt punctuation.
 - **No live calendar** — never invent available times.
 - End replies with `SUGGESTIONS: a | b | c` per `lib/assistant.ts`. Chips must be the next useful tap (answers to the question just asked, or a concrete next step). `lib/chat-suggestions.ts` sanitizes fluff and fills a fallback. UI strips the marker and never shows tool/channel tokens (`<|channel|>`, etc.).
-- Same facts as the public site — keep `chat-knowledge` / assistant prompts in sync when DLI or people change.
+- Same facts as the public site: keep `lib/assistant.ts` and the tool hints in `lib/chat-tools.ts` in sync when DLI or people change.
 
 ---
 
@@ -168,7 +179,7 @@ npx vercel deploy --prod --yes   # or push main after owner commits
 ### Change DLI workshop copy
 
 1. Edit **only** `lib/dli.ts`.
-2. Update FAQ / assistant / chat-knowledge if they paraphrase the same fact.
+2. Update FAQ / `lib/assistant.ts` / `lib/chat-tools.ts` hints if they paraphrase the same fact.
 3. Never invent a second workshop or a price.
 
 ### Add a team member

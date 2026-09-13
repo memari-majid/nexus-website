@@ -1,11 +1,18 @@
 import { SITE } from "@/lib/site";
 import { classifyInquiry, fallbackInquiryResponse, type InquiryCategory } from "@/lib/inquiry-ai";
-import { sendEmail, renderEmail, escapeHtml } from "@/lib/email";
+import {
+  EMAIL_RE,
+  cleanSubject,
+  escapeHtml,
+  founderInbox,
+  renderEmail,
+  sendEmail,
+} from "@/lib/email";
 
 const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "anthropic/claude-haiku-4-5";
 
-/** Sources whose requests route to the founder's inbox to arrange with NVIDIA. */
-const WORKSHOP_SOURCES = new Set(["chat-workshop"]);
+/** Sources whose requests route to the founder's inbox instead of the shared contact inbox. */
+const FOUNDER_SOURCES = new Set(["chat-workshop", "chat-handoff"]);
 
 export type InquiryInput = {
   name: string;
@@ -17,7 +24,10 @@ export type InquiryInput = {
 
 export type InquirySuccess = {
   ok: true;
+  /** True when email is not configured and the inquiry was only logged. */
   dev: boolean;
+  /** True when Resend accepted the notification to the team. */
+  delivered: boolean;
   category: InquiryCategory;
   autoReply: string;
 };
@@ -31,7 +41,8 @@ export type InquiryFailure = {
 export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess | InquiryFailure> {
   const source = input.source?.trim() || "contact-form";
   const isVoice = source === "voice-assistant";
-  const isWorkshop = WORKSHOP_SOURCES.has(source);
+  const isHandoff = source === "chat-handoff";
+  const toFounder = FOUNDER_SOURCES.has(source);
   const name = input.name.trim() || (isVoice ? "Phone caller" : "");
   const email = input.email?.trim() ?? "";
   const phone = input.phone?.trim() ?? "";
@@ -46,38 +57,44 @@ export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess
   if (isVoice && !phone && !email) {
     return { ok: false, error: "A callback number or email is required for phone messages.", status: 400 };
   }
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (email && !EMAIL_RE.test(email)) {
     return { ok: false, error: "Invalid email address.", status: 400 };
   }
 
-  let category: InquiryCategory = "general";
+  let category: InquiryCategory = isHandoff ? "consulting" : "general";
   let autoReply = fallbackInquiryResponse().autoReply;
 
-  try {
-    const classified = await classifyInquiry({
-      name,
-      message,
-      modelId: CLASSIFY_MODEL,
-    });
-    category = classified.category;
-    autoReply = classified.autoReply;
-  } catch (err) {
-    console.error("[inquiry] classifyInquiry:", err);
-    const fb = fallbackInquiryResponse();
-    category = fb.category;
-    autoReply = fb.autoReply;
+  // The chat hand-off is already structured by the assistant and never sends a
+  // visitor confirmation, so it skips the classifier call entirely.
+  if (!isHandoff) {
+    try {
+      const classified = await classifyInquiry({
+        name,
+        message,
+        modelId: CLASSIFY_MODEL,
+      });
+      category = classified.category;
+      autoReply = classified.autoReply;
+    } catch (err) {
+      console.error("[inquiry] classifyInquiry:", err);
+      const fb = fallbackInquiryResponse();
+      category = fb.category;
+      autoReply = fb.autoReply;
+    }
   }
 
-  // Workshop scheduling requests go to the founder's inbox so he can arrange
-  // delivery with NVIDIA; everything else goes to the shared contact inbox.
-  const to = isWorkshop
-    ? process.env.WORKSHOP_TO_EMAIL ?? "memari.majid@hotmail.com"
-    : process.env.CONTACT_TO_EMAIL ?? SITE.email;
-  const subject = isVoice
-    ? `[Nexus voice] Message for Majid from ${name}${phone ? ` (${phone})` : ""}`
-    : isWorkshop
-      ? `[Nexus workshop] Scheduling request from ${name}`
-      : `[Nexus AI Website] [${category}] Message from ${name}`;
+  // Consultation hand-offs and workshop requests go to the founder's inbox;
+  // everything else goes to the shared contact inbox.
+  const to = toFounder ? founderInbox() : process.env.CONTACT_TO_EMAIL ?? SITE.email;
+  const subject = cleanSubject(
+    isVoice
+      ? `[Nexus voice] Message for Majid from ${name}${phone ? ` (${phone})` : ""}`
+      : isHandoff
+        ? `[Nexus consultation] Hand-off from ${name}`
+        : toFounder
+          ? `[Nexus workshop] Scheduling request from ${name}`
+          : `[Nexus AI Website] [${category}] Message from ${name}`,
+  );
   const identity = [name, email && `<${email}>`, phone && `phone ${phone}`]
     .filter(Boolean)
     .join(" ");
@@ -93,12 +110,14 @@ export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess
     return { ok: false, error: "Failed to send message. Please try again later.", status: 502 };
   }
 
-  // 2) Confirm to the visitor. Best-effort: a failure here never fails the inquiry.
-  if (email) {
+  // 2) Confirm to the visitor. Best-effort: a failure here never fails the
+  //    inquiry. Skipped for the chat hand-off, whose body would carry
+  //    model-generated text to a visitor-supplied address.
+  if (email && !isHandoff) {
     const confirm = await sendEmail({
       to: email,
-      subject: "We got your message — Nexus AI Solutions".replace(" — ", ", "),
-      replyTo: SITE.email,
+      subject: "We got your message, Nexus AI Solutions",
+      replyTo: founderInbox(),
       text: `${autoReply}\n\nWe'll follow up by email to confirm the details. No need to call. You can reply straight to this message.\n\nNexus AI Solutions`,
       html: renderEmail({
         heading: "We've got your request",
@@ -110,5 +129,5 @@ export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess
     }
   }
 
-  return { ok: true, dev: !process.env.RESEND_API_KEY, category, autoReply };
+  return { ok: true, dev: !team.delivered, delivered: team.delivered, category, autoReply };
 }

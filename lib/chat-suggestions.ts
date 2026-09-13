@@ -2,15 +2,22 @@
  * Follow-up chips for Dr. MJ. The model is asked to emit `SUGGESTIONS: a | b | c`.
  * This module sanitizes that line and fills in useful defaults when it is
  * missing or generic, so visitors always get a next step they can tap.
+ *
+ * The chip lists themselves live in `lib/chat-chips.ts`, shared with the
+ * prompt, so the model's chips and the fallback chips cannot drift. This is a
+ * consulting-only site: nothing here ever offers headcount, delivery format,
+ * or timing chips, which belong to a booking flow that no longer exists.
  */
 
-import { nextField, type Registration } from "@/lib/registration";
+import {
+  AFTER_ADVICE_CHIPS,
+  AFTER_BRIEF_CHIPS,
+  AFTER_BRIEF_CHIPS_NO_EMAIL,
+  AFTER_HANDOFF_CHIPS,
+  AFTER_SNAPSHOT_CHIPS,
+} from "@/lib/chat-chips";
 
-export const OPENING_CHIPS = [
-  "We're exploring where AI fits",
-  "We have a project in mind",
-  "We want to train our team",
-] as const;
+export { OPENING_CHIPS } from "@/lib/chat-chips";
 
 const GENERIC = [
   "tell me more",
@@ -74,46 +81,56 @@ function pick(pool: readonly string[], used: readonly string[]): string[] {
 }
 
 /**
+ * The assistant just produced the brief card. Matches "I drafted your brief",
+ * "here's the brief", "your brief is above"; must NOT match an offer such as
+ * "want me to draft the brief?".
+ */
+export const BRIEF_DRAFTED_RE =
+  /\b(?:drafted|prepared|put together|pulled together|wrote up)\b[^.?!]{0,40}\bbrief\b(?![^.?!]*\?)|\bbrief\b[^.?!]{0,30}\b(?:is ready|is above|is below|is drafted|above)\b(?![^.?!]*\?)|\bhere(?:'s| is) (?:your|the|a) (?:consulting |quick |short )?brief\b(?![^.?!]*\?)/i;
+
+/** The readiness snapshot card just appeared. */
+export const SNAPSHOT_SHOWN_RE =
+  /\breadiness snapshot\b|\breadiness (?:comes out|lands|scores?|is) (?:at|around|about)?\s*\d|\b(?:scored|rated) (?:your|their|the) readiness\b/i;
+
+/** A chip that invites an email; hidden while outgoing email is off. */
+const EMAIL_CHIP_RE = /\bemail\b/i;
+
+export type SuggestionContext = {
+  lastAssistant?: string;
+  lastUser?: string;
+  used?: readonly string[];
+  /**
+   * False when the route reports outgoing email is not configured
+   * (`emailEnabled` in the start metadata), so no chip invites an email
+   * that would end in "not sent". Defaults to true.
+   */
+  emailEnabled?: boolean;
+};
+
+/**
  * Contextual chips when the model forgets the marker or only emits fluff.
  * Match on the last assistant turn (and last user turn) so the tap continues
  * the conversation instead of restarting it.
  */
-export function fallbackSuggestions(opts: {
-  lastAssistant?: string;
-  lastUser?: string;
-  used?: readonly string[];
-}): string[] {
+export function fallbackSuggestions(opts: SuggestionContext): string[] {
   const used = opts.used ?? [];
-  const a = `${opts.lastAssistant ?? ""} ${opts.lastUser ?? ""}`.toLowerCase();
+  const assistant = opts.lastAssistant ?? "";
+  const a = `${assistant} ${opts.lastUser ?? ""}`.toLowerCase();
+  const afterBrief = opts.emailEnabled === false ? AFTER_BRIEF_CHIPS_NO_EMAIL : AFTER_BRIEF_CHIPS;
 
-  if (/filed|on the way|inbox|follow up by email|request is in/.test(a)) {
-    return pick(
-      ["What should people prepare?", "How many people can join?", "What's covered?"],
-      used,
-    );
+  if (BRIEF_DRAFTED_RE.test(assistant)) return pick(afterBrief, used);
+  if (SNAPSHOT_SHOWN_RE.test(assistant)) return pick(AFTER_SNAPSHOT_CHIPS, used);
+
+  if (/filed|on the way|inbox|follow up by email|request is in|noted but not sent|hand-off|handoff/.test(a)) {
+    return pick(AFTER_HANDOFF_CHIPS, used);
   }
 
   if (/name and email|your name|your email|email address/.test(a)) {
     return [];
   }
 
-  if (/how many|headcount|participants|people/.test(a)) {
-    return pick(["About 15 people", "About 25 people", "About 40 people"], used);
-  }
-
-  if (/in person or|on site or|remote|online or/.test(a)) {
-    return pick(["In person", "Remote", "Not sure yet"], used);
-  }
-
-  if (/when|six weeks|date|schedule|lead time/.test(a) && /workshop|cohort|host/.test(a)) {
-    return pick(["In about two months", "This quarter", "Just exploring for now"], used);
-  }
-
   if (/consult|adopt|when not to|scoping/.test(a)) {
-    return pick(
-      ["When should we skip AI?", "Would the workshop help?", "Have Majid follow up"],
-      used,
-    );
+    return pick(AFTER_ADVICE_CHIPS, used);
   }
 
   if (/workshop|nvidia|dli|agentic|certificate/.test(a)) {
@@ -134,54 +151,17 @@ export function fallbackSuggestions(opts: {
 }
 
 /**
- * Chips driven by the booking record: each one is the next thing the form
- * needs, in the visitor's voice, so follow-ups always advance the current
- * workshop request instead of restarting it.
- */
-export function suggestionsForRegistration(
-  r: Registration,
-  used: readonly string[] = [],
-): string[] {
-  const field = nextField(r);
-  let pool: readonly string[];
-  switch (field) {
-    case null:
-      pool = ["Looks good, book it", "Change a detail", "What should we prepare?"];
-      break;
-    case "headcount":
-      pool = ["About 15 people", "About 30 people", "More than 40 people"];
-      break;
-    case "delivery":
-      pool = ["In person", "Remote", "Not sure yet"];
-      break;
-    case "timing":
-      pool = ["In about two months", "This quarter", "Just exploring"];
-      break;
-    default:
-      pool = []; // name / email: the visitor types these, no chips
-  }
-  return sanitizeSuggestions(pool, used);
-}
-
-/**
- * Prefer form-state chips while a booking is active, then the model's own
- * chips, then contextual defaults.
+ * Prefer the model's own chips, then contextual defaults. With email off,
+ * any chip that invites an email is dropped before the fallback fills in.
  */
 export function resolveSuggestions(
   modelChips: readonly string[],
-  context: {
-    lastAssistant?: string;
-    lastUser?: string;
-    used?: readonly string[];
-    registration?: Registration;
-  },
+  context: SuggestionContext,
 ): string[] {
   const used = context.used ?? [];
-  if (context.registration) {
-    const stateChips = suggestionsForRegistration(context.registration, used);
-    if (stateChips.length) return stateChips;
-  }
-  const fromModel = sanitizeSuggestions(modelChips, used);
+  const candidates =
+    context.emailEnabled === false ? modelChips.filter((c) => !EMAIL_CHIP_RE.test(c)) : modelChips;
+  const fromModel = sanitizeSuggestions(candidates, used);
   if (fromModel.length >= 2) return fromModel;
   const fallback = fallbackSuggestions({ ...context, used: [...used, ...fromModel] });
   return sanitizeSuggestions([...fromModel, ...fallback], used);

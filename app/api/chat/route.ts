@@ -1,62 +1,82 @@
+import { createHash } from "node:crypto";
 import {
   convertToModelMessages,
   gateway,
   stepCountIs,
   streamText,
-  tool,
-  type UIMessage,
+  type SystemModelMessage,
 } from "ai";
-import { z } from "zod";
 import { nexusChatSystem } from "@/lib/assistant";
-import { submitInquiry } from "@/lib/inquiry";
-import { sendEmail } from "@/lib/email";
-import { workshopInfoEmail } from "@/lib/workshop-email";
-import { recommendWorkshop as pickWorkshop } from "@/lib/recommend";
-import { DLI } from "@/lib/dli";
-import { SITE } from "@/lib/site";
+import { chatTools, type NexusUIMessage } from "@/lib/chat-tools";
+import { MAX_OUTPUT_TOKENS, MAX_STEPS, STREAM_TIMEOUT_MS, prechargeUsd } from "@/lib/chat-limits";
+import {
+  abortedBilledUsd,
+  billedUsd,
+  costUsd,
+  tokenBreakdown,
+  type ChatMessageMetadata,
+} from "@/lib/chat-metadata";
+import {
+  defaultModel,
+  fallbackModel,
+  findModel,
+  resolveModel,
+  type ChatModel,
+} from "@/lib/chat-models";
+import { INVALID, clientIp, parseChatBody, settleOnce } from "@/lib/chat-request";
+import { isEmailConfigured } from "@/lib/email";
+import { getRateLimiter } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+/**
+ * Literal on purpose: Next reads segment config statically. Mirrors
+ * `MAX_DURATION_SECONDS` in lib/chat-limits.ts and `vercel.json`. The SDK
+ * timeout (`STREAM_TIMEOUT_MS`) fires first so `onAbort` can settle the bill.
+ */
+export const maxDuration = 180;
 
 /**
- * Best-effort per-IP rate limit. The map lives in module scope, so it only
- * guards a single warm instance; serverless spreads traffic across instances
- * and cold starts reset it. It's a cheap backstop against one client hammering
- * the (paid) model, not a real quota. For production-grade limiting use the
- * Vercel WAF or an Upstash-backed limiter.
+ * Production runs Claude Opus 5 via `AI_CHAT_MODEL`. A value outside the
+ * picker allowlist is ignored with one warning at module load, never
+ * silently: routing to an unpriced model would break the budget math.
  */
-const RL_WINDOW_MS = 60_000;
-const RL_MAX = 20;
-const rlHits = new Map<string, number[]>();
+const DEFAULT_MODEL: ChatModel = (() => {
+  const env = process.env.AI_CHAT_MODEL;
+  const found = findModel(env);
+  if (env && !found) {
+    console.warn(
+      `[chat] AI_CHAT_MODEL "${env}" is not in the picker allowlist (lib/chat-models.ts); using ${defaultModel().id}`,
+    );
+  }
+  return found ?? defaultModel();
+})();
+
+type RenderedPrompt = { system: SystemModelMessage; emailEnabled: boolean };
+let rendered: RenderedPrompt | undefined;
 
 /**
- * Model and budget controls. Production runs Claude Opus 5 via `AI_CHAT_MODEL`
- * (see AI-WEBSITES-HANDOFF.md); the code default matches so a missing env var
- * never silently downgrades the experience. MAX_OUTPUT_TOKENS also bounds the
- * reasoning that precedes a reply on thinking models, so it leaves room for both.
+ * Rendered once per instance, on the first request so `RESEND_*` is read at
+ * runtime rather than at build. Sent as a system message with an Anthropic
+ * cache breakpoint: the prompt plus tool schemas are about 4k stable tokens,
+ * so every request after the first reads them at a tenth of the input price.
+ * Other vendors ignore the `anthropic` key. With email unconfigured (all of
+ * production today) the prompt declares the email tools off and the widget is
+ * told via `emailEnabled` so it can pick chips that do not invite an email.
  */
-const CHAT_MODEL = process.env.AI_CHAT_MODEL || "anthropic/claude-opus-5";
-const MAX_MESSAGES = 40;
-const MAX_CHARS_PER_TEXT_PART = 4_000;
-const MAX_CHARS_TOTAL = 12_000;
-const MAX_OUTPUT_TOKENS = 2_500;
-
-/**
- * Only user and assistant turns are accepted, so a client cannot inject system
- * messages. Tool parts (the in-chat booking card) pass through untouched.
- */
-const partSchema = z.looseObject({
-  type: z.string().max(64),
-  text: z.string().max(MAX_CHARS_PER_TEXT_PART).optional(),
-});
-const messageSchema = z.looseObject({
-  id: z.string().max(128).optional(),
-  role: z.enum(["user", "assistant"]),
-  parts: z.array(partSchema).max(50),
-});
-const bodySchema = z.object({
-  messages: z.array(messageSchema).min(1).max(MAX_MESSAGES),
-});
+function renderedPrompt(): RenderedPrompt {
+  if (!rendered) {
+    const emailEnabled = isEmailConfigured();
+    rendered = {
+      emailEnabled,
+      system: {
+        role: "system",
+        content: nexusChatSystem({ emailEnabled }),
+        providerOptions: { anthropic: { cacheControl: { type: "ephemeral" } } },
+      },
+    };
+  }
+  return rendered;
+}
 
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -65,192 +85,202 @@ function json(status: number, body: unknown): Response {
   });
 }
 
-function clientIp(req: Request): string {
-  const xff = req.headers.get("x-forwarded-for");
-  return xff?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
+/** Logs never carry a raw visitor IP. */
+function ipHash(ip: string): string {
+  return createHash("sha256").update(ip).digest("hex").slice(0, 12);
 }
 
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (rlHits.get(ip) ?? []).filter((t) => now - t < RL_WINDOW_MS);
-  recent.push(now);
-  rlHits.set(ip, recent);
-  if (rlHits.size > 5_000) {
-    for (const [key, hits] of rlHits) {
-      if (hits.every((t) => now - t >= RL_WINDOW_MS)) rlHits.delete(key);
-    }
-  }
-  return recent.length > RL_MAX;
+const round6 = (n: number) => Math.round(n * 1e6) / 1e6;
+
+/** True when `a` lists dearer than `b` on input or output, so a swap actually saves money. */
+function isDearer(a: ChatModel, b: ChatModel): boolean {
+  return a.inputPerM > b.inputPerM || a.outputPerM > b.outputPerM;
 }
-
-/**
- * Grounds a recommendation in the real NVIDIA catalog so Dr. MJ never invents a
- * title. Returns the pick, why it fits, whether Nexus teaches it in-house, and
- * alternatives.
- */
-const recommendWorkshop = tool({
-  description:
-    "Recommend the best-fit NVIDIA DLI training from the real catalog for what the visitor does and needs. Call this after you understand their need, before naming specific training. Returns a grounded pick, why it fits, whether Nexus teaches it in-house, and alternatives.",
-  inputSchema: z.object({
-    role: z.string().optional().describe("Their role or team, e.g. 'ML engineers'"),
-    need: z.string().optional().describe("What they want to build or improve with AI"),
-    level: z.string().optional().describe("Experience level, if known"),
-    text: z.string().optional().describe("Any extra context in their own words"),
-  }),
-  execute: async (input) => {
-    const rec = pickWorkshop(input, DLI.catalog);
-    return {
-      title: rec.workshop.title,
-      url: rec.workshop.url,
-      blurb: rec.workshop.blurb,
-      hostedByNexus: rec.hosted,
-      why: rec.why,
-      alternatives: rec.alternatives.slice(0, 3).map((w) => w.title),
-    };
-  },
-});
-
-/**
- * Consultation hand-off. After consulting, capture just enough for Majid to
- * follow up — name, email, and what they need. No scheduling, no booking form.
- * Routes to the founder's inbox (Dr. Memari).
- */
-const requestAppointment = tool({
-  description:
-    "Capture the visitor's details so Majid can follow up for a consultation. Call this only after consulting, when the visitor wants to move forward. This is not a booking and does not schedule a workshop.",
-  inputSchema: z.object({
-    name: z.string().min(1).describe("Visitor's name"),
-    email: z.string().email().describe("Visitor's email address"),
-    topic: z.string().min(1).describe("What they want to talk about or need, in one line"),
-    role: z.string().optional().describe("Their role or team"),
-    organization: z.string().optional().describe("Company if mentioned"),
-  }),
-  execute: async ({ name, email, topic, role, organization }) => {
-    const lines = [
-      `Wants a consultation about: ${topic}`,
-      role ? `Role: ${role}` : null,
-      organization ? `Organization: ${organization}` : null,
-    ].filter(Boolean);
-
-    const result = await submitInquiry({
-      name,
-      email,
-      message: `[Chat consultation request]\n${lines.join("\n")}`,
-      source: "chat-workshop",
-    });
-
-    if (!result.ok) {
-      return { ok: false as const, error: result.error };
-    }
-    return {
-      ok: true as const,
-      note: "Sent. Confirm in one short sentence that it's filed and Majid will follow up by email. Do not promise a time or a call.",
-    };
-  },
-});
-
-/**
- * Emails the visitor the NVIDIA workshop one-pager and drops a heads-up to the
- * team so the warm lead is captured.
- */
-const emailWorkshopInfo = tool({
-  description:
-    "Email the visitor the official NVIDIA DLI workshop details. Call this when they ask to be sent information, once you have their name and email.",
-  inputSchema: z.object({
-    name: z.string().min(1).describe("Visitor's name"),
-    email: z.string().email().describe("Visitor's email address"),
-  }),
-  execute: async ({ name, email }) => {
-    const { subject, text, html } = workshopInfoEmail({ name });
-    const sent = await sendEmail({ to: email, subject, text, html, replyTo: SITE.email });
-    if (!sent.ok) {
-      return { ok: false as const, error: sent.error };
-    }
-    await sendEmail({
-      to: process.env.WORKSHOP_TO_EMAIL ?? "memari.majid@hotmail.com",
-      subject: `[Nexus] ${name} requested workshop info`,
-      replyTo: email,
-      text: `${name} <${email}> asked Nex to email the NVIDIA workshop details.`,
-    });
-    return {
-      ok: true as const,
-      note: "Sent. Tell them it's on the way to their inbox and offer to scope it with them.",
-    };
-  },
-});
 
 export async function POST(req: Request) {
-  if (rateLimited(clientIp(req))) {
+  const startedAt = Date.now();
+  const ip = clientIp(req.headers);
+  const limiter = getRateLimiter();
+
+  const rate = await limiter.checkRequestRate(ip);
+  if (!rate.allowed) {
     return json(429, {
       error: "You're sending messages pretty fast. Give it a few seconds and try again.",
     });
   }
 
-  let raw: unknown;
+  // Bound the raw payload before parsing: echoed tool parts add up quickly.
+  let rawText: string;
   try {
-    raw = await req.json();
+    rawText = await req.text();
   } catch {
-    return json(400, { error: "Invalid request body." });
+    return json(400, { error: INVALID });
   }
-  const parsed = bodySchema.safeParse(raw);
-  if (!parsed.success) return json(400, { error: "Invalid request body." });
+  // Caps, the part-shape whitelist, and the stale-approval rewrite (lib/chat-request.ts).
+  const body = parseChatBody(rawText);
+  if (!body.ok) return json(body.status, { error: body.error });
 
-  const totalChars = parsed.data.messages.reduce(
-    (sum, m) =>
-      sum + m.parts.reduce((s, p) => s + (p.type === "text" && p.text ? p.text.length : 0), 0),
-    0,
-  );
-  if (totalChars > MAX_CHARS_TOTAL) {
-    return json(413, { error: "This conversation is getting long. Please start a new chat." });
-  }
-
+  // `tools` routes historical tool results through `toModelOutput` (compact
+  // text, optional chaining on untrusted output); `ignoreIncompleteToolCalls`
+  // keeps a transcript stopped mid-call from 400ing.
   let modelMessages;
   try {
-    modelMessages = await convertToModelMessages(parsed.data.messages as unknown as UIMessage[]);
-  } catch {
-    return json(400, { error: "Invalid request body." });
+    modelMessages = await convertToModelMessages(body.messages, {
+      tools: chatTools,
+      ignoreIncompleteToolCalls: true,
+    });
+  } catch (err) {
+    console.warn("[chat] convertToModelMessages rejected the transcript:", err);
+    return json(400, { error: INVALID });
   }
 
-  const turns = parsed.data.messages.length;
+  // Reserve the estimate on both day counters before the model runs; refused
+  // requests are refunded inside the limiter. Beyond the soft budget the
+  // request still runs, on the fallback model. Echoed tool payloads count
+  // toward the estimate; only text counts toward the conversation cap.
+  const requested = resolveModel(body.model, DEFAULT_MODEL);
+  const precharge = prechargeUsd(requested, body.prechargeChars);
+  const budget = await limiter.reserveBudget(ip, precharge);
+  if (!budget.ok) {
+    if (budget.reason === "ip") {
+      return json(429, {
+        error:
+          "This network has used today's chat allowance. Please use the contact form, or come back tomorrow.",
+      });
+    }
+    return json(503, {
+      error: "Dr. MJ has reached today's usage limit. Please use the contact form, or try again tomorrow.",
+    });
+  }
+  // Past the soft budget, dearer picks run on the fallback model. A pick that
+  // already costs no more than the fallback (Gemini, GPT-5.6 Sol) stays put:
+  // swapping it would raise the bill, not lower it.
+  const budgetFallback = budget.fallback && isDearer(requested, fallbackModel());
+  const model = budgetFallback ? fallbackModel() : requested;
+  const { reservation } = budget;
+  const turns = body.messages.length;
+  const prompt = renderedPrompt();
+
+  let firstTokenAt: number | undefined;
+  let stepCount = 0;
+  let toolCallCount = 0;
+
+  const logUsage = (fields: Record<string, unknown>) =>
+    console.log(
+      JSON.stringify({
+        event: "chat.usage",
+        site: "nexus",
+        model: model.id,
+        requestedModel: requested.id,
+        budgetFallback,
+        ip: ipHash(ip),
+        turns,
+        prechargeUsd: round6(precharge),
+        ttftMs: firstTokenAt === undefined ? null : firstTokenAt - startedAt,
+        totalMs: Date.now() - startedAt,
+        backend: limiter.backend,
+        globalSpentUsd: round6(budget.globalSpentUsd),
+        ...fields,
+      }),
+    );
+
+  // One settlement and one usage line per request: the SDK calls `onFinish`
+  // after `onAbort` whenever a step had completed before the abort.
+  const settle = settleOnce(
+    async (outcome: "aborted" | "finished", billed: number, fields: Record<string, unknown>) => {
+      if (outcome === "aborted") await limiter.topUpBudget(reservation, billed);
+      else await limiter.settleBudget(reservation, billed);
+      logUsage({ outcome, billedUsd: round6(billed), ...fields });
+    },
+  );
+
   const result = streamText({
-    model: gateway(CHAT_MODEL),
-    system: nexusChatSystem(),
+    model: gateway(model.id),
+    system: prompt.system,
     messages: modelMessages,
-    tools: { recommendWorkshop, requestAppointment, emailWorkshopInfo },
-    // Room for: recommend -> talk -> capture -> confirm.
-    stopWhen: stepCountIs(5),
+    tools: chatTools,
+    // Brief + snapshot + reply fits with one spare step; approvals end the turn early.
+    stopWhen: stepCountIs(MAX_STEPS),
     maxOutputTokens: MAX_OUTPUT_TOKENS,
+    timeout: { totalMs: STREAM_TIMEOUT_MS },
+    // The only clean way to hand the client IP to module-scope tools.
+    experimental_context: { ip },
     providerOptions: {
       gateway: {
         tags: ["site:nexus", "feature:chat", `env:${process.env.VERCEL_ENV ?? "dev"}`],
       },
     },
-    // One structured line per request so usage can be graphed from Vercel logs.
-    onFinish: ({ totalUsage, finishReason, steps }) => {
-      console.log(
-        JSON.stringify({
-          event: "chat.usage",
-          site: "nexus",
-          model: CHAT_MODEL,
-          turns,
-          inputTokens: totalUsage.inputTokens,
-          cachedInputTokens: totalUsage.cachedInputTokens,
-          outputTokens: totalUsage.outputTokens,
-          reasoningTokens: totalUsage.reasoningTokens,
-          totalTokens: totalUsage.totalTokens,
-          steps: steps.length,
-          toolCalls: steps.reduce((n, s) => n + s.toolCalls.length, 0),
-          finishReason,
-        }),
-      );
+    onError: ({ error }) => {
+      console.error("[chat] model error:", error);
+    },
+    // Abort (timeout or visitor stop): only ever top up, never refund. The
+    // step in flight had its prompt consumed, so it is charged at the estimate.
+    onAbort: async ({ steps }) => {
+      await settle("aborted", abortedBilledUsd(model, steps.map((s) => s.usage), precharge), {
+        steps: steps.length,
+      });
+    },
+    // Settle the reservation against actual usage and write one JSON line so
+    // cost per conversation can be graphed from Vercel logs.
+    onFinish: async ({ steps, totalUsage, finishReason }) => {
+      const tokens = tokenBreakdown(totalUsage);
+      await settle("finished", billedUsd(model, steps.map((s) => s.usage), precharge), {
+        inputTokens: tokens.input,
+        cacheReadTokens: tokens.cacheRead,
+        cacheWriteTokens: tokens.cacheWrite,
+        outputTokens: tokens.output,
+        reasoningTokens: tokens.reasoning,
+        totalTokens: tokens.total,
+        costUsd: round6(costUsd(model, tokens)),
+        steps: steps.length,
+        toolCalls: steps.reduce((n, s) => n + s.toolCalls.length, 0),
+        finishReason,
+      });
     },
   });
 
-  return result.toUIMessageStreamResponse({
+  return result.toUIMessageStreamResponse<NexusUIMessage>({
     // Never stream provider error text to visitors; log it and show a plain fallback.
     onError: (error) => {
       console.error("[chat] stream error:", error);
       return "Dr. MJ is unavailable right now. Please use the contact form instead.";
+    },
+    // Streamed in pieces and merged on the client: model on start, time to
+    // first token with the first text delta, totals on finish.
+    messageMetadata: ({ part }): ChatMessageMetadata | undefined => {
+      switch (part.type) {
+        case "start":
+          return {
+            model: model.id,
+            modelLabel: model.label,
+            budgetFallback,
+            emailEnabled: prompt.emailEnabled,
+          };
+        case "text-delta":
+          if (firstTokenAt !== undefined) return undefined;
+          firstTokenAt = Date.now();
+          return { ttftMs: firstTokenAt - startedAt };
+        case "tool-call":
+          toolCallCount += 1;
+          return undefined;
+        case "finish-step":
+          stepCount += 1;
+          return undefined;
+        case "finish": {
+          const tokens = tokenBreakdown(part.totalUsage);
+          return {
+            ttftMs: firstTokenAt === undefined ? undefined : firstTokenAt - startedAt,
+            totalMs: Date.now() - startedAt,
+            tokens,
+            costUsd: round6(costUsd(model, tokens)),
+            steps: stepCount,
+            toolCalls: toolCallCount,
+            finishReason: part.finishReason,
+          };
+        }
+        default:
+          return undefined;
+      }
     },
   });
 }

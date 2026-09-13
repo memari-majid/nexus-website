@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SITE } from "@/lib/site";
 
 const CATEGORY_LABEL: Record<string, string> = {
   consulting: "AI consulting",
@@ -21,6 +22,8 @@ export function ContactForm() {
   const [errorMsg, setErrorMsg] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [autoReply, setAutoReply] = useState<string | null>(null);
+  /** The route says whether the mail provider accepted the message; without that it only reached the server log. */
+  const [loggedOnly, setLoggedOnly] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,6 +31,7 @@ export function ContactForm() {
     setErrorMsg("");
     setCategory(null);
     setAutoReply(null);
+    setLoggedOnly(false);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -38,6 +42,8 @@ export function ContactForm() {
         error?: string;
         category?: string;
         autoReply?: string;
+        dev?: boolean;
+        delivered?: boolean;
       };
       if (!res.ok) {
         setStatus("error");
@@ -45,6 +51,7 @@ export function ContactForm() {
         return;
       }
       setStatus("success");
+      setLoggedOnly(data.delivered === false || data.dev === true);
       if (typeof data.category === "string") setCategory(data.category);
       if (typeof data.autoReply === "string") setAutoReply(data.autoReply);
       setName("");
@@ -52,7 +59,7 @@ export function ContactForm() {
       setMessage("");
     } catch {
       setStatus("error");
-      setErrorMsg("Network error. Please try again or email us directly.");
+      setErrorMsg(`Network error. Please try again or call ${SITE.phoneDisplay}.`);
     }
   }
 
@@ -115,7 +122,18 @@ export function ContactForm() {
         >
           {status === "loading" ? "Sending…" : "Send message"}
         </button>
-        {status === "success" && (
+        {status === "success" && loggedOnly && (
+          <div className="w-full space-y-2 rounded-xl border border-amber-300 bg-amber-50/80 px-4 py-3 text-left dark:border-amber-900/60 dark:bg-amber-950/20">
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-400">
+              Logged on the server, not emailed yet
+            </p>
+            <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Email delivery is not connected on this site yet, so your message was saved in the
+              server log rather than sent to an inbox. For anything urgent, call {SITE.phoneDisplay}.
+            </p>
+          </div>
+        )}
+        {status === "success" && !loggedOnly && (
           <div className="w-full space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-left dark:border-emerald-900/50 dark:bg-emerald-950/20">
             <p className="text-sm font-medium text-emerald-800 dark:text-emerald-400">Message received</p>
             {category && (
@@ -136,9 +154,9 @@ export function ContactForm() {
         {status === "error" && <p className="text-sm text-red-600 dark:text-red-400">{errorMsg}</p>}
       </div>
       <p className="text-xs text-zinc-500 dark:text-zinc-600">
-        Prefer email? Reach us at{" "}
-        <a href="mailto:info@nexusaisolution.net" className="text-sky-600 hover:underline dark:text-sky-400">
-          info@nexusaisolution.net
+        Prefer to talk? Call{" "}
+        <a href={`tel:${SITE.phone}`} className="text-sky-600 hover:underline dark:text-sky-400">
+          {SITE.phoneDisplay}
         </a>
         .
       </p>

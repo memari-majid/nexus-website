@@ -22,6 +22,7 @@
  *   5. Moves forward naturally: the next step and the chips fit the moment.
  */
 import { nexusChatSystem } from "../lib/assistant";
+import { CHAT_MODELS } from "../lib/chat-models";
 
 const KEY = process.env.AI_GATEWAY_API_KEY;
 if (!KEY) throw new Error("AI_GATEWAY_API_KEY is not set");
@@ -29,15 +30,15 @@ if (!KEY) throw new Error("AI_GATEWAY_API_KEY is not set");
 const MODELS = process.argv.slice(2);
 if (MODELS.length === 0) throw new Error("Pass one or more gateway model slugs");
 
-/** Gateway list prices, $/1M tokens, 2026-09-12. Update when the gateway changes them. */
-const PRICES: Record<string, [input: number, output: number]> = {
-  "anthropic/claude-opus-5": [5, 25],
-  "anthropic/claude-sonnet-5": [2, 10],
-  "anthropic/claude-fable-5.1": [10, 50],
-  "openai/gpt-5.6-sol": [2, 10],
-  "openai/gpt-5.6-terra": [2, 12],
-  "openai/gpt-oss-20b": [0.05, 0.2],
-};
+/**
+ * Prices come from lib/chat-models.ts so the page, the widget, and this eval
+ * agree. A model outside the picker allowlist still runs, at $0 (reported as
+ * "unpriced" in the output).
+ */
+function priceFor(model: string): [input: number, output: number] | null {
+  const m = CHAT_MODELS.find((c) => c.id === model);
+  return m ? [m.inputPerM, m.outputPerM] : null;
+}
 
 /** A realistic prospect: opens with a symptom, then asks the real question. */
 const TURNS = [
@@ -100,7 +101,9 @@ for (const model of MODELS) {
   console.log(`MODEL: ${model}`);
   const history: Msg[] = [{ role: "system", content: nexusChatSystem() }];
   let cost = 0;
-  const [pin, pout] = PRICES[model] ?? [0, 0];
+  const price = priceFor(model);
+  const [pin, pout] = price ?? [0, 0];
+  if (!price) console.log("(unpriced: not in lib/chat-models.ts; cost shown as $0)");
   for (const [i, turn] of TURNS.entries()) {
     history.push({ role: "user", content: turn });
     const r = await complete(model, history);

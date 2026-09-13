@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       dev: result.dev,
+      delivered: result.delivered,
       category: result.category,
       autoReply: result.autoReply,
     });

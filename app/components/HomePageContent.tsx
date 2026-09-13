@@ -16,6 +16,7 @@ const FOOTER_LINKS = [
   { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+  { label: "How Dr. MJ works", href: "/how-it-works" },
 ];
 
 /** Consulting is the lead offer; training and FDE follow from it. */

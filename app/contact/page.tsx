@@ -29,14 +29,6 @@ export default function ContactPage() {
 
         <dl className="mt-8 space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
           <div>
-            <dt className="font-medium text-zinc-800 dark:text-zinc-200">Email</dt>
-            <dd>
-              <a className="text-sky-600 underline dark:text-sky-400" href={`mailto:${SITE.email}`}>
-                {SITE.email}
-              </a>
-            </dd>
-          </div>
-          <div>
             <dt className="font-medium text-zinc-800 dark:text-zinc-200">Phone</dt>
             <dd>
               <a className="text-sky-600 underline dark:text-sky-400" href={`tel:${SITE.phone}`}>

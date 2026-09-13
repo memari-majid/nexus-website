@@ -7,7 +7,14 @@ import { MAJID } from "@/lib/majid";
 import { MOHAMMAD } from "@/lib/mohammad";
 import { SITE, SITE_URL } from "@/lib/site";
 
-export const INDEXABLE_PATHS = ["/", "/about", "/contact", "/nvidia-dli-workshops"] as const;
+/** Append only: sitemap priority is derived from index position. */
+export const INDEXABLE_PATHS = [
+  "/",
+  "/about",
+  "/contact",
+  "/nvidia-dli-workshops",
+  "/how-it-works",
+] as const;
 
 export function absoluteUrl(path = "/"): string {
   if (path === "/") return SITE_URL;
@@ -45,7 +52,18 @@ export const PAGE_COPY = {
     description:
       "Official NVIDIA Deep Learning Institute workshops for industry teams, hosted by a Certified Instructor. Building Agentic AI Applications With LLMs — eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
   },
+  howItWorks: {
+    title: "How Dr. MJ Works: Inside the Nexus AI Consultant Agent",
+    description:
+      "A teardown of Dr. MJ, the AI consultant agent on nexusaisolution.net: the consulting loop it runs, the tools it calls, the approval step before any email, the model picker with public list prices, per-reply cost, and the bake-off behind the default model.",
+  },
 } as const;
+
+/** Breadcrumb trail for /how-it-works. The page inlines its own JSON-LD graph. */
+export const HOW_IT_WORKS_BREADCRUMBS = [
+  { name: "Home", path: "/" },
+  { name: "How Dr. MJ works", path: "/how-it-works" },
+];
 
 export function pageMetadata(
   page: keyof typeof PAGE_COPY,

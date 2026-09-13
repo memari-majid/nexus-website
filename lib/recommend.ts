@@ -37,8 +37,8 @@ function scoreOf(w: CatalogWorkshop, haystack: string): number {
 
 function reasonFor(w: CatalogWorkshop): string {
   return w.hosted
-    ? `${w.title} is the workshop we host and teach in person — ${w.blurb}`
-    : `${w.title} is the best fit — ${w.blurb} We can arrange it for your team.`;
+    ? `${w.title} is the workshop we host and teach in person. ${w.blurb}`
+    : `${w.title} is the best fit. ${w.blurb} We can arrange it for your team.`;
 }
 
 export function recommendWorkshop(
@@ -55,7 +55,7 @@ export function recommendWorkshop(
 
   let workshop: CatalogWorkshop;
   if (maxScore === 0) {
-    // Nothing matched — lead with the flagship we actually teach.
+    // Nothing matched: lead with the flagship we actually teach.
     workshop = catalog.find((w) => w.hosted) ?? catalog[0];
   } else {
     const top = scored.filter((s) => s.score === maxScore);
