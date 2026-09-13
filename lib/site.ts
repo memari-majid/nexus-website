@@ -8,7 +8,7 @@ export const SITE = {
    * partnership or endorsement.
    */
   description:
-    "Nexus AI Solutions provides AI consulting and training — NVIDIA Deep Learning Institute workshops hosted by a Certified Instructor for industry teams, plus custom training designed around your company. Founded by Majid Memari, AI Scientist and Solution Architect.",
+    "Nexus AI Solutions provides AI consulting and training to industry teams across the United States: NVIDIA Deep Learning Institute workshops hosted by a Certified Instructor, plus custom training designed around your company. Based in Utah, delivered on site or online. Founded by Majid Memari, AI Scientist and Solution Architect.",
   email: "info@nexusaisolution.net",
   /** Public customer-facing line — Google Voice. Not a Twilio / Vercel webhook endpoint. */
   phone: "+18018109152",

@@ -1,15 +1,25 @@
 import { describe, expect, it } from "vitest";
 import {
+  APPROVAL_WAITING,
+  FOCUSABLE_SELECTOR,
   NOT_SENT_COPY,
+  SHEET_PANEL_QUERY,
+  announcementFor,
+  announcementText,
   betweenSteps,
+  escapeClosesDialog,
   hasDraftedBrief,
   hasPendingApproval,
   hasUnsettledApproval,
   isNotSentReason,
+  lockedBodyStyle,
+  nextAnnouncement,
   notSentCopy,
   notSentStepLabel,
   readChatMetadata,
+  scrollBehavior,
   statSummary,
+  trapTabTarget,
   wasNoted,
 } from "@/lib/chat-ui";
 
@@ -115,5 +125,173 @@ describe("readChatMetadata and statSummary", () => {
   it("rejects metadata of the wrong shape instead of throwing", () => {
     expect(readChatMetadata({ totalMs: "fast" })).toBeUndefined();
     expect(readChatMetadata(null)).toBeUndefined();
+  });
+});
+
+describe("trapTabTarget", () => {
+  it("wraps from the last control to the first and back", () => {
+    expect(trapTabTarget(2, 3, false)).toBe(0);
+    expect(trapTabTarget(0, 3, true)).toBe(2);
+  });
+
+  it("leaves a move inside the dialog to the browser", () => {
+    expect(trapTabTarget(0, 3, false)).toBeUndefined();
+    expect(trapTabTarget(1, 3, false)).toBeUndefined();
+    expect(trapTabTarget(2, 3, true)).toBeUndefined();
+    expect(trapTabTarget(1, 3, true)).toBeUndefined();
+  });
+
+  it("pulls focus back in when it sits outside the dialog", () => {
+    expect(trapTabTarget(-1, 3, false)).toBe(0);
+    expect(trapTabTarget(-1, 3, true)).toBe(2);
+    expect(trapTabTarget(7, 3, false)).toBe(0);
+  });
+
+  it("cycles a single control onto itself and does nothing with none", () => {
+    expect(trapTabTarget(0, 1, false)).toBe(0);
+    expect(trapTabTarget(0, 1, true)).toBe(0);
+    expect(trapTabTarget(-1, 0, false)).toBeUndefined();
+    expect(trapTabTarget(0, 0, true)).toBeUndefined();
+  });
+
+  it("skips the dialog container and disabled controls in the focusable selector", () => {
+    expect(FOCUSABLE_SELECTOR).toContain('[tabindex]:not([tabindex="-1"])');
+    expect(FOCUSABLE_SELECTOR).toContain("button:not([disabled])");
+    expect(FOCUSABLE_SELECTOR).toContain("input:not([disabled])");
+    expect(FOCUSABLE_SELECTOR).toContain("select:not([disabled])");
+    expect(FOCUSABLE_SELECTOR).toContain("a[href]");
+  });
+});
+
+describe("escapeClosesDialog", () => {
+  it("closes from anywhere except a native select", () => {
+    expect(escapeClosesDialog("INPUT")).toBe(true);
+    expect(escapeClosesDialog("BUTTON")).toBe(true);
+    expect(escapeClosesDialog("DIV")).toBe(true);
+    expect(escapeClosesDialog(undefined)).toBe(true);
+    expect(escapeClosesDialog(null)).toBe(true);
+    expect(escapeClosesDialog("SELECT")).toBe(false);
+    expect(escapeClosesDialog("select")).toBe(false);
+  });
+});
+
+describe("announcementFor", () => {
+  const text = { type: "text", state: "done" };
+  const requested = { type: "tool-handOffToMajid", state: "approval-requested" };
+  const done = { type: "tool-handOffToMajid", state: "output-available" };
+
+  it("announces the reply's own words when the turn has any", () => {
+    expect(announcementFor({ id: "a1", text: "Start with a two week pilot.", parts: [text] })).toEqual({
+      id: "a1",
+      text: "Start with a two week pilot.",
+    });
+    expect(announcementFor({ id: "a1", text: "  Two week pilot.\n", parts: [text, requested] })).toEqual({
+      id: "a1",
+      text: "Two week pilot.",
+    });
+  });
+
+  it("says an approval is waiting when the turn is only a card", () => {
+    expect(announcementFor({ id: "a1", text: "", parts: [requested] })).toEqual({
+      id: "a1",
+      text: APPROVAL_WAITING,
+    });
+    expect(APPROVAL_WAITING).toContain("Send");
+    expect(APPROVAL_WAITING).toContain("Not now");
+  });
+
+  it("has nothing to say for a wordless turn with no card waiting", () => {
+    expect(announcementFor({ id: "a1", text: "", parts: [done] })).toBeUndefined();
+    expect(announcementFor({ id: "a1", text: "   ", parts: [] })).toBeUndefined();
+    expect(announcementFor(undefined)).toBeUndefined();
+  });
+});
+
+describe("nextAnnouncement", () => {
+  const reply = { id: "a1", text: "Start with a two week pilot." };
+
+  it("announces a finished reply once and stays quiet while it streams", () => {
+    expect(nextAnnouncement(reply, true, undefined)).toBeUndefined();
+    expect(nextAnnouncement(reply, false, undefined)).toEqual(reply);
+    expect(nextAnnouncement(reply, false, reply)).toBeUndefined();
+  });
+
+  it("announces a new message, or the same message once it has grown", () => {
+    expect(nextAnnouncement({ id: "a2", text: reply.text }, false, reply)).toEqual({ id: "a2", text: reply.text });
+    const grown = { id: "a1", text: `${reply.text} Sent to Majid.` };
+    expect(nextAnnouncement(grown, false, reply)).toEqual(grown);
+  });
+
+  it("keeps a repeated reply distinguishable by id, so the live region can re-announce it", () => {
+    const repeat = nextAnnouncement({ id: "a2", text: reply.text }, false, reply);
+    expect(repeat).toBeDefined();
+    expect(repeat!.text).toBe(reply.text);
+    // The widget keys the live-region element by this id: same words, new
+    // element, so a screen reader reads the second reply as well.
+    expect(repeat!.id).not.toBe(reply.id);
+  });
+
+  it("has nothing to say without an assistant message or without text", () => {
+    expect(nextAnnouncement(undefined, false, undefined)).toBeUndefined();
+    expect(nextAnnouncement({ id: "a1", text: "   " }, false, undefined)).toBeUndefined();
+  });
+
+  it("trims the text it announces so whitespace changes do not repeat it", () => {
+    expect(nextAnnouncement({ id: "a1", text: `  ${reply.text}\n` }, false, undefined)).toEqual(reply);
+    expect(nextAnnouncement({ id: "a1", text: `  ${reply.text}\n` }, false, reply)).toBeUndefined();
+  });
+});
+
+describe("announcementText", () => {
+  it("reads markdown as plain prose", () => {
+    expect(
+      announcementText(
+        "## Next step\n\nStart with a **two week** pilot on the [workshop page](/nvidia-dli-workshops).\n\n- Scope it\n- *Measure* it\n\nRun `vercel env pull` first.",
+      ),
+    ).toBe("Next step Start with a two week pilot on the workshop page. Scope it Measure it Run vercel env pull first.");
+  });
+
+  it("keeps underscores and asterisks that are part of words or maths", () => {
+    expect(announcementText("Use snake_case names and 3 * 4 = 12")).toBe("Use snake_case names and 3 * 4 = 12");
+  });
+
+  it("drops code fences and quotes but keeps their text", () => {
+    expect(announcementText("> Quoted line\n\n```ts\nconst a = 1;\n```")).toBe("Quoted line const a = 1;");
+  });
+
+  it("returns an empty string for empty or whitespace input", () => {
+    expect(announcementText("")).toBe("");
+    expect(announcementText(" \n ")).toBe("");
+  });
+});
+
+describe("lockedBodyStyle", () => {
+  it("pins the page at its current offset", () => {
+    expect(lockedBodyStyle(240)).toEqual({
+      position: "fixed",
+      top: "-240px",
+      left: "0",
+      right: "0",
+      width: "100%",
+      overflow: "hidden",
+    });
+  });
+
+  it("never produces a positive or fractional top", () => {
+    expect(lockedBodyStyle(0).top).toBe("-0px");
+    expect(lockedBodyStyle(-30).top).toBe("-0px");
+    expect(lockedBodyStyle(12.6).top).toBe("-13px");
+    expect(lockedBodyStyle(Number.NaN).top).toBe("-0px");
+  });
+
+  it("locks only the full-screen sheet below Tailwind's sm breakpoint", () => {
+    expect(SHEET_PANEL_QUERY).toBe("(min-width: 40rem)");
+  });
+});
+
+describe("scrollBehavior", () => {
+  it("drops the smooth scroll for visitors who prefer reduced motion", () => {
+    expect(scrollBehavior(false)).toBe("smooth");
+    expect(scrollBehavior(true)).toBe("auto");
   });
 });

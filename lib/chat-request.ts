@@ -11,12 +11,14 @@
  * and every kept part is rebuilt from its allowed keys only.
  *
  * Why the approval rewrite: a tool part left in `approval-requested` (the
- * visitor typed instead of answering the card) reaches the model as a tool
- * call with no result and `streamText` fails with MissingToolResultsError on
- * every later turn. Such parts become `output-denied` with a reason the
- * model can act on. An `approval-responded` part is kept only in the final
- * message, where the SDK executes it; anywhere earlier it was never run, and
- * the model is told so.
+ * visitor typed instead of answering the card) is a tool call with no
+ * result. Converted strictly, `streamText` fails with MissingToolResultsError
+ * on every later turn; with the route's `ignoreIncompleteToolCalls`, the SDK
+ * (ai 6.0.282 and later) drops the call outright, so the model never learns
+ * the send was offered and may offer it again. Such parts become
+ * `output-denied` with a reason the model can act on. An `approval-responded`
+ * part is kept only in the final message, where the SDK executes it;
+ * anywhere earlier it was never run, and the model is told so.
  *
  * Server-only (imports the tool set for its names).
  */

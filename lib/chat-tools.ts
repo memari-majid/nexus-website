@@ -17,6 +17,18 @@
  *   before the model runs, with that request's context and rate checks. It
  *   takes the input from the echoed transcript and skips `inputSchema`, so
  *   every gated `execute` re-validates its input first (`recheck`).
+ * - Gated sends are idempotent per toolCallId. A retry after a dropped
+ *   connection re-sends the approved call and the SDK executes it again, so
+ *   every gated `execute` first asks the limiter whether it already delivered
+ *   under that id (`recallDelivered`) and replays that outcome instead of
+ *   sending twice. Only delivered sends are remembered (`rememberDelivered`),
+ *   for a day; a failed or not-configured attempt stays retryable. Fails
+ *   open: a store error means a normal send.
+ * - The store holds no personal data. A memo is the outcome, a short label,
+ *   and whether a brief rode along: never the visitor's name, address,
+ *   topic, organization, or role. The replay rebuilds those card fields from
+ *   the approved input that is executing again, which the SDK echoes back
+ *   with the call.
  * - Email quotas are reserved only when email can actually go out
  *   (`isEmailConfigured()`); production has no Resend today, and a
  *   not-configured attempt must never burn the day's allowance.
@@ -154,6 +166,47 @@ function recheck<S extends z.ZodType>(schema: S, input: unknown): z.output<S> | 
 const field = (raw: unknown, key: string, max: number): string =>
   str((raw as Record<string, unknown> | null | undefined)?.[key]).trim().slice(0, max);
 
+type SendTool = (typeof APPROVAL_TOOLS)[number];
+
+/**
+ * Everything the limiter store keeps about a delivered send, and all it may
+ * keep: the outcome, a short non-personal label, and whether a brief rode
+ * along. It sits in Upstash or memory for a day, so no visitor field belongs
+ * in it.
+ */
+type DeliveryMemo = { delivered: true; label: string; briefAttached?: boolean };
+
+/**
+ * The memo for a send this tool already delivered under `toolCallId`, or
+ * null. Checked before validation, quota, and send: a re-sent approval must
+ * neither spend the day's allowance nor email again. Anything but a delivered
+ * memo is treated as absent, so a stale or corrupt record can only cause one
+ * more send, never a missed one. Read defensively: the store is shared and
+ * its contents are not trusted to be shaped.
+ */
+async function recallDelivered(tool: SendTool, toolCallId: string): Promise<DeliveryMemo | null> {
+  const stored = await getRateLimiter().recallSent(tool, toolCallId);
+  if (!stored || typeof stored !== "object" || (stored as { delivered?: unknown }).delivered !== true) {
+    return null;
+  }
+  const memo = stored as Record<string, unknown>;
+  console.info(`[chat-tools] ${tool} already delivered for ${toolCallId}; replaying that outcome`);
+  return { delivered: true, label: str(memo.label), briefAttached: memo.briefAttached === true };
+}
+
+/**
+ * Remembers a delivered send for a day so a re-sent approval replays it.
+ * Takes a memo, never a tool output: the output carries the visitor's
+ * details and the store must not. Never throws.
+ */
+async function rememberDelivered(
+  tool: SendTool,
+  toolCallId: string,
+  memo: DeliveryMemo,
+): Promise<void> {
+  await getRateLimiter().rememberSent(tool, toolCallId, memo);
+}
+
 /**
  * Grounds a recommendation in the real NVIDIA catalog so Dr. MJ never invents
  * a title.
@@ -283,6 +336,10 @@ export const handOffToMajid = tool({
       ...(organization ? { organization } : {}),
       ...(role ? { role } : {}),
     };
+    // Still ahead of validation, quota, and send. The card's fields come
+    // back from the approved input, so only the outcome had to be stored.
+    const memo = await recallDelivered("handOffToMajid", options.toolCallId);
+    if (memo) return { ...base, briefAttached: memo.briefAttached === true, delivered: true };
     if (!input) return { ...base, briefAttached: false, delivered: false, reason: "invalid-input" };
     if (!EMAIL_RE.test(base.email)) {
       return { ...base, briefAttached: false, delivered: false, reason: "invalid-email" };
@@ -315,6 +372,11 @@ export const handOffToMajid = tool({
     if (!result.delivered) {
       return { ...base, briefAttached, delivered: false, reason: "not-configured" };
     }
+    await rememberDelivered("handOffToMajid", options.toolCallId, {
+      delivered: true,
+      label: WHAT.handoff,
+      briefAttached,
+    });
     return { ...base, briefAttached, delivered: true };
   },
   toModelOutput: ({ output }) => {
@@ -359,6 +421,8 @@ export const emailBriefToVisitor = tool({
       email: field(raw, "email", 254),
       subject: BRIEF_EMAIL_SUBJECT,
     };
+    const memo = await recallDelivered("emailBriefToVisitor", options.toolCallId);
+    if (memo) return { ...base, delivered: true };
     if (!input) return { ...base, delivered: false, reason: "invalid-input" };
     if (!EMAIL_RE.test(base.email)) return { ...base, delivered: false, reason: "invalid-email" };
     const brief = findBrief(options.messages, input.briefToolCallId);
@@ -377,6 +441,7 @@ export const emailBriefToVisitor = tool({
     });
     if (!sent.ok) return { ...base, delivered: false, reason: "send-failed" };
     if (!sent.delivered) return { ...base, delivered: false, reason: "not-configured" };
+    await rememberDelivered("emailBriefToVisitor", options.toolCallId, { delivered: true, label: WHAT.brief });
     return { ...base, delivered: true };
   },
   toModelOutput: ({ output }) =>
@@ -404,6 +469,8 @@ export const emailWorkshopInfo = tool({
     const name = scrubForEmail(field(raw, "name", 120)).slice(0, 80) || "there";
     const prepared = workshopInfoEmail({ name });
     const base = { name, email: field(raw, "email", 254), subject: prepared.subject };
+    const memo = await recallDelivered("emailWorkshopInfo", options.toolCallId);
+    if (memo) return { ...base, delivered: true };
     if (!input) return { ...base, delivered: false, reason: "invalid-input" };
     if (!EMAIL_RE.test(base.email)) return { ...base, delivered: false, reason: "invalid-email" };
     if (isEmailConfigured() && !(await getRateLimiter().reserveEmail(ip, "visitor"))) {
@@ -419,6 +486,7 @@ export const emailWorkshopInfo = tool({
     });
     if (!sent.ok) return { ...base, delivered: false, reason: "send-failed" };
     if (!sent.delivered) return { ...base, delivered: false, reason: "not-configured" };
+    await rememberDelivered("emailWorkshopInfo", options.toolCallId, { delivered: true, label: WHAT.workshop });
     return { ...base, delivered: true };
   },
   toModelOutput: ({ output }) =>

@@ -17,6 +17,17 @@ describe("nexusChatSystem", () => {
     expect(chat).toContain("noted but not sent");
   });
 
+  it("knows Utah is the home base and the market is the whole United States", () => {
+    for (const render of [nexusAssistantSystem, () => nexusChatSystem(), nexusVoiceSystem]) {
+      const text = render();
+      expect(text).toContain("across the United States");
+      expect(text).toContain("anywhere in the US");
+      expect(text).toContain("Utah is the home base, not the edge of the market");
+      expect(text).not.toMatch(/only (in )?Utah|Utah[- ]only|serving Utah|Utah businesses|Utah companies/i);
+      expect(text).not.toMatch(/Mountain West|Wasatch Front|Salt Lake area/i);
+    }
+  });
+
   it("offers the email tools and the email chip by default", () => {
     const chat = nexusChatSystem();
     expect(chat).toContain("call emailWorkshopInfo");

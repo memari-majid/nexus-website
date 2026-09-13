@@ -7,6 +7,23 @@ import { APPROVAL_TOOLS, chatTools, isFailureReason, notSentHint, toolContext } 
 import { PER_IP_EMAILS_PER_DAY, PER_IP_HANDOFFS_PER_DAY } from "@/lib/chat-limits";
 import { getRateLimiter } from "@/lib/rate-limit";
 
+// The Resend client, so a configured send is observable without the network.
+const { resendSend } = vi.hoisted(() => ({ resendSend: vi.fn() }));
+vi.mock("resend", () => ({
+  Resend: class {
+    emails = { send: resendSend };
+  },
+}));
+
+/** Configures email and makes every Resend call succeed. */
+function configureEmail() {
+  process.env.RESEND_API_KEY = "re_test";
+  process.env.RESEND_FROM_EMAIL = "Nexus AI <hello@nexusaisolution.net>";
+  resendSend.mockResolvedValue({ data: { id: "email_1" }, error: null });
+}
+
+type SendOutput = { delivered: boolean; reason?: string; briefAttached?: boolean; email: string };
+
 type AnyTool = {
   inputSchema: unknown;
   needsApproval?: unknown;
@@ -46,6 +63,7 @@ beforeEach(() => {
     saved[k] = process.env[k];
     delete process.env[k];
   }
+  resendSend.mockReset();
   vi.spyOn(console, "info").mockImplementation(() => {});
 });
 
@@ -278,6 +296,142 @@ describe("emailBriefToVisitor.execute and emailWorkshopInfo.execute", () => {
     )) as { delivered: boolean; reason?: string; subject: string };
     expect(ok).toMatchObject({ delivered: false, reason: "not-configured" });
     expect(ok.subject).toContain("NVIDIA DLI workshop");
+  });
+});
+
+describe("approval-gated sends are idempotent per toolCallId", () => {
+  const input = { name: "Ada", email: "ada@acme.com", topic: "RAG over SOPs", briefToolCallId: "brief_1" };
+
+  it("returns the remembered hand-off instead of emailing twice when the approved call is re-sent", async () => {
+    configureEmail();
+    const opts = { ...options([briefMessage]), toolCallId: "toolu_retry_1", experimental_context: { ip: "198.51.100.20" } };
+    const first = (await tools.handOffToMajid.execute!(input, opts)) as SendOutput;
+    expect(first).toMatchObject({ delivered: true, briefAttached: true, email: "ada@acme.com" });
+    expect(resendSend).toHaveBeenCalledTimes(1);
+    // The dropped-connection retry: same id, same input, executed again.
+    const again = (await tools.handOffToMajid.execute!(input, opts)) as SendOutput;
+    expect(again).toEqual(first);
+    expect(resendSend).toHaveBeenCalledTimes(1);
+    // A different call id is a genuine new send.
+    const other = (await tools.handOffToMajid.execute!(input, { ...opts, toolCallId: "toolu_retry_2" })) as SendOutput;
+    expect(other).toMatchObject({ delivered: true });
+    expect(resendSend).toHaveBeenCalledTimes(2);
+  });
+
+  it("a replay spends none of the day's hand-off allowance", async () => {
+    configureEmail();
+    const ip = "198.51.100.21";
+    const opts = { ...options(), toolCallId: "toolu_retry_3", experimental_context: { ip } };
+    expect((await tools.handOffToMajid.execute!(input, opts)) as SendOutput).toMatchObject({ delivered: true });
+    for (let i = 0; i < PER_IP_HANDOFFS_PER_DAY + 2; i++) {
+      expect((await tools.handOffToMajid.execute!(input, opts)) as SendOutput).toMatchObject({ delivered: true });
+    }
+    expect(resendSend).toHaveBeenCalledTimes(1);
+    // Exactly one hand-off was counted for that IP.
+    for (let i = 0; i < PER_IP_HANDOFFS_PER_DAY - 1; i++) {
+      expect(await getRateLimiter().reserveEmail(ip, "handoff"), `reservation ${i}`).toBe(true);
+    }
+    expect(await getRateLimiter().reserveEmail(ip, "handoff")).toBe(false);
+  });
+
+  it("remembers only delivered outcomes: a failed send is retried under the same call id", async () => {
+    configureEmail();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    resendSend.mockResolvedValueOnce({ data: null, error: { name: "application_error", message: "boom" } });
+    const opts = { ...options(), toolCallId: "toolu_retry_4", experimental_context: { ip: "198.51.100.22" } };
+    const failed = (await tools.handOffToMajid.execute!(input, opts)) as SendOutput;
+    expect(failed).toMatchObject({ delivered: false, reason: "send-failed" });
+    const retried = (await tools.handOffToMajid.execute!(input, opts)) as SendOutput;
+    expect(retried).toMatchObject({ delivered: true });
+    expect(resendSend).toHaveBeenCalledTimes(2);
+    // Now delivered, so a further re-send replays.
+    expect((await tools.handOffToMajid.execute!(input, opts)) as SendOutput).toEqual(retried);
+    expect(resendSend).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not remember a not-configured attempt, so nothing is replayed once email is connected", async () => {
+    const opts = { ...options(), toolCallId: "toolu_retry_5", experimental_context: { ip: "198.51.100.23" } };
+    expect((await tools.handOffToMajid.execute!(input, opts)) as SendOutput).toMatchObject({
+      delivered: false,
+      reason: "not-configured",
+    });
+    configureEmail();
+    expect((await tools.handOffToMajid.execute!(input, opts)) as SendOutput).toMatchObject({ delivered: true });
+    expect(resendSend).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the visitor out of the idempotency store, and still replays the same card", async () => {
+    configureEmail();
+    const personal = {
+      name: "Ada Lovelace",
+      email: "ada@acme.com",
+      topic: "RAG over SOPs",
+      organization: "Acme Analytics",
+      role: "Head of Data",
+      briefToolCallId: "brief_1",
+    };
+    const opts = {
+      ...options([briefMessage]),
+      toolCallId: "toolu_privacy_1",
+      experimental_context: { ip: "198.51.100.25" },
+    };
+    const sent = (await tools.handOffToMajid.execute!(personal, opts)) as SendOutput;
+    expect(sent).toMatchObject({ delivered: true, briefAttached: true, email: "ada@acme.com" });
+
+    // Only the outcome, a short label, and the brief flag are kept for a day.
+    const stored = await getRateLimiter().recallSent("handOffToMajid", "toolu_privacy_1");
+    expect(stored).toEqual({ delivered: true, label: "Hand-off", briefAttached: true });
+    expect([...keysDeep(stored)].sort()).toEqual(["briefAttached", "delivered", "label"]);
+    const serialized = JSON.stringify(stored).toLowerCase();
+    for (const personalValue of ["ada", "lovelace", "@acme.com", "acme analytics", "head of data", "rag over sops"]) {
+      expect(serialized, personalValue).not.toContain(personalValue);
+    }
+
+    // The replay rebuilds the card from the approved input, so the visitor
+    // and the model see exactly what the first send produced.
+    const again = (await tools.handOffToMajid.execute!(personal, opts)) as SendOutput;
+    expect(again).toEqual(sent);
+    expect(resendSend).toHaveBeenCalledTimes(1);
+  });
+
+  it("stores no address for the visitor-addressed tools either", async () => {
+    configureEmail();
+    const to = { name: "Ada Lovelace", email: "ada@acme.com" };
+    const ip = "198.51.100.26";
+    const briefOpts = { ...options([briefMessage]), toolCallId: "toolu_privacy_2", experimental_context: { ip } };
+    expect((await tools.emailBriefToVisitor.execute!(to, briefOpts)) as SendOutput).toMatchObject({ delivered: true });
+    expect(await getRateLimiter().recallSent("emailBriefToVisitor", "toolu_privacy_2")).toEqual({
+      delivered: true,
+      label: "Brief",
+    });
+
+    const workshopOpts = { ...options(), toolCallId: "toolu_privacy_3", experimental_context: { ip } };
+    expect((await tools.emailWorkshopInfo.execute!(to, workshopOpts)) as SendOutput).toMatchObject({ delivered: true });
+    expect(await getRateLimiter().recallSent("emailWorkshopInfo", "toolu_privacy_3")).toEqual({
+      delivered: true,
+      label: "Workshop details",
+    });
+  });
+
+  it("replays the visitor-addressed tools too", async () => {
+    configureEmail();
+    const ip = "198.51.100.24";
+    const briefOpts = { ...options([briefMessage]), toolCallId: "toolu_retry_6", experimental_context: { ip } };
+    const brief = (await tools.emailBriefToVisitor.execute!({ name: "Ada", email: "ada@acme.com" }, briefOpts)) as SendOutput;
+    expect(brief).toMatchObject({ delivered: true, email: "ada@acme.com" });
+    expect((await tools.emailBriefToVisitor.execute!({ name: "Ada", email: "ada@acme.com" }, briefOpts)) as SendOutput).toEqual(brief);
+    expect(resendSend).toHaveBeenCalledTimes(1);
+
+    const workshopOpts = { ...options(), toolCallId: "toolu_retry_7", experimental_context: { ip } };
+    const workshop = (await tools.emailWorkshopInfo.execute!({ name: "Ada", email: "ada@acme.com" }, workshopOpts)) as SendOutput;
+    expect(workshop).toMatchObject({ delivered: true, email: "ada@acme.com" });
+    expect((await tools.emailWorkshopInfo.execute!({ name: "Ada", email: "ada@acme.com" }, workshopOpts)) as SendOutput).toEqual(workshop);
+    expect(resendSend).toHaveBeenCalledTimes(2);
+
+    // Memories are per tool: the brief's id does not replay for the one-pager.
+    const crossed = (await tools.emailWorkshopInfo.execute!({ name: "Ada", email: "ada@acme.com" }, { ...workshopOpts, toolCallId: "toolu_retry_6" })) as SendOutput;
+    expect(crossed).toMatchObject({ delivered: true });
+    expect(resendSend).toHaveBeenCalledTimes(3);
   });
 });
 

@@ -136,6 +136,27 @@ Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLM
 - End replies with `SUGGESTIONS: a | b | c` per `lib/assistant.ts`. Chips must be the next useful tap (answers to the question just asked, or a concrete next step). `lib/chat-suggestions.ts` sanitizes fluff and fills a fallback. UI strips the marker and never shows tool/channel tokens (`<|channel|>`, etc.).
 - Same facts as the public site: keep `lib/assistant.ts` and the tool hints in `lib/chat-tools.ts` in sync when DLI or people change.
 
+### 10. Market geography (owner rule, 2026-09-13)
+
+**Utah is the home base, not the market boundary.** Nexus is based in Sandy, Utah and serves companies **across the United States**, in person at the client offices or online.
+
+- Positioning copy says **the United States**: hero, page titles and meta descriptions, keywords, schema `areaServed` (`Country: United States`), chat and voice prompt geography, plan SEO intent.
+- Never write "Utah AI consulting", "brought to Utah", "Utah-based" as the market, or any line that reads as a Utah-only service area.
+- Delivery line to use: **in person at your offices anywhere in the US, or online**.
+
+**Keep these factual Utah references** (credentials and real work, not market limits). Do not scrub them:
+
+| Keep | Where |
+|------|-------|
+| Sandy UT business address + `PostalAddress` schema | `lib/site.ts`, `lib/seo.ts`, footer |
+| 2026 AI Utah 100 honoree | `lib/majid.ts`, schema, FAQ |
+| University of Utah One-U Responsible AI | founder bio / FAQ (per §4) |
+| Utah public-sector collaborations (Gary R. Herbert Institute for Public Policy, Utah Office of Data Privacy, Utah Department of Health and Human Services) | `lib/collaborations.ts` |
+| GridEye / PacifiCorp collaboration, Silicon Slopes community involvement | collaborations / bios |
+| Team based in Utah's Salt Lake metro | `lib/faq.ts`, paired with the nationwide line |
+
+UVU employment stays off this commercial site per §3; it lives on the personal site.
+
 ---
 
 ## People & headshots

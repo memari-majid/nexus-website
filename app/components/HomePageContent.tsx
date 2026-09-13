@@ -98,14 +98,16 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={80}>
             <h1 className="mt-8 text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-7xl sm:leading-[1.05]">
-              AI consulting and training, <span className="gradient-text">brought to Utah</span>
+              AI consulting and training,{" "}
+              <span className="gradient-text">across the United States</span>
             </h1>
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-8 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-              We specialize in generative AI. We start with what your team actually needs and
-              give you straight guidance, then deliver the right NVIDIA Gen AI training in person,
-              or embed an engineer to build it with you.
+              We specialize in generative AI. We work with companies across the US, in person
+              at your offices or online. Based in Utah, we start with what your team actually
+              needs, then deliver the right NVIDIA Gen AI training or embed an engineer to
+              build it with you.
             </p>
           </Reveal>
           <Reveal delay={220}>

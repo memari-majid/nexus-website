@@ -3,12 +3,12 @@
 import { openChat } from "@/lib/chat-events";
 
 /**
- * Reusable "Schedule the workshop" CTA. Opens the ChatWidget via the
+ * Reusable "Start a conversation" CTA. Opens the ChatWidget via the
  * open-chat event so it works from Server Components (hero, workshop page)
  * without prop-drilling the widget's open state.
  */
 export function ScheduleButton({
-  children = "Schedule the workshop",
+  children = "Start a conversation",
   variant = "primary",
   className = "",
 }: {

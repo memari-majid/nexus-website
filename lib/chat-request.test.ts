@@ -335,14 +335,38 @@ describe("with the real SDK", () => {
     user("actually, what does the workshop cost?"),
   ];
 
-  it("streamText fails on an unanswered approval unless the transcript is sanitized", async () => {
+  it("keeps a stale approval visible to the model, where the SDK alone would throw or drop it", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    const raw = await convertToModelMessages(stale as never, { tools: chatTools, ignoreIncompleteToolCalls: true });
-    const before = await run(raw);
-    expect(before.errors.length).toBeGreaterThan(0);
-    expect(String((before.errors[0] as { name?: string })?.name ?? before.errors[0])).toMatch(/MissingToolResults/);
+    // The SDK's own rule: converted strictly, the unanswered call has no result and streamText refuses the prompt.
+    const strict = await convertToModelMessages(stale as never, { tools: chatTools });
+    expect(danglingCalls(strict)).toEqual(["call_1"]);
+    const refused = await run(strict);
+    expect(refused.errors.length).toBeGreaterThan(0);
+    expect(String((refused.errors[0] as { name?: string })?.name ?? refused.errors[0])).toMatch(/MissingToolResults/);
 
-    const after = await run(await sanitized(stale));
+    // The route's setting no longer throws: since ai 6.0.282, `ignoreIncompleteToolCalls` drops the
+    // unresolved approval (and with it the whole assistant turn), so the model never learns the
+    // visitor was offered the hand-off and may offer it again.
+    const dropped = await convertToModelMessages(stale as never, { tools: chatTools, ignoreIncompleteToolCalls: true });
+    expect(dropped.every((m) => m.role === "user")).toBe(true);
+    expect((await run(dropped)).errors).toEqual([]);
+
+    // Sanitized, the call survives with the stale denial as its result, and the turn still runs.
+    const model = await sanitized(stale);
+    expect(danglingCalls(model)).toEqual([]);
+    const toolParts = model.flatMap((m) => (m.role === "tool" ? m.content : []));
+    expect(toolParts).toHaveLength(2);
+    expect(toolParts).toContainEqual(
+      expect.objectContaining({ type: "tool-approval-response", approvalId: "ap_1", approved: false, reason: STALE_APPROVAL_REASON }),
+    );
+    expect(toolParts).toContainEqual(
+      expect.objectContaining({
+        type: "tool-result",
+        toolCallId: "call_1",
+        output: { type: "error-text", value: STALE_APPROVAL_REASON },
+      }),
+    );
+    const after = await run(model);
     expect(after.errors).toEqual([]);
     expect(after.text).toBe("Understood.");
   });

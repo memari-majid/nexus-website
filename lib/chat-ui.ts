@@ -269,3 +269,127 @@ export function readReadinessInput(raw: unknown): ReadinessInput | undefined {
   if (dimensions.length === 0 && !headline) return undefined;
   return { headline, dimensions, nextStep };
 }
+
+/* ---------- Dialog accessibility (pure, so the widget rules are testable) ---------- */
+
+/** Elements a Tab press can land on inside the dialog. The container itself carries tabindex -1 and is skipped. */
+export const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** Mirrors Tailwind's `sm` breakpoint. Below it the chat is a full-screen sheet, above it a floating panel. */
+export const SHEET_PANEL_QUERY = "(min-width: 40rem)";
+
+/**
+ * Where a trapped Tab should land, as an index into the dialog's focusable
+ * elements, or undefined to let the browser move focus on its own. Focus
+ * outside the list (index -1, for instance on the body after a backdrop
+ * click) is pulled back to the first or last element.
+ */
+export function trapTabTarget(activeIndex: number, count: number, shift: boolean): number | undefined {
+  if (count <= 0) return undefined;
+  if (activeIndex < 0 || activeIndex >= count) return shift ? count - 1 : 0;
+  if (shift) return activeIndex === 0 ? count - 1 : undefined;
+  return activeIndex === count - 1 ? 0 : undefined;
+}
+
+/**
+ * Escape closes the dialog unless focus sits on a native select: there the
+ * key closes the open option list first, and the dialog must stay put.
+ */
+export function escapeClosesDialog(targetTagName: string | undefined | null): boolean {
+  return (targetTagName ?? "").toUpperCase() !== "SELECT";
+}
+
+/**
+ * What the live region last received, so a reply is announced once, not per
+ * token. The widget keeps the whole object and renders the text in an element
+ * keyed by `id`: two replies that happen to use the same words are two
+ * different elements, so the second one is announced too.
+ */
+export type Announcement = { id: string; text: string };
+
+/**
+ * What a turn that ends with an approval card and no words says instead.
+ * Silence there would leave a screen reader with a Send button and no reason
+ * for it.
+ */
+export const APPROVAL_WAITING = "Dr. MJ needs your approval before sending. Choose Send or Not now.";
+
+/**
+ * What the live region should carry for the last assistant turn: the reply's
+ * prose, or, when the turn produced only an approval card, the line that says
+ * a decision is waiting. Undefined when there is no assistant turn yet, or
+ * when it has neither words nor a card.
+ */
+export function announcementFor(
+  message: { id: string; text: string; parts: readonly PartLike[] } | undefined,
+): Announcement | undefined {
+  if (!message) return undefined;
+  const text = message.text.trim();
+  if (text) return { id: message.id, text };
+  if (hasPendingApproval(message.parts)) return { id: message.id, text: APPROVAL_WAITING };
+  return undefined;
+}
+
+/**
+ * The next thing the visually hidden live region should announce: the last
+ * assistant message's announcement once the turn has finished, or undefined
+ * while a reply is still streaming, when there is nothing to say, or when
+ * that exact text for that message was already announced. A message that
+ * grows after an approval re-send (same id, more text) is announced again in
+ * full.
+ */
+export function nextAnnouncement(
+  current: Announcement | undefined,
+  busy: boolean,
+  previous: Announcement | undefined,
+): Announcement | undefined {
+  if (busy || !current) return undefined;
+  const text = current.text.trim();
+  if (!text) return undefined;
+  if (previous && previous.id === current.id && previous.text === text) return undefined;
+  return { id: current.id, text };
+}
+
+/**
+ * Plain text for a screen reader from the markdown the assistant writes:
+ * links keep their label, emphasis and code markers go, headings and bullets
+ * lose their prefix, and line breaks collapse to spaces.
+ */
+export function announcementText(markdown: string): string {
+  return markdown
+    .replace(/```[\s\S]*?```/g, (block) => block.replace(/```\w*\n?/g, ""))
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/`([^`]*)`/g, "$1")
+    .replace(/(\*\*|__)(.+?)\1/g, "$2")
+    .replace(/(^|[^\w*])\*([^*\n]+)\*(?!\w)/g, "$1$2")
+    .replace(/(^|[^\w_])_([^_\n]+)_(?!\w)/g, "$1$2")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s?/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Inline styles that freeze the page behind the full-screen sheet, including
+ * on iOS Safari, which scrolls through `overflow: hidden`. The negative top
+ * keeps the page where it was; the widget restores the scroll offset on
+ * release.
+ */
+export function lockedBodyStyle(scrollY: number): Record<string, string> {
+  const top = Number.isFinite(scrollY) && scrollY > 0 ? Math.round(scrollY) : 0;
+  return {
+    position: "fixed",
+    top: `-${top}px`,
+    left: "0",
+    right: "0",
+    width: "100%",
+    overflow: "hidden",
+  };
+}
+
+/** Smooth scrolling only for visitors who have not asked for reduced motion. */
+export function scrollBehavior(reducedMotion: boolean): ScrollBehavior {
+  return reducedMotion ? "auto" : "smooth";
+}

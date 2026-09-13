@@ -1,6 +1,5 @@
 import {
   breadcrumbJsonLd,
-  faqJsonLd,
   founderJsonLd,
   organizationJsonLd,
   websiteJsonLd,
@@ -14,19 +13,18 @@ export function JsonLd({ page = "/" }: { page?: JsonLdPage }) {
   const graph: Record<string, unknown>[] = [organizationJsonLd(), founderJsonLd(), websiteJsonLd()];
 
   if (page === "/") {
-    graph.push(
-      {
-        "@type": "WebPage",
-        "@id": `${SITE_URL}#page`,
-        url: SITE_URL,
-        name: SITE.name,
-        isPartOf: { "@id": `${SITE_URL}/#website` },
-        about: { "@id": `${SITE_URL}/#organization` },
-        mainEntity: { "@id": `${SITE_URL}/#organization` },
-        inLanguage: "en-US",
-      },
-      faqJsonLd(),
-    );
+    // No FAQPage here: the homepage does not render the FAQ, and Google
+    // requires the questions to be visible on the page that declares them.
+    graph.push({
+      "@type": "WebPage",
+      "@id": `${SITE_URL}#page`,
+      url: SITE_URL,
+      name: SITE.name,
+      isPartOf: { "@id": `${SITE_URL}/#website` },
+      about: { "@id": `${SITE_URL}/#organization` },
+      mainEntity: { "@id": `${SITE_URL}/#organization` },
+      inLanguage: "en-US",
+    });
   } else if (page === "/about") {
     graph.push(
       {

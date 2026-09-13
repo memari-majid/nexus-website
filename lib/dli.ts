@@ -7,6 +7,11 @@ import { MAJID } from "@/lib/majid";
  * **DLI Certified Instructor**. Do not publish University Ambassador,
  * free campus workshops, or academia as an audience.
  *
+ * MARKET: Nexus is based in Sandy, Utah and delivers to companies across the
+ * United States. In person means at the client site anywhere in the US, and
+ * online is always an option. Utah is the home base, never the service area,
+ * so no copy here may imply a Utah-only or regional market.
+ *
  * Never write "NVIDIA partner", "NVIDIA-sponsored", or anything implying
  * NVIDIA endorses Nexus. $500/seat is Nexus's own industry rate — never call
  * it an NVIDIA-set or "official" price. Only name workshops from `catalog`.
@@ -22,7 +27,8 @@ export const DLI = {
   credential: "NVIDIA DLI Certified Instructor",
   instructorDirectory: MAJID.nvidiaInstructorDirectory,
   instructorProgramUrl: "https://www.nvidia.com/en-us/learn/certified-instructor-program/",
-  audiences: "For industry teams. A Certified Instructor hosts the official workshop — in person or online.",
+  audiences:
+    "For industry teams across the United States. A Certified Instructor hosts the official workshop, in person at your offices or online.",
   workshop: {
     status: "Available now",
     title: "Building Agentic AI Applications With LLMs",
@@ -38,7 +44,7 @@ export const DLI = {
    * NVIDIA owns the product; Nexus hosts, teaches, and invoices.
    */
   model:
-    "NVIDIA owns the labs, curriculum, assessment, and certificate. Nexus hosts and teaches — in person or online — and handles enrollment and invoicing. Your company needs nothing: no GPUs, no local compute, no special infrastructure.",
+    "NVIDIA owns the labs, curriculum, assessment, and certificate. Nexus hosts and teaches, on site anywhere in the United States or online, and handles enrollment and invoicing. Your company needs nothing: no GPUs, no local compute, no special infrastructure.",
   /** What NVIDIA controls vs what Nexus does. */
   boundary:
     "NVIDIA owns the content, cloud GPU labs, assessment, and the DLI certificate. Nexus hosts, teaches as a Certified Instructor, and invoices you directly at $500 per seat.",
@@ -55,7 +61,7 @@ export const DLI = {
     heading: "Nexus provides",
     items: [
       "Consulting to scope the training your team actually needs",
-      "In-person (or online) hosting and teaching",
+      "In-person hosting and teaching at your offices anywhere in the United States, or online",
       "The right NVIDIA-certified instructor for the topic",
       "A private cohort built around your team",
       "Help every participant pass the assessment",
@@ -63,11 +69,11 @@ export const DLI = {
     ],
   },
   logistics:
-    "Private industry cohorts, in person or online. NVIDIA supplies the cloud labs. Allow six weeks to schedule.",
+    "Private industry cohorts anywhere in the United States, in person at your offices or online. NVIDIA supplies the cloud labs. Allow six weeks to schedule.",
   industry: {
     heading: "Industry workshops",
     role: "DLI Certified Instructor",
-    text: "We host the official workshop for company teams — in person or online. A Certified Instructor teaches, and Nexus handles enrollment and invoicing.",
+    text: "We host the official workshop for company teams anywhere in the United States, in person at your offices or online. A Certified Instructor teaches, and Nexus handles enrollment and invoicing.",
   },
   /**
    * Nexus's own industry pricing. $500/seat is a Nexus business decision, not
@@ -86,7 +92,7 @@ export const DLI = {
     heading: "Why Nexus",
     points: [
       "We consult first to scope the right training, then deliver it — not a one-size course off a shelf.",
-      "In person and hands-on. NVIDIA's public workshops are virtual; we come to your team (or run it online if you prefer).",
+      "In person and hands-on. NVIDIA's public workshops are virtual; we come to your team anywhere in the United States (or run it online if you prefer).",
       "The full NVIDIA catalog, with the certified instructor matched to your topic.",
       "A private cohort built around your team's real work, not a room of strangers.",
       "We help every participant pass the assessment and earn the NVIDIA DLI certificate.",
@@ -98,7 +104,7 @@ export const DLI = {
    */
   process: {
     heading: "How it works",
-    text: "We start with a conversation to understand your team and goals, give you honest AI guidance, then scope the right NVIDIA DLI training, match the certified instructor for it, and deliver — in person. Plan on roughly two to three months end to end.",
+    text: "We start with a conversation to understand your team and goals, give you honest AI guidance, then scope the right NVIDIA DLI training, match the certified instructor for it, and deliver in person at your offices anywhere in the United States, or online. Plan on roughly two to three months end to end.",
   },
   /** NVIDIA DLI training spans far more than generative AI. */
   domains: [

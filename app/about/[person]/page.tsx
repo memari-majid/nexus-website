@@ -6,7 +6,13 @@ import { ChatWidget } from "@/app/components/ChatWidget";
 import { NavBar } from "@/app/components/NavBar";
 import { NvidiaBadge } from "@/app/components/NvidiaBadge";
 import { PEOPLE, getPerson } from "@/lib/people";
-import { breadcrumbJsonLd, organizationJsonLd, personJsonLd, websiteJsonLd } from "@/lib/seo";
+import {
+  OG_IMAGE,
+  breadcrumbJsonLd,
+  organizationJsonLd,
+  personJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import { SITE, SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -24,6 +30,9 @@ export async function generateMetadata({
 
   const title = `${person.displayName} — ${person.role}, Nexus AI Solutions`;
   const path = `/about/${person.slug}`;
+  // The 1200x630 card leads so large-image previews are never a cropped face;
+  // the 640x640 headshot follows for platforms that let the sharer pick.
+  const headshot = { url: person.image, width: 640, height: 640, alt: person.displayName };
   return {
     title: { absolute: title },
     description: person.summary,
@@ -32,10 +41,17 @@ export async function generateMetadata({
       title,
       description: person.summary,
       url: path,
+      siteName: SITE.name,
+      locale: "en_US",
       type: "profile",
-      images: [{ url: person.image, alt: person.displayName }],
+      images: [OG_IMAGE, headshot],
     },
-    twitter: { title, description: person.summary, images: [person.image] },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: person.summary,
+      images: [OG_IMAGE],
+    },
   };
 }
 

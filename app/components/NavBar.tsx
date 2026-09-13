@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 import { openChat } from "@/lib/chat-events";
 
+/** Consulting is the lead offer, so it comes first. Keep exactly four links. */
 const NAV_ITEMS = [
-  { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "Consulting", href: "/#consulting" },
+  { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -62,7 +63,7 @@ export function NavBar() {
             onClick={openChat}
             className="btn-primary btn-compact"
           >
-            Schedule the workshop
+            Start a conversation
           </button>
         </div>
 
@@ -106,7 +107,7 @@ export function NavBar() {
             }}
             className="btn-primary block w-full"
           >
-            Schedule the workshop
+            Start a conversation
           </button>
         </div>
       )}

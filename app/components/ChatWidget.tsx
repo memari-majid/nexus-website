@@ -7,7 +7,7 @@ import {
   lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import { SUGGESTION_MARKER } from "@/lib/assistant";
 import { OPENING_CHIPS } from "@/lib/chat-chips";
@@ -15,13 +15,23 @@ import { OPEN_CHAT_EVENT } from "@/lib/chat-events";
 import { DEFAULT_MODEL_ID } from "@/lib/chat-models";
 import { resolveSuggestions } from "@/lib/chat-suggestions";
 import {
+  FOCUSABLE_SELECTOR,
   MODEL_STORAGE_KEY,
+  SHEET_PANEL_QUERY,
+  announcementFor,
+  announcementText,
   betweenSteps,
+  escapeClosesDialog,
   hasDraftedBrief,
   hasPendingApproval,
   hasUnsettledApproval,
   isChatModelId,
+  lockedBodyStyle,
+  nextAnnouncement,
   readChatMetadata,
+  scrollBehavior,
+  trapTabTarget,
+  type Announcement,
   type ChatUIMessage,
 } from "@/lib/chat-ui";
 import { ModelPicker } from "@/app/components/chat/ModelPicker";
@@ -186,6 +196,26 @@ export function ChatWidget() {
   const [modelId, setModelId] = useState<string>(DEFAULT_MODEL_ID);
   const modelRef = useRef<string>(DEFAULT_MODEL_ID);
   const endRef = useRef<HTMLDivElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Whatever had focus when the dialog opened (a CTA, or the launcher).
+  // Focus goes back there on close, or to the launcher when it is gone.
+  const openerRef = useRef<HTMLElement | null>(null);
+  const wasOpenRef = useRef(false);
+  // The visually hidden live region gets each finished reply once. It holds
+  // the whole announcement, not just the text: the region renders it in an
+  // element keyed by the message id, so two replies with identical words are
+  // two elements and the second one is announced too.
+  const [announcement, setAnnouncement] = useState<Announcement | undefined>(undefined);
+  const announcedRef = useRef<Announcement | undefined>(undefined);
+
+  const openDialog = useCallback(() => {
+    const active = document.activeElement;
+    openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
+    setAnnouncement(undefined);
+    setOpen(true);
+  }, []);
 
   // The transport reads the ref on every send, so the automatic re-send after
   // an approval carries the same model as the visitor's picker.
@@ -225,15 +255,133 @@ export function ChatWidget() {
   const locked = busy || approvalUnsettled;
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    endRef.current?.scrollIntoView({ behavior: scrollBehavior(reduced) });
   }, [messages, open]);
 
   // Open the panel when any CTA dispatches the open-chat event.
   useEffect(() => {
-    const onOpen = () => setOpen(true);
+    const onOpen = () => openDialog();
     window.addEventListener(OPEN_CHAT_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_CHAT_EVENT, onOpen);
-  }, []);
+  }, [openDialog]);
+
+  // Focus moves into the dialog when it opens (the input, or the first
+  // control while the input is locked) and back out when it closes.
+  useEffect(() => {
+    if (open) {
+      const input = inputRef.current;
+      const target =
+        input && !input.disabled
+          ? input
+          : (dialogRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR) ?? dialogRef.current);
+      target?.focus({ preventScroll: true });
+    } else if (wasOpenRef.current) {
+      const opener = openerRef.current;
+      const usable = !!opener && opener.isConnected && opener.getClientRects().length > 0;
+      (usable ? opener : launcherRef.current)?.focus({ preventScroll: true });
+      openerRef.current = null;
+    }
+    wasOpenRef.current = open;
+  }, [open]);
+
+  // Escape closes the dialog (not from a native select, where it closes the
+  // option list), and Tab cycles inside it, pulling focus back in when it
+  // has drifted to the page behind.
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.isComposing) return;
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      if (e.key === "Escape") {
+        if (!escapeClosesDialog(e.target instanceof Element ? e.target.tagName : undefined)) return;
+        e.preventDefault();
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (el) => el.getClientRects().length > 0,
+      );
+      const active = document.activeElement;
+      const index = active instanceof HTMLElement ? focusable.indexOf(active) : -1;
+      const target = trapTabTarget(index, focusable.length, e.shiftKey);
+      if (target === undefined) return;
+      e.preventDefault();
+      focusable[target]?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
+  // Below `sm` the dialog is a full-screen sheet, so the page behind it is
+  // pinned while it is open (iOS Safari scrolls through overflow: hidden, so
+  // the body is fixed in place at its current offset) and put back on close.
+  // The floating panel on wider screens leaves the page alone.
+  useEffect(() => {
+    if (!open) return;
+    const media = window.matchMedia(SHEET_PANEL_QUERY);
+    const body = document.body;
+    let lock: { scrollY: number; previous: [string, string][] } | undefined;
+    const release = () => {
+      if (!lock) return;
+      for (const [name, value] of lock.previous) {
+        if (value) body.style.setProperty(name, value);
+        else body.style.removeProperty(name);
+      }
+      window.scrollTo({ top: lock.scrollY, behavior: "instant" });
+      lock = undefined;
+    };
+    const sync = () => {
+      if (media.matches) {
+        release();
+        return;
+      }
+      if (lock) return;
+      const scrollY = window.scrollY;
+      const style = lockedBodyStyle(scrollY);
+      lock = {
+        scrollY,
+        previous: Object.keys(style).map((name): [string, string] => [name, body.style.getPropertyValue(name)]),
+      };
+      for (const [name, value] of Object.entries(style)) body.style.setProperty(name, value);
+    };
+    sync();
+    media.addEventListener("change", sync);
+    return () => {
+      media.removeEventListener("change", sync);
+      release();
+    };
+  }, [open]);
+
+  // Announce each finished reply once. The transcript itself is not a live
+  // region, or every streamed token would be read out.
+  useEffect(() => {
+    const last = [...messages].reverse().find((m) => m.role === "assistant");
+    const current = announcementFor(
+      last && {
+        id: last.id,
+        text: announcementText(splitSuggestions(displayAssistantText(textFromMessage(last))).body),
+        parts: last.parts,
+      },
+    );
+    const next = nextAnnouncement(current, busy, announcedRef.current);
+    if (!next) return;
+    announcedRef.current = next;
+    setAnnouncement(next);
+  }, [messages, busy]);
+
+  // Disabling the input while a reply streams drops focus to the page. Once
+  // the input is usable again and nothing in the dialog holds focus, bring
+  // it back so the next message can be typed straight away.
+  useEffect(() => {
+    if (!open || locked) return;
+    const active = document.activeElement;
+    const dialog = dialogRef.current;
+    if (active && active !== document.body && active !== dialog && dialog?.contains(active)) return;
+    inputRef.current?.focus({ preventScroll: true });
+  }, [open, locked]);
 
   // Hydration-safe: render the default on the server and first paint, then
   // read the saved pick once mounted. Storage can be blocked, so never throw.
@@ -264,6 +412,8 @@ export function ChatWidget() {
     setMessages([]);
     clearError();
     setInput("");
+    announcedRef.current = undefined;
+    setAnnouncement(undefined);
   }
 
   function onApproval(id: string, approved: boolean) {
@@ -332,10 +482,12 @@ export function ChatWidget() {
   return (
     <>
       <button
+        ref={launcherRef}
         type="button"
-        onClick={() => setOpen(true)}
-        className={`fixed z-[60] flex h-14 w-14 min-h-[56px] min-w-[56px] items-center justify-center rounded-full bg-brand-500 text-zinc-950 shadow-lg shadow-brand-900/30 transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-zinc-50 dark:focus:ring-offset-zinc-950 ${open ? "hidden" : ""} bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))]`}
+        onClick={openDialog}
+        className={`fixed z-[60] flex h-14 w-14 min-h-[56px] min-w-[56px] items-center justify-center rounded-full bg-brand-500 text-zinc-950 shadow-lg shadow-brand-900/30 transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-zinc-50 motion-reduce:transition-none dark:focus:ring-offset-zinc-950 ${open ? "hidden" : ""} bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))]`}
         aria-label="Open chat"
+        aria-haspopup="dialog"
       >
         <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path
@@ -348,7 +500,9 @@ export function ChatWidget() {
 
       {open && (
         <div
-          className="fixed inset-0 z-[70] flex items-stretch justify-end bg-black/50 p-0 pt-[env(safe-area-inset-top)] sm:items-end sm:p-4 md:p-6"
+          ref={dialogRef}
+          tabIndex={-1}
+          className="fixed inset-0 z-[70] flex items-stretch justify-end bg-black/50 p-0 pt-[env(safe-area-inset-top)] outline-none sm:items-end sm:p-4 md:p-6"
           role="dialog"
           aria-modal="true"
           aria-labelledby="chat-title"
@@ -412,7 +566,10 @@ export function ChatWidget() {
               </button>
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+            <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+              {announcement && <p key={announcement.id}>{announcement.text}</p>}
+            </div>
+            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3" aria-busy={busy}>
               {messages.length === 0 && (
                 <div className="space-y-3">
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -464,7 +621,9 @@ export function ChatWidget() {
                 </div>
               )}
               {error && (
-                <p className="text-xs text-amber-700 dark:text-amber-400">{friendlyError(error.message)}</p>
+                <p role="alert" className="text-xs text-amber-700 dark:text-amber-400">
+                  {friendlyError(error.message)}
+                </p>
               )}
               <div ref={endRef} />
             </div>
@@ -472,9 +631,11 @@ export function ChatWidget() {
             <div className="space-y-3 border-t border-zinc-200 p-3 dark:border-zinc-800">
               <form onSubmit={onSubmit} className="flex gap-2">
                 <input
+                  ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={placeholder}
+                  aria-label="Message Dr. MJ"
                   className="min-h-[44px] min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-500 focus:border-brand-600 focus:outline-none sm:min-h-0 sm:text-sm dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder:text-zinc-500"
                   disabled={locked}
                 />

@@ -9,6 +9,7 @@ import { MAJID } from "@/lib/majid";
 import {
   breadcrumbJsonLd,
   dliCourseJsonLd,
+  founderJsonLd,
   organizationJsonLd,
   pageMetadata,
   websiteJsonLd,
@@ -33,6 +34,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function NvidiaDliPage() {
   const graph = [
     organizationJsonLd(),
+    // The Course below points its instructor at /#person; ship that node too.
+    founderJsonLd(),
     websiteJsonLd(),
     dliCourseJsonLd(),
     {

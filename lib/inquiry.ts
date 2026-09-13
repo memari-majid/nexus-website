@@ -11,9 +11,6 @@ import {
 
 const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "anthropic/claude-haiku-4-5";
 
-/** Sources whose requests route to the founder's inbox instead of the shared contact inbox. */
-const FOUNDER_SOURCES = new Set(["chat-workshop", "chat-handoff"]);
-
 export type InquiryInput = {
   name: string;
   email?: string;
@@ -42,7 +39,6 @@ export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess
   const source = input.source?.trim() || "contact-form";
   const isVoice = source === "voice-assistant";
   const isHandoff = source === "chat-handoff";
-  const toFounder = FOUNDER_SOURCES.has(source);
   const name = input.name.trim() || (isVoice ? "Phone caller" : "");
   const email = input.email?.trim() ?? "";
   const phone = input.phone?.trim() ?? "";
@@ -83,17 +79,15 @@ export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess
     }
   }
 
-  // Consultation hand-offs and workshop requests go to the founder's inbox;
-  // everything else goes to the shared contact inbox.
-  const to = toFounder ? founderInbox() : process.env.CONTACT_TO_EMAIL ?? SITE.email;
+  // The consultation hand-off is the one source that goes to the founder's
+  // inbox; everything else goes to the shared contact inbox.
+  const to = isHandoff ? founderInbox() : process.env.CONTACT_TO_EMAIL ?? SITE.email;
   const subject = cleanSubject(
     isVoice
       ? `[Nexus voice] Message for Majid from ${name}${phone ? ` (${phone})` : ""}`
       : isHandoff
         ? `[Nexus consultation] Hand-off from ${name}`
-        : toFounder
-          ? `[Nexus workshop] Scheduling request from ${name}`
-          : `[Nexus AI Website] [${category}] Message from ${name}`,
+        : `[Nexus AI Website] [${category}] Message from ${name}`,
   );
   const identity = [name, email && `<${email}>`, phone && `phone ${phone}`]
     .filter(Boolean)

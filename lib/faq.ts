@@ -15,7 +15,7 @@ export const FAQS = [
   },
   {
     q: "How are workshops and team training structured?",
-    a: "A DLI Certified Instructor hosts the official NVIDIA workshop for industry teams, and we design custom training when the catalog is not the right fit. Custom curriculum is scoped to your stack, data, and use cases — typically a half-day or full-day session, or a short series, delivered virtually or on site. Custom sessions are Nexus curriculum, so the NVIDIA DLI certificate applies only to the official DLI workshop.",
+    a: "A DLI Certified Instructor hosts the official NVIDIA workshop for industry teams, and we design custom training when the catalog is not the right fit. Custom curriculum is scoped to your stack, data, and use cases: typically a half-day or full-day session, or a short series, delivered online or on site at your offices anywhere in the United States. Custom sessions are Nexus curriculum, so the NVIDIA DLI certificate applies only to the official DLI workshop.",
   },
   {
     q: "Do you deliver official NVIDIA Deep Learning Institute workshops?",
@@ -23,11 +23,11 @@ export const FAQS = [
   },
   {
     q: "How do we schedule a private DLI workshop?",
-    a: "Private cohorts can be delivered in person or online, subject to NVIDIA requirements. NVIDIA supplies the cloud labs — your company needs no compute. Allow at least six weeks for scheduling and workshop access. Contact Nexus to start that conversation; Nexus prices and invoices delivery, $500 per seat for up to 20, larger groups quoted.",
+    a: "Private cohorts can be delivered online or in person at your offices anywhere in the United States, subject to NVIDIA requirements. NVIDIA supplies the cloud labs — your company needs no compute. Allow at least six weeks for scheduling and workshop access. Contact Nexus to start that conversation; Nexus prices and invoices delivery, $500 per seat for up to 20, larger groups quoted.",
   },
   {
     q: "Who delivers Nexus client work?",
-    a: "Every statement of work is executed under Nexus AI Solutions LLC. Majid Memari, PhD — Founder and CEO, NVIDIA DLI Certified Instructor, and a researcher working on LLMs, agents, and retrieval — leads AI consulting and team training. He is a 2026 AI Utah 100 honoree. Hamid Memari, Chief Technology Officer, leads the technical side of that consulting, training, and follow-on implementation. Mohammad Jafarinejad, PhD, Chief Financial Officer, leads pricing, engagement economics, and financial planning. Work is based in Utah's Salt Lake metro — not a revolving cast of subcontractors.",
+    a: "Every statement of work is executed under Nexus AI Solutions LLC. Majid Memari, PhD — Founder and CEO, NVIDIA DLI Certified Instructor, and a researcher working on LLMs, agents, and retrieval — leads AI consulting and team training. He is a 2026 AI Utah 100 honoree. Hamid Memari, Chief Technology Officer, leads the technical side of that consulting, training, and follow-on implementation. Mohammad Jafarinejad, PhD, Chief Financial Officer, leads pricing, engagement economics, and financial planning. Nexus is based in Utah's Salt Lake metro and works with companies across the United States, in person at your offices or online. Every engagement is delivered by this team, not a revolving cast of subcontractors.",
   },
   {
     q: "What is the founder's research background?",
@@ -39,7 +39,7 @@ export const FAQS = [
   },
   {
     q: "What industries do you serve?",
-    a: "We work with industry teams across government, healthcare, public safety, and enterprise. Representative work includes simulation training and privacy-preserving data systems for state agencies — always as AI solutions, not generic IT operations.",
+    a: "We work with industry teams across the United States in government, healthcare, public safety, and enterprise. Representative work includes simulation training and privacy-preserving data systems for state agencies, always as AI solutions, not generic IT operations.",
   },
   {
     q: "Can you work with our existing tech stack?",

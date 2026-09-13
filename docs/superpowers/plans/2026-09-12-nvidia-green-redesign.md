@@ -1,5 +1,21 @@
 # NVIDIA-Green Redesign Implementation Plan
 
+> **SUPERSEDED IN PART (2026-09-13). Do NOT execute this plan as written.**
+> This plan shipped on 2026-09-12 and is kept as a record. Two of its positioning
+> decisions have since been reversed by the owner, so the copy in Task 7 and the
+> academia tasks is stale. Current rules live in `AGENTS.md` and `docs/PLAN.md`.
+>
+> 1. **Market geography.** The hero copy below ("brought to Utah") and every
+>    Utah-focused messaging note are reversed. Nexus is based in Sandy, Utah and
+>    serves companies **across the United States**, in person at the client offices
+>    or online. The shipped hero now reads "AI consulting and training, across the
+>    United States". See `AGENTS.md` section 10.
+> 2. **Free for academia.** Reversed. The site is **industry-only**. Never call
+>    consulting or training free.
+>
+> The color system, CTA wiring, and contact-channel tasks here still describe what
+> shipped.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Redesign the nexus-website homepage and `/nvidia-dli-workshops` page into an NVIDIA-green, dark-premium, community-contribution site where the chatbot is the only contact channel.

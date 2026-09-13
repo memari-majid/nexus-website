@@ -34,23 +34,23 @@ export const FOUNDER_SAME_AS = [
 
 export const PAGE_COPY = {
   home: {
-    title: "Nexus AI Solutions — Utah AI Consulting & NVIDIA DLI Training",
+    title: "Nexus AI Solutions: US AI Consulting & NVIDIA DLI Training",
     description: SITE.description,
   },
   about: {
-    title: "About — Nexus AI Solutions",
+    title: "About Nexus AI Solutions",
     description:
-      "Nexus AI Solutions is led by Majid Memari, PhD (Founder & CEO) — an NVIDIA DLI Certified Instructor who hosts industry workshops — with Hamid Memari (CTO) and Mohammad Jafarinejad, PhD (CFO). AI consulting and training: advisory work, NVIDIA DLI workshops, and in-house team sessions.",
+      "Nexus AI Solutions is led by Majid Memari, PhD (Founder & CEO), an NVIDIA DLI Certified Instructor who hosts industry workshops, with Hamid Memari (CTO) and Mohammad Jafarinejad, PhD (CFO). AI consulting and training for companies across the United States: advisory work, NVIDIA DLI workshops, and in-house team sessions.",
   },
   contact: {
-    title: "Contact Nexus AI Solutions — AI Consulting & NVIDIA DLI Training",
+    title: "Contact Nexus AI Solutions: AI Consulting & Training",
     description:
-      "Contact Nexus AI Solutions about AI consulting, team training, and NVIDIA Deep Learning Institute workshops taught by a DLI Certified Instructor. Utah-based — call (801) 810-9152 or send a message and we will get back to you.",
+      "Contact Nexus AI Solutions about AI consulting, team training, and NVIDIA Deep Learning Institute workshops taught by a DLI Certified Instructor. We work with companies across the United States, on site or online. Call (801) 810-9152 or send a message and we will get back to you.",
   },
   nvidiaDli: {
-    title: "NVIDIA DLI Generative AI Workshops for Teams — Nexus AI Solutions",
+    title: "NVIDIA DLI Gen AI Workshops · Nexus AI Solutions",
     description:
-      "Official NVIDIA Deep Learning Institute workshops for industry teams, hosted by a Certified Instructor. Building Agentic AI Applications With LLMs — eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
+      "Official NVIDIA Deep Learning Institute workshops for industry teams across the United States, hosted by a Certified Instructor on site or online. Building Agentic AI Applications With LLMs: eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
   },
   howItWorks: {
     title: "How Dr. MJ Works: Inside the Nexus AI Consultant Agent",
@@ -64,6 +64,17 @@ export const HOW_IT_WORKS_BREADCRUMBS = [
   { name: "Home", path: "/" },
   { name: "How Dr. MJ works", path: "/how-it-works" },
 ];
+
+/**
+ * Shared 1200x630 social preview card. Relative so `metadataBase` in
+ * app/layout.tsx resolves it to an absolute URL on every page.
+ */
+export const OG_IMAGE = {
+  url: "/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: SITE.name,
+} as const;
 
 export function pageMetadata(
   page: keyof typeof PAGE_COPY,
@@ -79,11 +90,16 @@ export function pageMetadata(
       title: copy.title,
       description: copy.description,
       url: path,
+      siteName: SITE.name,
+      locale: "en_US",
       type: ogType,
+      images: [OG_IMAGE],
     },
     twitter: {
+      card: "summary_large_image",
       title: copy.title,
       description: copy.description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -108,10 +124,8 @@ export function organizationJsonLd() {
       postalCode: SITE.postalCode,
       addressCountry: SITE.addressCountry,
     },
-    areaServed: [
-      { "@type": "AdministrativeArea", name: "Utah" },
-      { "@type": "Country", name: "United States" },
-    ],
+    /** Home base is Sandy, UT (see address above); the service area is the whole US. */
+    areaServed: { "@type": "Country", name: "United States" },
     founder: { "@id": `${SITE_URL}/#person` },
     employee: [
       {

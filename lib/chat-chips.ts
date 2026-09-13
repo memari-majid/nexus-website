@@ -5,6 +5,10 @@
  *
  * Every chip is under seven words and reads as something a visitor would tap.
  * Client-safe, dependency-free.
+ *
+ * Nexus is based in Utah and works with companies across the United States, so
+ * no chip may name a state, a region, or a travel radius, or invite a visitor
+ * to wonder whether their location qualifies.
  */
 
 /** Shown before the first message. */

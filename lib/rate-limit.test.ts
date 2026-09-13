@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  SENT_TTL_SECONDS,
   createMemoryStore,
   createRateLimiter,
   createUpstashStore,
@@ -18,6 +19,19 @@ function limiter(overrides: Parameters<typeof createRateLimiter>[1] = {}) {
   const rl = createRateLimiter(store, { now: c.now, ...overrides });
   return { rl, clock: c, store };
 }
+
+/** A store whose every call throws. */
+const failingStore: CounterStore = {
+  incrBy: async () => {
+    throw new Error("boom");
+  },
+  get: async () => {
+    throw new Error("boom");
+  },
+  set: async () => {
+    throw new Error("boom");
+  },
+};
 
 describe("checkRequestRate", () => {
   it("allows 20 requests a minute from one IP and refuses the 21st", async () => {
@@ -139,6 +153,100 @@ describe("reserveEmail", () => {
   });
 });
 
+describe("createMemoryStore records", () => {
+  it("stores a string with a TTL, replaces it, and forgets it once expired", async () => {
+    const c = clock();
+    const store = createMemoryStore(c.now);
+    expect(await store.get("chat:sent:t:1")).toBeNull();
+    await store.set("chat:sent:t:1", '{"a":1}', 10);
+    expect(await store.get("chat:sent:t:1")).toBe('{"a":1}');
+    await store.set("chat:sent:t:1", '{"a":2}', 10);
+    expect(await store.get("chat:sent:t:1")).toBe('{"a":2}');
+    c.advance(10_001);
+    expect(await store.get("chat:sent:t:1")).toBeNull();
+    // Records and counters never share a namespace.
+    await store.incrBy([{ key: "chat:sent:t:2", by: 1 }], 10);
+    expect(await store.get("chat:sent:t:2")).toBeNull();
+  });
+});
+
+describe("rememberSent and recallSent", () => {
+  it("remembers a delivered output for 24 hours, per tool and call id", async () => {
+    const { rl, clock: c } = limiter();
+    const output = { name: "Ada", email: "ada@acme.com", briefAttached: true, delivered: true };
+    expect(await rl.recallSent("handOffToMajid", "toolu_01")).toBeNull();
+    await rl.rememberSent("handOffToMajid", "toolu_01", output);
+    expect(await rl.recallSent("handOffToMajid", "toolu_01")).toEqual(output);
+    expect(await rl.recallSent("emailBriefToVisitor", "toolu_01")).toBeNull();
+    expect(await rl.recallSent("handOffToMajid", "toolu_02")).toBeNull();
+    c.advance(SENT_TTL_SECONDS * 1000 - 1);
+    expect(await rl.recallSent("handOffToMajid", "toolu_01")).toEqual(output);
+    c.advance(2);
+    expect(await rl.recallSent("handOffToMajid", "toolu_01")).toBeNull();
+  });
+
+  it("ignores an empty call id so unrelated sends can never collide", async () => {
+    const { rl } = limiter();
+    await rl.rememberSent("handOffToMajid", "", { delivered: true });
+    expect(await rl.recallSent("handOffToMajid", "")).toBeNull();
+  });
+
+  it("keeps long or odd call ids apart", async () => {
+    const { rl } = limiter();
+    const a = "x".repeat(100) + "a";
+    const b = "x".repeat(100) + "b";
+    await rl.rememberSent("emailWorkshopInfo", a, { delivered: true, which: "a" });
+    await rl.rememberSent("emailWorkshopInfo", "call/with:odd chars", { delivered: true, which: "odd" });
+    expect(await rl.recallSent("emailWorkshopInfo", a)).toEqual({ delivered: true, which: "a" });
+    expect(await rl.recallSent("emailWorkshopInfo", b)).toBeNull();
+    expect(await rl.recallSent("emailWorkshopInfo", "call/with:odd chars")).toEqual({
+      delivered: true,
+      which: "odd",
+    });
+  });
+
+  it("uses the memory fallback for the call when the primary throws, and never throws itself", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const c = clock();
+    const rl = createRateLimiter(failingStore, { now: c.now, fallbackStore: createMemoryStore(c.now) });
+    await expect(rl.rememberSent("handOffToMajid", "toolu_01", { delivered: true })).resolves.toBeUndefined();
+    expect(await rl.recallSent("handOffToMajid", "toolu_01")).toEqual({ delivered: true });
+    expect(error).toHaveBeenCalledTimes(1);
+    error.mockRestore();
+  });
+
+  it("fails open when a record cannot be read: null, so the caller sends normally", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const c = clock();
+    const memory = createMemoryStore(c.now);
+    const readBroken: CounterStore = { ...memory, get: failingStore.get };
+    const rl = createRateLimiter(readBroken, { now: c.now, fallbackStore: createMemoryStore(c.now) });
+    await rl.rememberSent("handOffToMajid", "toolu_01", { delivered: true });
+    expect(await memory.get("chat:sent:handOffToMajid:toolu_01")).toBe('{"delivered":true}');
+    expect(await rl.recallSent("handOffToMajid", "toolu_01")).toBeNull();
+    expect(error).toHaveBeenCalledTimes(1);
+    error.mockRestore();
+  });
+
+  it("fails open on a corrupt record", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { rl, store } = limiter();
+    await store.set("chat:sent:handOffToMajid:toolu_01", "not json", 60);
+    expect(await rl.recallSent("handOffToMajid", "toolu_01")).toBeNull();
+    expect(error).toHaveBeenCalledTimes(1);
+    error.mockRestore();
+  });
+
+  it("shares the key prefix with the counters so two sites can share one database", async () => {
+    const c = clock();
+    const store = createMemoryStore(c.now);
+    const rl = createRateLimiter(store, { now: c.now, prefix: "majid" });
+    await rl.rememberSent("handOffToMajid", "toolu_01", { delivered: true });
+    expect(await store.get("majid:sent:handOffToMajid:toolu_01")).toBe('{"delivered":true}');
+    expect(await store.get("chat:sent:handOffToMajid:toolu_01")).toBeNull();
+  });
+});
+
 describe("createUpstashStore", () => {
   it("uses the body-form pipeline with keys in the body, never the URL", async () => {
     const calls: { url: string; body: unknown }[] = [];
@@ -190,15 +298,51 @@ describe("createUpstashStore", () => {
   });
 
   it("falls back to the in-memory store for a call when the primary throws", async () => {
-    const failing: CounterStore = {
-      incrBy: async () => {
-        throw new Error("boom");
-      },
-    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const c = clock();
-    const rl = createRateLimiter(failing, { now: c.now, fallbackStore: createMemoryStore(c.now) });
+    const rl = createRateLimiter(failingStore, { now: c.now, fallbackStore: createMemoryStore(c.now) });
     for (let i = 0; i < 20; i++) expect((await rl.checkRequestRate("x")).allowed).toBe(true);
     expect((await rl.checkRequestRate("x")).allowed).toBe(false);
+    error.mockRestore();
+  });
+
+  it("reads and writes sent records through the same body-form pipeline", async () => {
+    const bodies: unknown[] = [];
+    let stored: string | null = null;
+    const fetchImpl = (async (_url: string | URL | Request, init?: RequestInit) => {
+      const commands = JSON.parse(String(init?.body)) as string[][];
+      bodies.push(commands);
+      const rows = commands.map((cmd) => {
+        if (cmd[0] === "GET") return { result: stored };
+        stored = cmd[2];
+        return { result: "OK" };
+      });
+      return new Response(JSON.stringify(rows), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }) as typeof fetch;
+    const store = createUpstashStore("https://example.upstash.io", "tok", fetchImpl);
+    const key = "chat:sent:handOffToMajid:toolu_01";
+    expect(await store.get(key)).toBeNull();
+    await store.set(key, '{"delivered":true}', SENT_TTL_SECONDS);
+    expect(await store.get(key)).toBe('{"delivered":true}');
+    expect(bodies).toEqual([
+      [["GET", key]],
+      [["SET", key, '{"delivered":true}', "EX", String(SENT_TTL_SECONDS)]],
+      [["GET", key]],
+    ]);
+  });
+
+  it("throws on a pipeline error row for get and set so the limiter can fail open", async () => {
+    const fetchImpl = (async () =>
+      new Response(JSON.stringify([{ error: "WRONGTYPE" }]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })) as typeof fetch;
+    const store = createUpstashStore("https://example.upstash.io", "tok", fetchImpl);
+    await expect(store.get("chat:sent:t:1")).rejects.toThrow(/WRONGTYPE/);
+    await expect(store.set("chat:sent:t:1", "x", 10)).rejects.toThrow(/WRONGTYPE/);
   });
 });
 
