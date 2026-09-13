@@ -79,7 +79,7 @@ export function renderEmail({ heading, bodyHtml }: { heading: string; bodyHtml: 
         <tr><td style="padding:18px 28px;border-top:1px solid #e4e4e7;font-size:12px;line-height:1.6;color:#71717a;">
           ${esc(SITE.name)} · <a href="mailto:${esc(SITE.email)}" style="color:#4f7a00;text-decoration:underline;">${esc(SITE.email)}</a><br/>
           ${esc(SITE.addressDisplay)}<br/>
-          NVIDIA DLI Certified Instructor (industry) · University Ambassador (campus) · independent, not endorsed by NVIDIA.
+          NVIDIA DLI Certified Instructor · independent, not endorsed by NVIDIA.
         </td></tr>
       </table>
     </td></tr>

@@ -49,7 +49,7 @@ function rateLimited(ip: string): boolean {
  */
 const requestAppointment = tool({
   description:
-    "File a workshop or consultation request. Call this as soon as you have the visitor's name, email, and what they need. For a workshop, also capture audience, timing, delivery, and headcount when given. This files a request for email follow-up; never promise a specific time or a phone call.",
+    "File a workshop or consultation request. Call this as soon as you have the visitor's name, email, and what they need. For a workshop, also capture company, timing, delivery, and headcount when given. This files a request for email follow-up; never promise a specific time or a phone call.",
   inputSchema: z.object({
     name: z.string().min(1).describe("Visitor's name"),
     email: z.string().email().describe("Visitor's email address"),
@@ -57,10 +57,6 @@ const requestAppointment = tool({
       .string()
       .min(1)
       .describe("What they need, in one line, e.g. 'NVIDIA DLI workshop for 30 engineers'"),
-    audience: z
-      .enum(["industry", "academia"])
-      .optional()
-      .describe("Industry team or academic institution. Omit if unclear."),
     workshop: z.string().optional().describe("Which workshop, if named. Defaults to the live one."),
     when: z
       .string()
@@ -78,13 +74,12 @@ const requestAppointment = tool({
       .optional()
       .describe("Number of participants, 1 to 40 per cohort."),
     phone: z.string().optional().describe("Phone number if offered. Omit if not given."),
-    organization: z.string().optional().describe("Company or institution if mentioned."),
+    organization: z.string().optional().describe("Company if mentioned."),
   }),
   execute: async ({
     name,
     email,
     topic,
-    audience,
     workshop,
     when,
     delivery,
@@ -95,14 +90,13 @@ const requestAppointment = tool({
     const lines = [
       `Request: ${topic}`,
       workshop ? `Workshop: ${workshop}` : null,
-      audience ? `Audience: ${audience}` : null,
       when ? `When: ${when}` : null,
       delivery ? `Delivery: ${delivery}` : null,
       headcount ? `Headcount: ${headcount}` : null,
       organization ? `Organization: ${organization}` : null,
     ].filter(Boolean);
 
-    const isWorkshop = Boolean(audience || workshop || when || delivery || headcount);
+    const isWorkshop = Boolean(workshop || when || delivery || headcount);
 
     const result = await submitInquiry({
       name,
@@ -133,13 +127,9 @@ const emailWorkshopInfo = tool({
   inputSchema: z.object({
     name: z.string().min(1).describe("Visitor's name"),
     email: z.string().email().describe("Visitor's email address"),
-    audience: z
-      .enum(["industry", "academia"])
-      .optional()
-      .describe("Tailors the email; academia highlights the free offer."),
   }),
-  execute: async ({ name, email, audience }) => {
-    const { subject, text, html } = workshopInfoEmail({ name, audience });
+  execute: async ({ name, email }) => {
+    const { subject, text, html } = workshopInfoEmail({ name });
     const sent = await sendEmail({ to: email, subject, text, html, replyTo: SITE.email });
     if (!sent.ok) {
       return { ok: false as const, error: sent.error };
@@ -149,9 +139,7 @@ const emailWorkshopInfo = tool({
       to: process.env.WORKSHOP_TO_EMAIL ?? "memari.majid@hotmail.com",
       subject: `[Nexus] ${name} requested workshop info`,
       replyTo: email,
-      text: `${name} <${email}> asked Nex to email the NVIDIA workshop details${
-        audience ? ` (audience: ${audience})` : ""
-      }.`,
+      text: `${name} <${email}> asked Nex to email the NVIDIA workshop details.`,
     });
     return {
       ok: true as const,

@@ -11,19 +11,15 @@ export const FAQS = [
   },
   {
     q: "Does Nexus teach people to build AI-powered businesses?",
-    a: "The founder teaches AI and entrepreneurship at the university level — students take AI from a real problem to a working business, end to end. The same model is the direction of Nexus team training: helping people build their own AI-powered businesses. That training direction is not a launched product SKU.",
+    a: "The founder teaches AI and entrepreneurship — taking a real problem to a working business, end to end. The same model is the direction of Nexus team training: helping people build their own AI-powered businesses. That training direction is not a launched product SKU.",
   },
   {
     q: "How are workshops and team training structured?",
-    a: "Two NVIDIA tracks, plus custom Nexus training when the catalog is not the right fit. A DLI Certified Instructor hosts the official workshop for industry teams. Through the University Ambassador Program the same workshop is free for US universities. Custom curriculum is scoped to your stack, data, and use cases — typically a half-day or full-day session, or a short series, delivered virtually or on site. Custom sessions are Nexus curriculum, so the NVIDIA DLI certificate applies only to the official DLI workshop.",
+    a: "A DLI Certified Instructor hosts the official NVIDIA workshop for industry teams, and we design custom training when the catalog is not the right fit. Custom curriculum is scoped to your stack, data, and use cases — typically a half-day or full-day session, or a short series, delivered virtually or on site. Custom sessions are Nexus curriculum, so the NVIDIA DLI certificate applies only to the official DLI workshop.",
   },
   {
     q: "Do you deliver official NVIDIA Deep Learning Institute workshops?",
-    a: "Yes. Majid Memari holds two NVIDIA titles, used for two different offers: DLI Certified Instructor for hosting industry workshops, and University Ambassador for free campus workshops. He is listed in the NVIDIA Certified Instructor Directory. The workshop available now is Building Agentic AI Applications With LLMs — eight hours, hands-on. NVIDIA takes care of everything: cloud GPU VMs (your company needs no GPUs, local compute, or special infrastructure), pricing and purchase, course content and curriculum, assessment, and the DLI certificate. Nexus only hosts and teaches — in person or online — and helps participants pass the assessment. Nexus has no control over pricing, content, curriculum, assessment, or the certificate; industry seats are purchased through NVIDIA at NVIDIA's rate. Official sources: learn.nvidia.com, nvidia.com/en-us/learn/certified-instructor-program/, and nvidia.com/en-us/training/educator-programs/university-ambassador-program/.",
-  },
-  {
-    q: "Do you offer free workshops for academia?",
-    a: "Yes — that is the University Ambassador role, not the industry hosting role. Through NVIDIA's University Ambassador Program we teach the official DLI workshop at no cost to US academic institutions — students, faculty, and researchers. Give us at least six weeks' notice so NVIDIA can schedule labs and access.",
+    a: "Yes. Majid Memari is an NVIDIA Deep Learning Institute Certified Instructor, listed in the NVIDIA Certified Instructor Directory. The workshop available now is Building Agentic AI Applications With LLMs — eight hours, hands-on. NVIDIA takes care of everything: cloud GPU VMs (your company needs no GPUs, local compute, or special infrastructure), pricing and purchase, course content and curriculum, assessment, and the DLI certificate. Nexus only hosts and teaches — in person or online — and helps participants pass the assessment. Nexus has no control over pricing, content, curriculum, assessment, or the certificate; seats are purchased through NVIDIA at NVIDIA's rate. Official sources: learn.nvidia.com and nvidia.com/en-us/learn/certified-instructor-program/.",
   },
   {
     q: "How do we schedule a private DLI workshop?",
@@ -31,11 +27,11 @@ export const FAQS = [
   },
   {
     q: "Who delivers Nexus client work?",
-    a: "Every statement of work is executed under Nexus AI Solutions LLC. Majid Memari, PhD — Founder and CEO, NVIDIA DLI Certified Instructor, University Ambassador, and a university-level instructor and researcher working on LLMs, agents, and retrieval — leads AI consulting and team training. He is a 2026 AI Utah 100 honoree. Hamid Memari, Chief Technology Officer, leads the technical side of that consulting, training, and follow-on implementation. Mohammad Jafarinejad, PhD, Chief Financial Officer, leads pricing, engagement economics, and financial planning. Work is based in Utah's Salt Lake metro — not a revolving cast of subcontractors.",
+    a: "Every statement of work is executed under Nexus AI Solutions LLC. Majid Memari, PhD — Founder and CEO, NVIDIA DLI Certified Instructor, and a researcher working on LLMs, agents, and retrieval — leads AI consulting and team training. He is a 2026 AI Utah 100 honoree. Hamid Memari, Chief Technology Officer, leads the technical side of that consulting, training, and follow-on implementation. Mohammad Jafarinejad, PhD, Chief Financial Officer, leads pricing, engagement economics, and financial planning. Work is based in Utah's Salt Lake metro — not a revolving cast of subcontractors.",
   },
   {
     q: "What is the founder's research background?",
-    a: "Majid Memari, PhD holds a PhD in Computer Science, with doctoral research in generative AI — conditional VAE and GAN models for synthetic-image generation and evaluation. He then held a postdoctoral research appointment at the University of Pennsylvania, and that appointment brought research collaborations with Stanford and Johns Hopkins; those were collaborations, not appointments, and no university sponsors or endorses Nexus. Earlier research runs from graduate work at Southern Illinois University Carbondale, starting in 2015, through the University of Utah One-U Responsible AI Initiative. His work today centres on LLMs, agents, retrieval, and evaluation — the same ground the NVIDIA DLI agentic AI workshop covers.",
+    a: "Majid Memari, PhD holds a PhD in Computer Science, with doctoral research in generative AI — conditional VAE and GAN models for synthetic-image generation and evaluation. He then held a postdoctoral research appointment at the University of Pennsylvania, and that appointment brought research collaborations with Stanford and Johns Hopkins; those were collaborations, not appointments, and none of those institutions sponsors or endorses Nexus. Earlier research runs from graduate work at Southern Illinois University Carbondale, starting in 2015, through the University of Utah One-U Responsible AI Initiative. His work today centres on LLMs, agents, retrieval, and evaluation — the same ground the NVIDIA DLI agentic AI workshop covers.",
   },
   {
     q: "Are we employing your team, or hiring Nexus as a vendor?",
@@ -43,7 +39,7 @@ export const FAQS = [
   },
   {
     q: "What industries do you serve?",
-    a: "We work across education, government, healthcare, public safety, and enterprise. Representative work includes AI-powered EdTech, simulation training, and privacy-preserving data systems for state agencies — always as AI solutions, not generic IT operations.",
+    a: "We work with industry teams across government, healthcare, public safety, and enterprise. Representative work includes simulation training and privacy-preserving data systems for state agencies — always as AI solutions, not generic IT operations.",
   },
   {
     q: "Can you work with our existing tech stack?",

@@ -22,7 +22,6 @@ export const metadata: Metadata = {
     "NVIDIA DLI workshop",
     "NVIDIA Deep Learning Institute training",
     "NVIDIA Certified Instructor",
-    "NVIDIA University Ambassador",
     "generative AI workshop for teams",
     "agentic AI training",
     "Utah AI consulting",

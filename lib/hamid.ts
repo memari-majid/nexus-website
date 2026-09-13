@@ -17,7 +17,7 @@ export const HAMID = {
   bio: [
     "Builds what the practice designs: retrieval, agents, evaluation, integrations, and the path from prototype to production.",
     "Regulated, high-stakes delivery — release cycles, escalated defect triage, code review, build verification, and production cutovers.",
-    "M.S. in Computer Science, a graduate program in natural language processing and deep learning, and university teaching in information assurance and network security.",
+    "M.S. in Computer Science, a graduate program in natural language processing and deep learning, and teaching in information assurance and network security.",
   ],
   linkedin: "https://www.linkedin.com/in/hamid-memari-66631848/",
   photo: "/team-hamid-memari.jpg",

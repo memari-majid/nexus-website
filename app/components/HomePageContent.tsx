@@ -86,12 +86,9 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-8 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-              A DLI Certified Instructor hosts the workshop for industry teams. Through the
-              University Ambassador Program, the same workshop is{" "}
-              <strong className="font-semibold text-zinc-800 dark:text-zinc-200">
-                free for US universities
-              </strong>
-              . NVIDIA provides the curriculum, GPU labs, and certificate.
+              A DLI Certified Instructor hosts NVIDIA&apos;s official workshop for industry
+              teams. NVIDIA provides the curriculum, GPU labs, and certificate. Your company
+              needs no hardware.
             </p>
           </Reveal>
           <Reveal delay={220}>
@@ -151,29 +148,16 @@ export function HomePageContent() {
           </Reveal>
 
           <Reveal delay={140}>
-            <div className="mt-10 grid gap-10 border-t border-zinc-200 pt-10 text-left dark:border-zinc-800 sm:grid-cols-2">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
-                  {DLI.industry.role}
-                </p>
-                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                  {DLI.industry.heading}
-                </h3>
-                <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-                  {DLI.industry.text}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
-                  {DLI.academia.role}
-                </p>
-                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                  {DLI.academia.heading}
-                </h3>
-                <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-                  {DLI.academia.text}
-                </p>
-              </div>
+            <div className="mt-10 border-t border-zinc-200 pt-10 text-left dark:border-zinc-800">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
+                {DLI.industry.role}
+              </p>
+              <h3 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                {DLI.industry.heading}
+              </h3>
+              <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
+                {DLI.industry.text}
+              </p>
             </div>
           </Reveal>
 

@@ -15,7 +15,7 @@ export const briefInputSchema = z.object({
   description: z.string().trim().min(BRIEF_INPUT_MIN).max(BRIEF_INPUT_MAX),
 });
 
-export const AUDIENCES = ["business", "university", "nonprofit", "public-sector", "individual", "other"] as const;
+export const AUDIENCES = ["business", "nonprofit", "public-sector", "individual", "other"] as const;
 export const EFFORTS = ["low", "medium", "high"] as const;
 
 /**
@@ -28,7 +28,7 @@ export const PATHS = ["consulting", "nvidia-dli-workshop", "custom-training", "i
 export const briefSchema = z.object({
   audience: z
     .enum(AUDIENCES)
-    .describe("Who the visitor is. 'university' for any college or university department or campus group."),
+    .describe("Who the visitor is. Use business for company teams."),
   summary: z
     .string()
     .describe("Two or three plain sentences restating the situation and the goal in the visitor's terms."),

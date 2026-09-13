@@ -3,25 +3,20 @@ import { renderEmail, escapeHtml } from "@/lib/email";
 
 /**
  * Branded "here are the NVIDIA workshop details" email, built entirely from the
- * typed DLI data so it can never drift from the site or the guardrails. The
- * `academia` variant foregrounds the free-for-academic-institutions offer.
+ * typed DLI data so it can never drift from the site or the guardrails.
+ * Industry delivery only — do not add a campus / free variant.
  */
 export function workshopInfoEmail(opts: {
   name: string;
-  audience?: "industry" | "academia";
 }): { subject: string; text: string; html: string } {
   const name = opts.name || "there";
-  const free = opts.audience === "academia";
   const w = DLI.workshop;
-
-  const offerText = free
-    ? `${DLI.academia.heading} (${DLI.academia.role}): ${DLI.academia.text}`
-    : `${DLI.industry.heading} (${DLI.industry.role}): ${DLI.industry.text} ${DLI.logistics}`;
+  const offerText = `${DLI.industry.heading} (${DLI.industry.role}): ${DLI.industry.text} ${DLI.logistics}`;
 
   const text = [
     `Hi ${name},`,
     ``,
-    `Here are the details on the NVIDIA Deep Learning Institute workshop. A Certified Instructor hosts industry cohorts; University Ambassador delivery is free for US campuses:`,
+    `Here are the details on the NVIDIA Deep Learning Institute workshop we host for industry teams as a Certified Instructor:`,
     ``,
     `${w.title} — ${w.length}`,
     w.summary,
@@ -47,14 +42,12 @@ export function workshopInfoEmail(opts: {
 
   const bodyHtml = `
     <p>Hi ${escapeHtml(name)},</p>
-    <p>Here are the details on the NVIDIA Deep Learning Institute workshop. A Certified Instructor hosts industry cohorts; University Ambassador delivery is free for US campuses:</p>
+    <p>Here are the details on the NVIDIA Deep Learning Institute workshop we host for industry teams as a Certified Instructor:</p>
     <p style="margin:16px 0 4px;"><strong>${escapeHtml(w.title)}</strong> — ${escapeHtml(w.length)}</p>
     <p style="margin:0 0 12px;">${escapeHtml(w.summary)}</p>
-    <p style="margin:12px 0;padding:10px 14px;background:#f2f9e6;border-radius:8px;">${
-      free
-        ? `<strong>${escapeHtml(DLI.academia.heading)} — ${escapeHtml(DLI.academia.role)}.</strong> ${escapeHtml(DLI.academia.text)}`
-        : `<strong>${escapeHtml(DLI.industry.heading)} — ${escapeHtml(DLI.industry.role)}.</strong> ${escapeHtml(DLI.industry.text)} ${escapeHtml(DLI.logistics)}`
-    }</p>
+    <p style="margin:12px 0;padding:10px 14px;background:#f2f9e6;border-radius:8px;">
+      <strong>${escapeHtml(DLI.industry.heading)} — ${escapeHtml(DLI.industry.role)}.</strong> ${escapeHtml(DLI.industry.text)} ${escapeHtml(DLI.logistics)}
+    </p>
     <p style="margin:16px 0 4px;"><strong>What's covered</strong></p>
     ${liText(DLI.outline.map((m) => `${m.title}: ${m.text}`))}
     <p style="margin:16px 0 4px;"><strong>NVIDIA provides</strong></p>

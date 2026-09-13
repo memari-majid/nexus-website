@@ -38,7 +38,7 @@ Homepage should stay sparse: hero + Consulting + Training + Team + footer. Depth
 | CTO | `lib/hamid.ts` | `lib/people.ts` |
 | CFO | `lib/mohammad.ts` | `lib/people.ts` |
 | Who appears on team / about / schema | `lib/people.ts` | `lib/team.ts`, `/about`, `/about/[person]` |
-| NVIDIA workshop facts, delivery model, free academia | `lib/dli.ts` | Training page, FAQ, chat knowledge, homepage teaser |
+| NVIDIA workshop facts, delivery model | `lib/dli.ts` | Training page, FAQ, chat knowledge, homepage teaser |
 | Custom (non-NVIDIA) training | `lib/training.ts` | Do not mix into DLI copy |
 | FAQ answers | `lib/faq.ts` | FAQ JSON-LD in SEO |
 | Chat / voice personality & facts | `lib/assistant.ts`, `lib/chat-knowledge.ts` | `/api/chat`, `/api/voice/*` |
@@ -60,13 +60,13 @@ Homepage should stay sparse: hero + Consulting + Training + Team + footer. Depth
 
 ### 2. Collaborations vs pedigree
 
-- `lib/collaborations.ts` = **current Nexus** university/public work — stay generic (no campus names).
+- `lib/collaborations.ts` = **current Nexus** industry / public-sector work — stay generic (no campus names).
 - Founder prior research in `lib/majid.ts` may name Penn / Stanford / Johns Hopkins / One-U RAI / SIU under §3 below. Do not scrub those bios because of the collaborations policy.
 
 ### 3. Current employer (conflict of interest)
 
 - **Do not publish** his current UVU faculty title, UVU course list, or UVU directory link on this commercial site.
-- Teaching may be described generically (“teaches at the university level”).
+- Do not describe teaching as “university level” on this commercial site.
 - Personal site / LinkedIn may carry employment detail — this site must not.
 
 ### 4. Prior research institutions (named, carefully)
@@ -85,10 +85,11 @@ Allowed and encouraged when accurate: **Penn** (postdoc appointment), **Stanford
 
 ### 6. NVIDIA credentials & language
 
-Public titles only — **two roles, two offers. Never mash them into one job.**
+This commercial site is **industry only**. Public title:
 
-- **DLI Certified Instructor** → hosts **industry** workshops (NVIDIA sells seats)
-- **University Ambassador** → teaches **free campus** workshops (US academia, six weeks’ notice)
+- **DLI Certified Instructor** → hosts industry workshops (NVIDIA sells seats)
+
+**Do not publish** University Ambassador, free workshops, campus workshops, or academia as an audience. If asked in chat, stay on industry hosting — do not describe another program.
 
 Never: NVIDIA partner, NVIDIA-sponsored, NVIDIA-endorsed, or any implication that NVIDIA endorses Nexus.
 
@@ -105,7 +106,7 @@ Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLM
 - Nexus has **no control** over price, content, assessment, or certificate.
 - **Never quote a dollar price** for the DLI workshop.
 - Chat must never invent that Nexus sells seats or requires client hardware.
-- **Free for any US university** (students/faculty/researchers), **six weeks’ notice**, via Ambassador program. Never publish Ambassador program cost or projected profit.
+- **Never** mention a free workshop, campus delivery, or Ambassador program on this site.
 - Custom training (`lib/training.ts`) ≠ DLI; no DLI certificate language there.
 - Every page showing the NVIDIA mark must include the trademark notice (`TRADEMARK_NOTICE` / `TRADEMARK_SHORT`).
 - Re-check NVIDIA URLs before editing the Resources link list (sibling paths 404 easily). Do not frame those links as “verify our claims.”
@@ -177,11 +178,11 @@ npx vercel deploy --prod --yes   # or push main after owner commits
 3. Add `public/team-*.jpg` (same crop recipe).
 4. Confirm `/about` and `/about/<slug>` pick them up from the registry — avoid one-off page forks.
 
-### Soften or strengthen academia language
+### Industry-only workshop language
 
-- Current employer → stay generic (policy §2).
-- Prior research → name institutions per policy §3.
-- If unsure, prefer under-claiming over over-claiming.
+- Public offer is **Certified Instructor + industry teams**.
+- Do not reintroduce Ambassador, campus, academia, or a free workshop.
+- Prior research institutions in bios may still be named per policy §3.
 
 ---
 

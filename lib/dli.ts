@@ -3,11 +3,13 @@ import { MAJID } from "@/lib/majid";
 /**
  * NVIDIA Deep Learning Institute workshop offering.
  *
- * Public claims are limited to the two accurate titles: **DLI Certified
- * Instructor** and **University Ambassador**. Never write "NVIDIA partner",
- * "NVIDIA-sponsored", or anything implying NVIDIA endorses Nexus.
- * Never publish the Ambassador program cost, projected profit, or any
- * workshop he is not certified to teach. Only list workshops below.
+ * This commercial site sells industry delivery only. Public title:
+ * **DLI Certified Instructor**. Do not publish University Ambassador,
+ * free campus workshops, or academia as an audience.
+ *
+ * Never write "NVIDIA partner", "NVIDIA-sponsored", or anything implying
+ * NVIDIA endorses Nexus. Never quote a workshop dollar price. Only list
+ * workshops below.
  *
  * Link official NVIDIA pages inline and in the quiet Resources list — do not
  * frame them as a “verify our claims” section. Re-check URLs before changing
@@ -16,15 +18,10 @@ import { MAJID } from "@/lib/majid";
 
 export const DLI = {
   instructorTitle: "NVIDIA DLI Certified Instructor",
-  ambassadorTitle: "NVIDIA University Ambassador",
-  /** Person holds both titles — never mash them into one job. */
-  credential:
-    "NVIDIA DLI Certified Instructor (industry workshops) and University Ambassador (free campus workshops)",
+  credential: "NVIDIA DLI Certified Instructor",
   instructorDirectory: MAJID.nvidiaInstructorDirectory,
   instructorProgramUrl: "https://www.nvidia.com/en-us/learn/certified-instructor-program/",
-  ambassadorProgramUrl:
-    "https://www.nvidia.com/en-us/training/educator-programs/university-ambassador-program/",
-  audiences: "Two tracks: industry teams hosted by a Certified Instructor, and free campus workshops through the University Ambassador Program.",
+  audiences: "For industry teams. A Certified Instructor hosts the official workshop — in person or online.",
   workshop: {
     status: "Available now",
     title: "Building Agentic AI Applications With LLMs",
@@ -65,26 +62,11 @@ export const DLI = {
     ],
   },
   logistics:
-    "Private cohorts, in person or online. NVIDIA supplies the cloud labs. Allow six weeks to schedule.",
-  /**
-   * Two NVIDIA roles, two offers. Do not combine them into one sentence
-   * that makes Ambassador and Certified Instructor sound like the same job.
-   */
+    "Private industry cohorts, in person or online. NVIDIA supplies the cloud labs. Allow six weeks to schedule.",
   industry: {
     heading: "Industry workshops",
     role: "DLI Certified Instructor",
     text: "We host the official workshop for company teams — in person or online. NVIDIA prices and sells the seats; a Certified Instructor teaches.",
-  },
-  /**
-   * University Ambassador delivery: free to academic audiences. This is the
-   * Ambassador program working as intended — students, faculty, and
-   * researchers are not charged. Keep the six-week lead time attached, since
-   * scheduling and lab access run through NVIDIA.
-   */
-  academia: {
-    heading: "Free campus workshops",
-    role: "University Ambassador",
-    text: "Through the University Ambassador Program we teach this workshop at no cost to US academic institutions — students, faculty, and researchers. Give us six weeks' notice.",
   },
   /**
    * Module list summarised from NVIDIA's published course outline (courseUrl).
@@ -141,10 +123,6 @@ export const DLI = {
     {
       label: "Certified Instructor Program",
       href: "https://www.nvidia.com/en-us/learn/certified-instructor-program/",
-    },
-    {
-      label: "University Ambassador Program",
-      href: "https://www.nvidia.com/en-us/training/educator-programs/university-ambassador-program/",
     },
     {
       label: "Deep Learning Institute",

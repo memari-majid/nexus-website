@@ -42,11 +42,10 @@ export const MAJID = {
   name: "Majid Memari",
   displayName: "Majid (MJ) Memari",
   shortBio:
-    "NVIDIA DLI Certified Instructor for industry workshops; University Ambassador for free campus workshops. LLMs, agents, and retrieval. PhD in Computer Science with doctoral research in generative AI, in applied AI since 2015.",
+    "NVIDIA DLI Certified Instructor. LLMs, agents, and retrieval. PhD in Computer Science with doctoral research in generative AI, in applied AI since 2015.",
   headlineRole: "AI Scientist & Solution Architect",
   roles: {
-    nvidia:
-      "NVIDIA DLI Certified Instructor (industry workshops) and University Ambassador (free campus workshops)",
+    nvidia: "NVIDIA DLI Certified Instructor",
     herbert: "Principal AI Architect, Gary R. Herbert Institute for Public Policy",
     rai: "AI Consultant, University of Utah One-U Responsible AI Initiative",
     nexus: "Founder & CEO, Nexus AI Solutions LLC",
@@ -106,7 +105,7 @@ export const MAJID = {
    */
   bio: {
     academia:
-      "Research on LLMs, agents, and retrieval. PhD in Computer Science with doctoral research in generative AI — conditional VAE and GAN models for synthetic-image generation and evaluation. Postdoctoral research at the University of Pennsylvania; that appointment brought research collaborations with Stanford and Johns Hopkins. Teaches applied AI and AI entrepreneurship at the university level.",
+      "Research on LLMs, agents, and retrieval. PhD in Computer Science with doctoral research in generative AI — conditional VAE and GAN models for synthetic-image generation and evaluation. Postdoctoral research at the University of Pennsylvania; that appointment brought research collaborations with Stanford and Johns Hopkins.",
     industry:
       "Advises on LLM and agent workflows: RAG over private data, agentic tool use, evaluation and guardrails — and when not to use AI. Earlier work in healthcare data science.",
     community:
@@ -132,5 +131,5 @@ export const MAJID = {
    * department, course catalog, or campus program.
    */
   teachingBackground:
-    "He teaches applied AI, machine learning, and AI entrepreneurship at the university level, and brings that classroom method into Nexus team training.",
+    "He teaches applied AI, machine learning, and AI entrepreneurship, and brings that method into Nexus team training.",
 } as const;

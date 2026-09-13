@@ -22,7 +22,7 @@ export const MOHAMMAD = {
     "Leads pricing and engagement economics. PhD in Finance, MBA, and a tenured finance professor since 2016.",
   bio: [
     "Owns pricing, engagement structure, delivery cost, and financial planning.",
-    "Teaches investments, financial markets and institutions, banking, and corporate finance. Currently a teaching and research fellow at a European university of applied sciences.",
+    "Teaches investments, financial markets and institutions, banking, and corporate finance. Currently a teaching and research fellow in Europe.",
     "Publishes peer-reviewed research on corporate finance, banking, and behavioral finance.",
   ],
   linkedin: "https://www.linkedin.com/in/mohammad-jafarinejad-0530a438",

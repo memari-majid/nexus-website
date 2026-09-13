@@ -7,7 +7,7 @@
 export const OPENING_CHIPS = [
   "Schedule the NVIDIA workshop",
   "What's covered in the workshop?",
-  "We're a university",
+  "Do we need our own GPUs?",
 ] as const;
 
 const GENERIC = [
@@ -103,16 +103,8 @@ export function fallbackSuggestions(opts: {
     return pick(["In person", "Remote", "Not sure yet"], used);
   }
 
-  if (/industry or academia|company or|university or/.test(a)) {
-    return pick(["We're a company", "We're a university", "We're a lab"], used);
-  }
-
   if (/when|six weeks|date|schedule|lead time/.test(a) && /workshop|cohort|host/.test(a)) {
     return pick(["In about two months", "This quarter", "Just exploring for now"], used);
-  }
-
-  if (/free|academia|university|campus|ambassador/.test(a)) {
-    return pick(["We're a university", "Schedule a campus workshop", "What's covered?"], used);
   }
 
   if (/consult|adopt|when not to|scoping/.test(a)) {
