@@ -13,7 +13,7 @@ export const TRADEMARK_NOTICE =
 
 /** Compact form for the site footer, where the full notice is too heavy. */
 export const TRADEMARK_SHORT =
-  "NVIDIA® and the NVIDIA logo are trademarks of NVIDIA Corporation. Majid Memari is an NVIDIA DLI Certified Instructor & University Ambassador; Nexus AI Solutions LLC is independent and not endorsed by NVIDIA.";
+  "NVIDIA® and the NVIDIA logo are trademarks of NVIDIA Corporation. Majid Memari is an NVIDIA DLI Certified Instructor (industry workshops) and University Ambassador (free campus workshops); Nexus AI Solutions LLC is independent and not endorsed by NVIDIA.";
 
 export function NvidiaLogo({ className = "h-6 w-6" }: { className?: string }) {
   return (

@@ -67,7 +67,7 @@ export default function NvidiaDliPage() {
           NVIDIA Deep Learning Institute generative AI workshops
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-          We host official{" "}
+          Official{" "}
           <a
             className="text-brand-700 underline dark:text-brand-400"
             href={DLI.catalogUrl}
@@ -76,23 +76,23 @@ export default function NvidiaDliPage() {
           >
             NVIDIA Deep Learning Institute
           </a>{" "}
-          workshops for industry teams and academic institutions, taught by an NVIDIA{" "}
+          workshops on two tracks. Industry teams are hosted by a{" "}
           <a
             className="text-brand-700 underline dark:text-brand-400"
-            href="https://www.nvidia.com/en-us/learn/certified-instructor-program/"
+            href={DLI.instructorProgramUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
             Certified Instructor
-          </a>{" "}
-          and{" "}
+          </a>
+          . US universities get the same workshop free through the{" "}
           <a
             className="text-brand-700 underline dark:text-brand-400"
-            href="https://www.nvidia.com/en-us/training/educator-programs/university-ambassador-program/"
+            href={DLI.ambassadorProgramUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
-            University Ambassador
+            University Ambassador Program
           </a>
           .
         </p>
@@ -159,10 +159,26 @@ export default function NvidiaDliPage() {
           </p>
         </Section>
 
+        <Section title={DLI.industry.heading}>
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
+            {DLI.industry.role}
+          </p>
+          <p className="mt-3 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+            {DLI.industry.text} Engineering and data teams get a full day of hands-on practice
+            on NVIDIA&apos;s GPU cloud. Seats are purchased through NVIDIA at NVIDIA&apos;s rate.
+          </p>
+          <div className="mt-6">
+            <ScheduleButton>Host it for my team</ScheduleButton>
+          </div>
+        </Section>
+
         <Section title={DLI.academia.heading}>
-          <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-            {DLI.academia.text} Scheduling and lab access run through NVIDIA&apos;s University
-            Ambassador Program, which is why the lead time matters.
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
+            {DLI.academia.role}
+          </p>
+          <p className="mt-3 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+            {DLI.academia.text} Scheduling and lab access run through NVIDIA&apos;s Ambassador
+            program, which is why the lead time matters.
           </p>
           <div className="mt-6">
             <ScheduleButton>Request a campus workshop</ScheduleButton>
@@ -171,9 +187,7 @@ export default function NvidiaDliPage() {
 
         <Section title="Who it is for">
           <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-            {DLI.audiences} Engineering and data teams adopting LLMs and agents get a full day of
-            hands-on practice on NVIDIA&apos;s GPU cloud. Academic institutions can bring the same
-            workshop to faculty, researchers, and students through the DLI University Ambassador Program.
+            {DLI.audiences}
           </p>
           <p className="mt-4 text-sm leading-relaxed text-zinc-500 dark:text-zinc-500">
             {DLI.catalogNote}
@@ -182,8 +196,9 @@ export default function NvidiaDliPage() {
 
         <Section title="The instructor">
           <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-            {MAJID.fullName} — {MAJID.roles.nexus} — is an {DLI.credential}.{" "}
-            {MAJID.teachingBackground}
+            {MAJID.fullName} — {MAJID.roles.nexus} — holds both NVIDIA titles separately:{" "}
+            {DLI.instructorTitle} for hosting industry workshops, and {DLI.ambassadorTitle} for
+            free campus workshops. {MAJID.teachingBackground}
           </p>
           <p className="mt-4 text-sm">
             <a

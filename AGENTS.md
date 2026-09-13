@@ -85,10 +85,10 @@ Allowed and encouraged when accurate: **Penn** (postdoc appointment), **Stanford
 
 ### 6. NVIDIA credentials & language
 
-Public titles only:
+Public titles only — **two roles, two offers. Never mash them into one job.**
 
-- **DLI Certified Instructor**
-- **University Ambassador**
+- **DLI Certified Instructor** → hosts **industry** workshops (NVIDIA sells seats)
+- **University Ambassador** → teaches **free campus** workshops (US academia, six weeks’ notice)
 
 Never: NVIDIA partner, NVIDIA-sponsored, NVIDIA-endorsed, or any implication that NVIDIA endorses Nexus.
 

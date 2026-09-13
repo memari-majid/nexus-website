@@ -27,7 +27,7 @@ export const SITE_PAGES: { path: string; covers: string }[] = [
   { path: "/", covers: "Overview of services, the workshop, the team, and the FAQ" },
   {
     path: "/nvidia-dli-workshops",
-    covers: "The NVIDIA DLI workshop: outline, tools, delivery model, free-for-universities, official NVIDIA links",
+    covers: "The NVIDIA DLI workshop: outline, tools, delivery model, industry hosting vs free campus Ambassador track, official NVIDIA links",
   },
   { path: "/about", covers: "The three leaders and what Nexus does" },
   ...PEOPLE.map((p) => ({
@@ -53,7 +53,7 @@ export type KnowledgeTopic = (typeof KNOWLEDGE_TOPICS)[number];
 export const KNOWLEDGE_TOPIC_HINTS: Record<KnowledgeTopic, string> = {
   "workshop-outline": "module-by-module outline, tools, and length of the NVIDIA DLI workshop",
   "workshop-logistics": "who provides what, scheduling lead time, on-site vs virtual, pricing policy",
-  universities: "free delivery for US universities, campus audiences, Ambassador program terms",
+  universities: "University Ambassador track: free delivery for US universities, campus audiences, six weeks' notice",
   "custom-training": "Nexus-designed training when the NVIDIA catalog is not the right fit",
   team: "the three leaders, their roles, bios, and profile links",
   faq: "the published FAQ answers about services, engagements, privacy, and industries",
@@ -93,6 +93,8 @@ export function knowledgeTopic(topic: KnowledgeTopic): string {
         bullets(DLI.weProvide.items),
         "",
         DLI.logistics,
+        `${DLI.industry.heading} (${DLI.industry.role}): ${DLI.industry.text}`,
+        `${DLI.academia.heading} (${DLI.academia.role}): ${DLI.academia.text}`,
         `Audiences: ${DLI.audiences}`,
         "Pricing: seats are purchased through NVIDIA at NVIDIA's published rate. Nexus does not sell seats or set the price. Never quote a figure — invite them to contact Nexus to arrange delivery.",
         "Compute: the customer needs no GPUs, local compute, or special infrastructure — NVIDIA supplies cloud GPU VMs.",
@@ -101,9 +103,11 @@ export function knowledgeTopic(topic: KnowledgeTopic): string {
 
     case "universities":
       return [
-        `${DLI.academia.heading}: ${DLI.academia.text}`,
-        `Credential behind it: ${DLI.credential}.`,
+        `${DLI.academia.heading} — this is the ${DLI.ambassadorTitle} role, not the industry hosting role.`,
+        DLI.academia.text,
+        `Ambassador program: ${DLI.ambassadorProgramUrl}`,
         "Scheduling and lab access run through NVIDIA's University Ambassador Program, so six weeks' notice is a real constraint, not a preference.",
+        `Industry workshops are a separate title: ${DLI.instructorTitle}. ${DLI.industry.text}`,
         `${UNIVERSITY_COLLABORATIONS.summary} ${UNIVERSITY_COLLABORATIONS.items
           .map((i) => `${i.name}: ${i.text}`)
           .join(" ")} ${UNIVERSITY_COLLABORATIONS.note}`,
@@ -133,7 +137,7 @@ export function knowledgeTopic(topic: KnowledgeTopic): string {
 
     case "nvidia-resources":
       return [
-        `Credential: ${DLI.credential}. Directory: ${DLI.instructorDirectory}`,
+        `Two NVIDIA titles: ${DLI.instructorTitle} for industry workshops (${DLI.instructorProgramUrl}). ${DLI.ambassadorTitle} for free campus workshops (${DLI.ambassadorProgramUrl}). Directory: ${DLI.instructorDirectory}`,
         bullets(DLI.references.map((r) => `${r.label}: ${r.href}`)),
         "Share these when useful. Never say NVIDIA partner, NVIDIA-sponsored, or NVIDIA-endorsed.",
       ].join("\n");
@@ -160,7 +164,7 @@ export function chatKnowledgeCore(): string {
   return `GROUNDED SITE KNOWLEDGE
 Everything below is published on ${SITE.name}'s own site. Answer from it. If a question is not covered here or by lookupKnowledge, say you do not know and offer ${SITE.email} or the /contact page — never guess, never fill a gap with a plausible-sounding fact.
 
-Workshop available now: ${DLI.workshop.title} — ${DLI.workshop.length}. ${DLI.workshop.summary} ${DLI.model} ${DLI.boundary} ${DLI.logistics} ${DLI.academia.heading.toLowerCase()}: ${DLI.academia.text}
+Workshop available now: ${DLI.workshop.title} — ${DLI.workshop.length}. ${DLI.workshop.summary} ${DLI.model} ${DLI.boundary} ${DLI.logistics} ${DLI.industry.heading} (${DLI.industry.role}): ${DLI.industry.text} ${DLI.academia.heading} (${DLI.academia.role}): ${DLI.academia.text}
 Custom training: ${CUSTOM_TRAINING.summary} ${CUSTOM_TRAINING.note}
 Leadership: ${leaders}.
 Contact: ${SITE.email} · ${SITE.phoneDisplay} · /contact

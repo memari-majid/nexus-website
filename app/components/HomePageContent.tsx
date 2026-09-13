@@ -86,13 +86,12 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-8 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-              We host and teach NVIDIA&apos;s Deep Learning Institute workshop as a certified
-              instructor —{" "}
+              A DLI Certified Instructor hosts the workshop for industry teams. Through the
+              University Ambassador Program, the same workshop is{" "}
               <strong className="font-semibold text-zinc-800 dark:text-zinc-200">
-                free for academia
+                free for US universities
               </strong>
-              , and hosted for industry teams. NVIDIA provides the curriculum, GPU labs, and
-              certificate; we bring it to the Utah community.
+              . NVIDIA provides the curriculum, GPU labs, and certificate.
             </p>
           </Reveal>
           <Reveal delay={220}>
@@ -118,7 +117,7 @@ export function HomePageContent() {
               Official NVIDIA DLI workshops
             </h2>
             <p className="mt-6 text-lg text-zinc-600 dark:text-zinc-400">
-              Taught by a certified instructor. {DLI.audiences}
+              {DLI.audiences}
             </p>
           </Reveal>
 
@@ -152,13 +151,29 @@ export function HomePageContent() {
           </Reveal>
 
           <Reveal delay={140}>
-            <div className="mt-10 border-t border-zinc-200 pt-10 text-left dark:border-zinc-800">
-              <h3 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                {DLI.academia.heading}
-              </h3>
-              <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
-                {DLI.academia.text}
-              </p>
+            <div className="mt-10 grid gap-10 border-t border-zinc-200 pt-10 text-left dark:border-zinc-800 sm:grid-cols-2">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
+                  {DLI.industry.role}
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                  {DLI.industry.heading}
+                </h3>
+                <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
+                  {DLI.industry.text}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
+                  {DLI.academia.role}
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                  {DLI.academia.heading}
+                </h3>
+                <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
+                  {DLI.academia.text}
+                </p>
+              </div>
             </div>
           </Reveal>
 

@@ -33,7 +33,7 @@ export const PAGE_COPY = {
   about: {
     title: "About — Nexus AI Solutions",
     description:
-      "Nexus AI Solutions is led by Majid Memari, PhD (Founder & CEO) — an NVIDIA Deep Learning Institute Certified Instructor and University Ambassador — with Hamid Memari (CTO) and Mohammad Jafarinejad, PhD (CFO). AI consulting and training: advisory work, NVIDIA DLI workshops, and in-house team sessions.",
+      "Nexus AI Solutions is led by Majid Memari, PhD (Founder & CEO) — an NVIDIA DLI Certified Instructor who hosts industry workshops, and a University Ambassador who teaches the same workshop free on US campuses — with Hamid Memari (CTO) and Mohammad Jafarinejad, PhD (CFO). AI consulting and training: advisory work, NVIDIA DLI workshops, and in-house team sessions.",
   },
   contact: {
     title: "Contact Nexus AI Solutions — AI Consulting & NVIDIA DLI Training",
@@ -43,7 +43,7 @@ export const PAGE_COPY = {
   nvidiaDli: {
     title: "NVIDIA DLI Generative AI Workshops for Teams — Nexus AI Solutions",
     description:
-      "Official NVIDIA Deep Learning Institute generative AI workshops for companies and universities, taught by an NVIDIA Certified Instructor and University Ambassador. Building Agentic AI Applications With LLMs — eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
+      "Official NVIDIA Deep Learning Institute workshops on two tracks: industry teams hosted by a Certified Instructor, and free US campus workshops through the University Ambassador Program. Building Agentic AI Applications With LLMs — eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
   },
 } as const;
 

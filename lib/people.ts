@@ -1,3 +1,4 @@
+import { DLI } from "@/lib/dli";
 import { HAMID } from "@/lib/hamid";
 import { MAJID } from "@/lib/majid";
 import { MOHAMMAD } from "@/lib/mohammad";
@@ -60,6 +61,7 @@ export const PEOPLE: Person[] = [
       { label: "Google Scholar", href: MAJID.scholar },
       { label: "ORCID", href: MAJID.orcid },
       { label: "NVIDIA Certified Instructor Directory", href: MAJID.nvidiaInstructorDirectory },
+      { label: "University Ambassador Program", href: DLI.ambassadorProgramUrl },
     ],
     image: "/team-majid-memari.jpg",
     nvidiaCertified: true,

@@ -15,13 +15,13 @@ export function workshopInfoEmail(opts: {
   const w = DLI.workshop;
 
   const offerText = free
-    ? `Free for academia: ${DLI.academia.text}`
-    : `For industry teams: NVIDIA sells seats at NVIDIA's rate; Nexus hosts and teaches. ${DLI.logistics}`;
+    ? `${DLI.academia.heading} (${DLI.academia.role}): ${DLI.academia.text}`
+    : `${DLI.industry.heading} (${DLI.industry.role}): ${DLI.industry.text} ${DLI.logistics}`;
 
   const text = [
     `Hi ${name},`,
     ``,
-    `Here are the details on the NVIDIA Deep Learning Institute workshop we host and teach as a certified instructor:`,
+    `Here are the details on the NVIDIA Deep Learning Institute workshop. A Certified Instructor hosts industry cohorts; University Ambassador delivery is free for US campuses:`,
     ``,
     `${w.title} — ${w.length}`,
     w.summary,
@@ -47,13 +47,13 @@ export function workshopInfoEmail(opts: {
 
   const bodyHtml = `
     <p>Hi ${escapeHtml(name)},</p>
-    <p>Here are the details on the NVIDIA Deep Learning Institute workshop we host and teach as a certified instructor:</p>
+    <p>Here are the details on the NVIDIA Deep Learning Institute workshop. A Certified Instructor hosts industry cohorts; University Ambassador delivery is free for US campuses:</p>
     <p style="margin:16px 0 4px;"><strong>${escapeHtml(w.title)}</strong> — ${escapeHtml(w.length)}</p>
     <p style="margin:0 0 12px;">${escapeHtml(w.summary)}</p>
     <p style="margin:12px 0;padding:10px 14px;background:#f2f9e6;border-radius:8px;">${
       free
-        ? `<strong>Free for academia.</strong> ${escapeHtml(DLI.academia.text)}`
-        : `<strong>For industry teams:</strong> NVIDIA sells seats at NVIDIA's rate; Nexus hosts and teaches. ${escapeHtml(DLI.logistics)}`
+        ? `<strong>${escapeHtml(DLI.academia.heading)} — ${escapeHtml(DLI.academia.role)}.</strong> ${escapeHtml(DLI.academia.text)}`
+        : `<strong>${escapeHtml(DLI.industry.heading)} — ${escapeHtml(DLI.industry.role)}.</strong> ${escapeHtml(DLI.industry.text)} ${escapeHtml(DLI.logistics)}`
     }</p>
     <p style="margin:16px 0 4px;"><strong>What's covered</strong></p>
     ${liText(DLI.outline.map((m) => `${m.title}: ${m.text}`))}

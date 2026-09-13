@@ -15,10 +15,16 @@ import { MAJID } from "@/lib/majid";
  */
 
 export const DLI = {
-  credential: "NVIDIA Deep Learning Institute Certified Instructor and University Ambassador",
+  instructorTitle: "NVIDIA DLI Certified Instructor",
+  ambassadorTitle: "NVIDIA University Ambassador",
+  /** Person holds both titles — never mash them into one job. */
+  credential:
+    "NVIDIA DLI Certified Instructor (industry workshops) and University Ambassador (free campus workshops)",
   instructorDirectory: MAJID.nvidiaInstructorDirectory,
-  /** Both audiences are covered by the Certified Instructor / Ambassador roles. */
-  audiences: "For industry teams and academic institutions.",
+  instructorProgramUrl: "https://www.nvidia.com/en-us/learn/certified-instructor-program/",
+  ambassadorProgramUrl:
+    "https://www.nvidia.com/en-us/training/educator-programs/university-ambassador-program/",
+  audiences: "Two tracks: industry teams hosted by a Certified Instructor, and free campus workshops through the University Ambassador Program.",
   workshop: {
     status: "Available now",
     title: "Building Agentic AI Applications With LLMs",
@@ -54,12 +60,21 @@ export const DLI = {
     heading: "Nexus provides",
     items: [
       "Host — in person or online",
-      "Teach as Certified Instructor / University Ambassador",
+      "Teach",
       "Help participants pass the assessment",
     ],
   },
   logistics:
     "Private cohorts, in person or online. NVIDIA supplies the cloud labs. Allow six weeks to schedule.",
+  /**
+   * Two NVIDIA roles, two offers. Do not combine them into one sentence
+   * that makes Ambassador and Certified Instructor sound like the same job.
+   */
+  industry: {
+    heading: "Industry workshops",
+    role: "DLI Certified Instructor",
+    text: "We host the official workshop for company teams — in person or online. NVIDIA prices and sells the seats; a Certified Instructor teaches.",
+  },
   /**
    * University Ambassador delivery: free to academic audiences. This is the
    * Ambassador program working as intended — students, faculty, and
@@ -67,8 +82,9 @@ export const DLI = {
    * scheduling and lab access run through NVIDIA.
    */
   academia: {
-    heading: "Free for academia",
-    text: "We teach this workshop at no cost to academic institutions in the United States — students, faculty, and researchers. Just give us six weeks' notice.",
+    heading: "Free campus workshops",
+    role: "University Ambassador",
+    text: "Through the University Ambassador Program we teach this workshop at no cost to US academic institutions — students, faculty, and researchers. Give us six weeks' notice.",
   },
   /**
    * Module list summarised from NVIDIA's published course outline (courseUrl).

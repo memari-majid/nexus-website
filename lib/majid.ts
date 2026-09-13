@@ -42,10 +42,11 @@ export const MAJID = {
   name: "Majid Memari",
   displayName: "Majid (MJ) Memari",
   shortBio:
-    "NVIDIA DLI Certified Instructor and University Ambassador. LLMs, agents, and retrieval. PhD in Computer Science with doctoral research in generative AI, in applied AI since 2015.",
+    "NVIDIA DLI Certified Instructor for industry workshops; University Ambassador for free campus workshops. LLMs, agents, and retrieval. PhD in Computer Science with doctoral research in generative AI, in applied AI since 2015.",
   headlineRole: "AI Scientist & Solution Architect",
   roles: {
-    nvidia: "NVIDIA University Ambassador and Deep Learning Institute Certified Instructor",
+    nvidia:
+      "NVIDIA DLI Certified Instructor (industry workshops) and University Ambassador (free campus workshops)",
     herbert: "Principal AI Architect, Gary R. Herbert Institute for Public Policy",
     rai: "AI Consultant, University of Utah One-U Responsible AI Initiative",
     nexus: "Founder & CEO, Nexus AI Solutions LLC",
