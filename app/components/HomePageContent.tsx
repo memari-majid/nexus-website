@@ -26,7 +26,7 @@ const OFFERINGS = [
   },
   {
     title: "Train",
-    text: "The right NVIDIA DLI workshop for your team, taught in person by a Certified Instructor.",
+    text: "The right NVIDIA Gen AI workshop taught in person, or customized Gen AI training built for your team.",
   },
   {
     title: "Build",
@@ -102,9 +102,9 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-8 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-              We start with what your team actually needs and give you straight AI guidance.
-              Then we deliver the right NVIDIA training in person, or embed an engineer to build
-              it with you.
+              We specialize in generative AI. We start with what your team actually needs and
+              give you straight guidance, then deliver the right NVIDIA Gen AI training in person,
+              or embed an engineer to build it with you.
             </p>
           </Reveal>
           <Reveal delay={220}>

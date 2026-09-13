@@ -32,8 +32,8 @@ export type Person = {
   image: string;
   /**
    * True only for the person NVIDIA certified individually. It drives the
-   * credential badge and the trademark notice on his profile page — never set
-   * it for someone who does not hold the certification.
+   * credential badge on his profile page — never set it for someone who does
+   * not hold the certification.
    */
   nvidiaCertified?: boolean;
 };

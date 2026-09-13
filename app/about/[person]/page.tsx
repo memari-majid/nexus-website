@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Avatar } from "@/app/components/Avatar";
 import { ChatWidget } from "@/app/components/ChatWidget";
 import { NavBar } from "@/app/components/NavBar";
-import { NvidiaBadge, NvidiaTrademark } from "@/app/components/NvidiaBadge";
+import { NvidiaBadge } from "@/app/components/NvidiaBadge";
 import { PEOPLE, getPerson } from "@/lib/people";
 import { breadcrumbJsonLd, organizationJsonLd, personJsonLd, websiteJsonLd } from "@/lib/seo";
 import { SITE, SITE_URL } from "@/lib/site";
@@ -148,10 +148,6 @@ export default async function PersonPage({ params }: { params: Promise<{ person:
             Contact Nexus
           </Link>
         </p>
-
-        {person.nvidiaCertified ? (
-          <NvidiaTrademark className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800" />
-        ) : null}
       </main>
       <ChatWidget />
     </div>

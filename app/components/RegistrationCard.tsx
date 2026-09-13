@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   COHORT_MAX,
-  deriveRegistration,
   priceLine,
   type Delivery,
   type Registration,
@@ -30,7 +29,6 @@ export function RegistrationCard({
   const [status, setStatus] = useState<"editing" | "sending" | "done" | "error">("editing");
   const [error, setError] = useState<string | null>(null);
 
-  const d = deriveRegistration(reg);
   const set = (patch: Partial<Registration>) => setReg((r) => ({ ...r, ...patch }));
   const n = reg.headcount ?? 0;
   const canSend = Boolean(reg.name?.trim() && reg.email && EMAIL_RE.test(reg.email));

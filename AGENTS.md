@@ -45,7 +45,7 @@ Homepage should stay sparse: hero + Consulting + Training + Team + footer. Depth
 | Metadata & structured data | `lib/seo.ts` | Titles, Organization, Person, Course |
 | Homepage layout / sections | `app/components/HomePageContent.tsx` | Keep Apple-sparse |
 | Chat UI | `app/components/ChatWidget.tsx` | Sanitize model output; no tool/channel leaks |
-| NVIDIA mark | `app/components/NvidiaLogo.tsx`, `NvidiaBadge.tsx` | Trademark notice on every page that shows the mark |
+| NVIDIA mark | `app/components/NvidiaLogo.tsx`, `NvidiaBadge.tsx` | Credential badge / mark only — no legal trademark paragraph |
 
 **Do not** hardcode person names, workshop titles, or NVIDIA claims in random components. Read from the libs above.
 
@@ -108,7 +108,7 @@ Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLM
 - Chat must never invent that Nexus sells seats or requires client hardware.
 - **Never** mention a free workshop, campus delivery, or Ambassador program on this site.
 - Custom training (`lib/training.ts`) ≠ DLI; no DLI certificate language there.
-- Every page showing the NVIDIA mark must include the trademark notice (`TRADEMARK_NOTICE` / `TRADEMARK_SHORT`).
+- Do not add a legal NVIDIA trademark disclaimer paragraph. Footer / training page may keep the short credential line (`TRADEMARK_SHORT`).
 - Re-check NVIDIA URLs before editing the Resources link list (sibling paths 404 easily). Do not frame those links as “verify our claims.”
 
 ### 8. Design / copy voice

@@ -167,7 +167,41 @@ export default function NvidiaDliPage() {
           <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
             {DLI.audiences}
           </p>
-          <p className="mt-4 text-sm leading-relaxed text-zinc-500 dark:text-zinc-500">
+        </Section>
+
+        <Section title="NVIDIA Gen AI workshops we can deliver">
+          <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+            {DLI.alwaysNew}
+          </p>
+          <ul className="mt-8 space-y-6">
+            {DLI.catalog.map((c) => (
+              <li key={c.key}>
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <a
+                    href={c.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-base font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:text-brand-700 dark:text-zinc-100 dark:decoration-zinc-600 dark:hover:text-brand-400"
+                  >
+                    {c.title}
+                  </a>
+                  {"hosted" in c && c.hosted ? (
+                    <span className="inline-flex items-center rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-400">
+                      We teach this
+                    </span>
+                  ) : (
+                    <span className="text-[11px] uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-600">
+                      {c.track}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {c.blurb}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 text-sm leading-relaxed text-zinc-500 dark:text-zinc-500">
             {DLI.catalogNote}
           </p>
         </Section>

@@ -4,7 +4,7 @@ import { Avatar } from "@/app/components/Avatar";
 import { ChatWidget } from "@/app/components/ChatWidget";
 import { JsonLd } from "@/app/components/JsonLd";
 import { NavBar } from "@/app/components/NavBar";
-import { NvidiaBadge, NvidiaTrademark } from "@/app/components/NvidiaBadge";
+import { NvidiaBadge } from "@/app/components/NvidiaBadge";
 import { UNIVERSITY_COLLABORATIONS } from "@/lib/collaborations";
 import { PEOPLE } from "@/lib/people";
 import { pageMetadata } from "@/lib/seo";
@@ -91,8 +91,6 @@ export default function AboutPage() {
             Contact
           </Link>
         </p>
-
-        <NvidiaTrademark className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800" />
       </main>
       <ChatWidget />
     </div>

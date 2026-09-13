@@ -7,9 +7,9 @@
 import { nextField, type Registration } from "@/lib/registration";
 
 export const OPENING_CHIPS = [
-  "What can AI do for my team?",
-  "Where does AI actually help?",
-  "Help me scope an AI project",
+  "We're exploring where AI fits",
+  "We have a project in mind",
+  "We want to train our team",
 ] as const;
 
 const GENERIC = [

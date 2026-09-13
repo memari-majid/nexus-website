@@ -213,6 +213,23 @@ export const DLI = {
       track: "self-paced",
       keywords: ["intro", "overview", "explained", "beginner", "non-technical", "leadership", "executive", "getting started"],
     },
+    {
+      key: "rapid-app-dev",
+      title: "Rapid Application Development Using Large Language Models",
+      url: "https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+S-FX-26+V1",
+      blurb:
+        "Practical LLM application development across the open-source ecosystem, from pretrained models to a working app. Self-paced.",
+      track: "self-paced",
+      keywords: ["rapid", "application development", "prototype", "mvp", "open-source", "build an app", "ship"],
+    },
+    {
+      key: "intro-deploy-rag",
+      title: "Introduction to Deploying RAG Pipelines for Production at Scale",
+      url: "https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+S-FX-19+V1",
+      blurb: "An introduction to taking RAG pipelines from prototype toward production. Self-paced.",
+      track: "self-paced",
+      keywords: ["rag", "deploy", "production", "pipeline", "intro", "scale"],
+    },
   ],
   /**
    * Module list summarised from NVIDIA's published course outline (courseUrl).
@@ -242,7 +259,7 @@ export const DLI = {
   ],
   tools: ["NVIDIA NIM", "build.nvidia.com", "LangChain", "LangGraph", "Python", "PyTorch"],
   catalogNote:
-    "NVIDIA's Deep Learning Institute spans generative AI, accelerated computing, data science, and more, and keeps growing. We consult to find what your team needs and deliver it with a certified instructor.",
+    "We specialize in generative AI. Beyond these NVIDIA workshops, we also design customized Gen AI training around your team and stack. We are not limited to NVIDIA's courses, but Gen AI is our focus.",
   catalogUrl: "https://www.nvidia.com/en-us/training/",
   /**
    * Official NVIDIA pages, grouped by purpose so they read as a tidy resource

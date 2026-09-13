@@ -4,7 +4,7 @@ import { ChatWidget } from "@/app/components/ChatWidget";
 import { ContactForm } from "@/app/components/ContactForm";
 import { JsonLd } from "@/app/components/JsonLd";
 import { NavBar } from "@/app/components/NavBar";
-import { NvidiaBadge, NvidiaTrademark } from "@/app/components/NvidiaBadge";
+import { NvidiaBadge } from "@/app/components/NvidiaBadge";
 import { pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
@@ -69,8 +69,6 @@ export default function ContactPage() {
             NVIDIA DLI training
           </Link>
         </p>
-
-        <NvidiaTrademark className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800" />
       </main>
       <ChatWidget />
     </div>

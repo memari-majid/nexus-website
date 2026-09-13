@@ -1,13 +1,10 @@
-import { NvidiaLogo, TRADEMARK_NOTICE, TRADEMARK_SHORT } from "@/app/components/NvidiaLogo";
+import { NvidiaLogo } from "@/app/components/NvidiaLogo";
 import { DLI } from "@/lib/dli";
 import { MAJID } from "@/lib/majid";
 
 /**
  * Public NVIDIA title on this commercial site: Certified Instructor.
  * Do not show University Ambassador or a free-campus offer here.
- *
- * Any page that renders this badge must also render `NvidiaTrademark` (the
- * homepage footer already carries the short form).
  */
 
 export const NVIDIA_CREDENTIAL = DLI.instructorTitle;
@@ -36,20 +33,5 @@ export function NvidiaBadge({
       <NvidiaLogo className="nvidia-mark h-4 w-4 shrink-0" />
       <span>Certified Instructor</span>
     </a>
-  );
-}
-
-/** Trademark notice required on every page that shows the NVIDIA mark. */
-export function NvidiaTrademark({
-  variant = "full",
-  className = "",
-}: {
-  variant?: "full" | "short";
-  className?: string;
-}) {
-  return (
-    <p className={`text-xs leading-relaxed text-zinc-500 dark:text-zinc-500 ${className}`}>
-      {variant === "full" ? TRADEMARK_NOTICE : TRADEMARK_SHORT}
-    </p>
   );
 }
