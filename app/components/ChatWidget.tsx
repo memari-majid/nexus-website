@@ -1,18 +1,32 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { RegistrationCard } from "@/app/components/RegistrationCard";
 import { SUGGESTION_MARKER } from "@/lib/assistant";
 import { OPEN_CHAT_EVENT } from "@/lib/chat-events";
 import { OPENING_CHIPS, resolveSuggestions } from "@/lib/chat-suggestions";
+import type { Registration } from "@/lib/registration";
 
 function textFromMessage(m: { parts: { type: string; text?: string }[] }) {
   return m.parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text" && typeof p.text === "string")
     .map((p) => p.text)
     .join("");
+}
+
+type CollectRegistrationPart = {
+  type: "tool-collectRegistration";
+  toolCallId: string;
+  state: "input-streaming" | "input-available" | "output-available" | "output-error";
+  input?: Registration;
+};
+
+/** Pull the assistant's smart-form tool parts out of a message. */
+function collectRegistrationParts(m: { parts: { type: string }[] }): CollectRegistrationPart[] {
+  return (m.parts as CollectRegistrationPart[]).filter((p) => p.type === "tool-collectRegistration");
 }
 
 /**
@@ -101,8 +115,10 @@ export function ChatWidget() {
     () => new DefaultChatTransport({ api: "/api/chat", fetch: chatFetch }),
     [],
   );
-  const { messages, sendMessage, status, stop, error } = useChat({
+  const { messages, sendMessage, status, stop, error, addToolOutput } = useChat({
     transport,
+    // When the smart-form card returns its result, continue the turn so Nex confirms.
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
   });
 
   const busy = status === "streaming" || status === "submitted";
@@ -131,8 +147,16 @@ export function ChatWidget() {
     .filter((m) => m.role === "user")
     .map((m) => textFromMessage(m))
     .filter(Boolean);
+
+  // While the smart-form card is open and awaiting input, hide the chip row —
+  // the card itself is the state-aware next step.
+  const activeCollect = messages.flatMap(collectRegistrationParts).at(-1);
+  const cardOpen =
+    !!activeCollect &&
+    (activeCollect.state === "input-available" || activeCollect.state === "input-streaming");
+
   const suggestions =
-    !busy && lastAssistant
+    !busy && lastAssistant && !cardOpen
       ? resolveSuggestions(
           splitSuggestions(stripControlTokens(textFromMessage(lastAssistant))).suggestions,
           {
@@ -181,7 +205,7 @@ export function ChatWidget() {
                   </span>
                 </div>
                 <p className="text-xs text-zinc-600 dark:text-zinc-500">
-                  Ask about AI, or get the NVIDIA workshop scheduled
+                  Tell me what you&apos;re building. I&apos;ll help you find the right AI training.
                 </p>
               </div>
               <div className="flex gap-2">
@@ -211,8 +235,9 @@ export function ChatWidget() {
               {messages.length === 0 && (
                 <div className="space-y-3">
                   <p className="text-sm text-zinc-600 dark:text-zinc-500">
-                    Hey, I&apos;m Nex. I can talk through AI for your team, explain the NVIDIA DLI
-                    workshop, and get it scheduled right here. What are you working on?
+                    Hey, I&apos;m Nex. Tell me what your team does and what you want to do with AI.
+                    I&apos;ll give you real guidance and point you to the right NVIDIA training. What
+                    are you working on?
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {OPENING_CHIPS.map((q) => (
@@ -229,30 +254,56 @@ export function ChatWidget() {
                   </div>
                 </div>
               )}
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`rounded-xl px-3 py-2 text-sm ${
-                    m.role === "user"
-                      ? "ml-6 border border-brand-200 bg-brand-50 text-zinc-900 dark:border-brand-900/40 dark:bg-brand-950/50 dark:text-zinc-100"
-                      : "mr-4 border border-zinc-200 bg-zinc-100 text-zinc-800 dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:text-zinc-300"
-                  }`}
-                >
-                  {m.role === "assistant" ? (
-                    <div className="max-w-none text-sm leading-relaxed [&_a]:text-brand-600 [&_a]:underline dark:[&_a]:text-brand-400 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-1.5 [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-zinc-200 [&_code]:px-1 dark:[&_code]:bg-zinc-800">
-                      <ReactMarkdown
-                        components={{
-                          a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                        }}
+              {messages.map((m) => {
+                const cards = m.role === "assistant" ? collectRegistrationParts(m) : [];
+                const body =
+                  m.role === "assistant"
+                    ? splitSuggestions(displayAssistantText(textFromMessage(m))).body
+                    : textFromMessage(m);
+                return (
+                  <div key={m.id} className="space-y-2">
+                    {(m.role === "user" || body.trim().length > 0) && (
+                      <div
+                        className={`rounded-xl px-3 py-2 text-sm ${
+                          m.role === "user"
+                            ? "ml-6 border border-brand-200 bg-brand-50 text-zinc-900 dark:border-brand-900/40 dark:bg-brand-950/50 dark:text-zinc-100"
+                            : "mr-4 border border-zinc-200 bg-zinc-100 text-zinc-800 dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:text-zinc-300"
+                        }`}
                       >
-                        {splitSuggestions(displayAssistantText(textFromMessage(m))).body}
-                      </ReactMarkdown>
-                    </div>
-                  ) : (
-                    textFromMessage(m)
-                  )}
-                </div>
-              ))}
+                        {m.role === "assistant" ? (
+                          <div className="max-w-none text-sm leading-relaxed [&_a]:text-brand-600 [&_a]:underline dark:[&_a]:text-brand-400 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-1.5 [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-zinc-200 [&_code]:px-1 dark:[&_code]:bg-zinc-800">
+                            <ReactMarkdown
+                              components={{
+                                a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                              }}
+                            >
+                              {body}
+                            </ReactMarkdown>
+                          </div>
+                        ) : (
+                          body
+                        )}
+                      </div>
+                    )}
+                    {cards.map((part) =>
+                      part.state === "output-available" || part.state === "output-error" ? null : (
+                        <div key={part.toolCallId} className="mr-4">
+                          <RegistrationCard
+                            initial={part.input ?? {}}
+                            onFiled={(note) =>
+                              addToolOutput({
+                                tool: "collectRegistration",
+                                toolCallId: part.toolCallId,
+                                output: { filed: true, note },
+                              })
+                            }
+                          />
+                        </div>
+                      ),
+                    )}
+                  </div>
+                );
+              })}
               {suggestions.length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {suggestions.map((s) => (

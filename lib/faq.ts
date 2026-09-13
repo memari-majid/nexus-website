@@ -19,11 +19,11 @@ export const FAQS = [
   },
   {
     q: "Do you deliver official NVIDIA Deep Learning Institute workshops?",
-    a: "Yes. Majid Memari is an NVIDIA Deep Learning Institute Certified Instructor, listed in the NVIDIA Certified Instructor Directory. The workshop available now is Building Agentic AI Applications With LLMs — eight hours, hands-on. NVIDIA takes care of everything: cloud GPU VMs (your company needs no GPUs, local compute, or special infrastructure), pricing and purchase, course content and curriculum, assessment, and the DLI certificate. Nexus only hosts and teaches — in person or online — and helps participants pass the assessment. Nexus has no control over pricing, content, curriculum, assessment, or the certificate; seats are purchased through NVIDIA at NVIDIA's rate. Official sources: learn.nvidia.com and nvidia.com/en-us/learn/certified-instructor-program/.",
+    a: "Yes. Majid Memari is an NVIDIA Deep Learning Institute Certified Instructor, listed in the NVIDIA Certified Instructor Directory. The workshop available now is Building Agentic AI Applications With LLMs — eight hours, hands-on. NVIDIA takes care of everything: cloud GPU VMs (your company needs no GPUs, local compute, or special infrastructure), course content and curriculum, assessment, and the DLI certificate. Nexus only hosts and teaches — in person or online — and helps participants pass the assessment. NVIDIA owns the content, curriculum, cloud labs, assessment, and certificate; Nexus prices and invoices delivery at $500 per seat for up to 20 people, with a tailored quote for larger groups. Official sources: learn.nvidia.com and nvidia.com/en-us/learn/certified-instructor-program/.",
   },
   {
     q: "How do we schedule a private DLI workshop?",
-    a: "Private cohorts can be delivered in person or online, subject to NVIDIA requirements. NVIDIA supplies the cloud labs — your company needs no compute. Allow at least six weeks for scheduling and workshop access. Contact Nexus to start that conversation; seats are purchased through NVIDIA, not from Nexus.",
+    a: "Private cohorts can be delivered in person or online, subject to NVIDIA requirements. NVIDIA supplies the cloud labs — your company needs no compute. Allow at least six weeks for scheduling and workshop access. Contact Nexus to start that conversation; Nexus prices and invoices delivery, $500 per seat for up to 20, larger groups quoted.",
   },
   {
     q: "Who delivers Nexus client work?",

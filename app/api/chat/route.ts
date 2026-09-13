@@ -11,6 +11,8 @@ import { nexusChatSystem } from "@/lib/assistant";
 import { submitInquiry } from "@/lib/inquiry";
 import { sendEmail } from "@/lib/email";
 import { workshopInfoEmail } from "@/lib/workshop-email";
+import { recommendWorkshop as pickWorkshop } from "@/lib/recommend";
+import { DLI } from "@/lib/dli";
 import { SITE } from "@/lib/site";
 
 export const runtime = "nodejs";
@@ -41,69 +43,92 @@ function rateLimited(ip: string): boolean {
 }
 
 /**
- * Booking is a real action, not a promise: Nex collects the details and files
- * them through the same inquiry pipeline as the contact form, so the request
- * lands in the inbox. There is no live calendar, so never imply a confirmed
- * slot. Workshop requests (any scheduling field present) route to the founder's
- * inbox via the `chat-workshop` source.
+ * Grounds a recommendation in the real NVIDIA catalog so Nex never invents a
+ * title. Returns the pick, why it fits, whether Nexus teaches it in-house, and
+ * alternatives.
+ */
+const recommendWorkshop = tool({
+  description:
+    "Recommend the best-fit NVIDIA DLI training from the real catalog for what the visitor does and needs. Call this after you understand their need, before naming specific training. Returns a grounded pick, why it fits, whether Nexus teaches it in-house, and alternatives.",
+  inputSchema: z.object({
+    role: z.string().optional().describe("Their role or team, e.g. 'ML engineers'"),
+    need: z.string().optional().describe("What they want to build or improve with AI"),
+    level: z.string().optional().describe("Experience level, if known"),
+    text: z.string().optional().describe("Any extra context in their own words"),
+  }),
+  execute: async (input) => {
+    const rec = pickWorkshop(input, DLI.catalog);
+    return {
+      title: rec.workshop.title,
+      url: rec.workshop.url,
+      blurb: rec.workshop.blurb,
+      hostedByNexus: rec.hosted,
+      why: rec.why,
+      alternatives: rec.alternatives.slice(0, 3).map((w) => w.title),
+    };
+  },
+});
+
+/**
+ * The assisted smart form. No `execute`: this is a client-side interaction
+ * tool. The UI renders a booking card pre-filled with whatever Nex passes, the
+ * visitor completes it, and the card files the request itself (via
+ * /api/workshop-request). Nex just confirms afterward.
+ */
+const collectRegistration = tool({
+  description:
+    "Open the in-chat booking form, pre-filled with whatever you already know. Call this only after consulting, when the visitor wants to move forward. The form files the request itself and reports back, so after it is filed just confirm warmly. Do not also call requestAppointment for the same request.",
+  inputSchema: z.object({
+    name: z.string().optional(),
+    email: z.string().optional(),
+    organization: z.string().optional(),
+    headcount: z.number().int().min(1).max(60).optional(),
+    timing: z.string().optional(),
+    delivery: z.enum(["in-person", "remote"]).optional(),
+    workshop: z.string().optional().describe("The recommended workshop, if any"),
+    role: z.string().optional(),
+    need: z.string().optional(),
+  }),
+});
+
+/**
+ * Fallback filing for when the visitor gives everything in chat and will not
+ * use the form card. Routes to the workshop inbox (Dr. Memari) like the card.
  */
 const requestAppointment = tool({
   description:
-    "File a workshop or consultation request. Call this as soon as you have the visitor's name, email, and what they need. For a workshop, also capture company, timing, delivery, and headcount when given. This files a request for email follow-up; never promise a specific time or a phone call.",
+    "Fallback: file a consulting or training request when the visitor gave the details in chat and will not use the form card. Never promise a specific time or a phone call.",
   inputSchema: z.object({
     name: z.string().min(1).describe("Visitor's name"),
     email: z.string().email().describe("Visitor's email address"),
-    topic: z
-      .string()
-      .min(1)
-      .describe("What they need, in one line, e.g. 'NVIDIA DLI workshop for 30 engineers'"),
-    workshop: z.string().optional().describe("Which workshop, if named. Defaults to the live one."),
-    when: z
-      .string()
-      .optional()
-      .describe("Requested date or timeframe, free text. Needs about six weeks of lead time."),
-    delivery: z
-      .enum(["in-person", "remote"])
-      .optional()
-      .describe("In person or remote. Omit if not given."),
-    headcount: z
-      .number()
-      .int()
-      .min(1)
-      .max(40)
-      .optional()
-      .describe("Number of participants, 1 to 40 per cohort."),
-    phone: z.string().optional().describe("Phone number if offered. Omit if not given."),
-    organization: z.string().optional().describe("Company if mentioned."),
+    topic: z.string().min(1).describe("What they need, in one line"),
+    workshop: z.string().optional().describe("Which workshop, if named"),
+    need: z.string().optional().describe("What they want to build or improve"),
+    role: z.string().optional().describe("Their role or team"),
+    when: z.string().optional().describe("Requested timeframe. ~6 weeks lead time."),
+    delivery: z.enum(["in-person", "remote"]).optional(),
+    headcount: z.number().int().min(1).max(60).optional().describe("Team size"),
+    phone: z.string().optional().describe("Phone if offered"),
+    organization: z.string().optional().describe("Company if mentioned"),
   }),
-  execute: async ({
-    name,
-    email,
-    topic,
-    workshop,
-    when,
-    delivery,
-    headcount,
-    phone,
-    organization,
-  }) => {
+  execute: async ({ name, email, topic, workshop, need, role, when, delivery, headcount, phone, organization }) => {
     const lines = [
       `Request: ${topic}`,
       workshop ? `Workshop: ${workshop}` : null,
+      need ? `Need: ${need}` : null,
+      role ? `Role: ${role}` : null,
+      organization ? `Organization: ${organization}` : null,
       when ? `When: ${when}` : null,
       delivery ? `Delivery: ${delivery}` : null,
-      headcount ? `Headcount: ${headcount}` : null,
-      organization ? `Organization: ${organization}` : null,
+      headcount ? `Team size: ${headcount}` : null,
     ].filter(Boolean);
-
-    const isWorkshop = Boolean(workshop || when || delivery || headcount);
 
     const result = await submitInquiry({
       name,
       email,
       phone,
-      message: `[Chat ${isWorkshop ? "workshop" : "request"}] ${lines.join("\n")}`,
-      source: isWorkshop ? "chat-workshop" : "chat-appointment",
+      message: `[Chat request]\n${lines.join("\n")}`,
+      source: "chat-workshop",
     });
 
     if (!result.ok) {
@@ -111,19 +136,18 @@ const requestAppointment = tool({
     }
     return {
       ok: true as const,
-      note: "Request filed. Confirm in one short sentence that it is sent and we will follow up by email. Do not invent a meeting time or promise a call.",
+      note: "Filed. Confirm in one short sentence that it's sent and Dr. Memari will follow up by email. Do not invent a time or promise a call.",
     };
   },
 });
 
 /**
  * Emails the visitor the NVIDIA workshop one-pager and drops a heads-up to the
- * team so the warm lead is captured. Separate from the inquiry pipeline so the
- * visitor does not also get a booking confirmation for the same action.
+ * team so the warm lead is captured.
  */
 const emailWorkshopInfo = tool({
   description:
-    "Email the visitor the official NVIDIA DLI workshop details. Call this when they ask to be sent information, once you have their name and email. Do not promise attachments beyond the email itself.",
+    "Email the visitor the official NVIDIA DLI workshop details. Call this when they ask to be sent information, once you have their name and email.",
   inputSchema: z.object({
     name: z.string().min(1).describe("Visitor's name"),
     email: z.string().email().describe("Visitor's email address"),
@@ -134,7 +158,6 @@ const emailWorkshopInfo = tool({
     if (!sent.ok) {
       return { ok: false as const, error: sent.error };
     }
-    // Best-effort team heads-up; do not fail the visitor send on this.
     await sendEmail({
       to: process.env.WORKSHOP_TO_EMAIL ?? "memari.majid@hotmail.com",
       subject: `[Nexus] ${name} requested workshop info`,
@@ -143,7 +166,7 @@ const emailWorkshopInfo = tool({
     });
     return {
       ok: true as const,
-      note: "Sent. Tell them it is on the way to their inbox and offer to get it scheduled.",
+      note: "Sent. Tell them it's on the way to their inbox and offer to scope it with them.",
     };
   },
 });
@@ -168,11 +191,10 @@ export async function POST(req: Request) {
       model: gateway(modelId),
       system: nexusChatSystem(),
       messages: modelMessages,
-      tools: { requestAppointment, emailWorkshopInfo },
-      // tool call -> result -> spoken confirmation, with room for a second tool.
-      stopWhen: stepCountIs(5),
-      // Nex answers briefly; this also caps cost per message on the public endpoint.
-      maxOutputTokens: 800,
+      tools: { recommendWorkshop, collectRegistration, requestAppointment, emailWorkshopInfo },
+      // Room for: recommend -> talk -> open form -> (form result) -> confirm.
+      stopWhen: stepCountIs(6),
+      maxOutputTokens: 900,
       providerOptions: {
         gateway: {
           tags: ["site:nexus", "feature:chat", `env:${process.env.VERCEL_ENV ?? "dev"}`],

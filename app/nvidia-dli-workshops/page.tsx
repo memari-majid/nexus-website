@@ -85,7 +85,7 @@ export default function NvidiaDliPage() {
           >
             Certified Instructor
           </a>
-          . NVIDIA prices and sells the seats; Nexus hosts and teaches.
+          . Nexus hosts, teaches, and invoices at $500 per seat.
         </p>
 
         <Section title="The workshop">
@@ -156,7 +156,7 @@ export default function NvidiaDliPage() {
           </p>
           <p className="mt-3 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
             {DLI.industry.text} Engineering and data teams get a full day of hands-on practice
-            on NVIDIA&apos;s GPU cloud. Seats are purchased through NVIDIA at NVIDIA&apos;s rate.
+            on NVIDIA&apos;s GPU cloud. Nexus handles enrollment and invoices at $500 per seat, up to 20; larger groups get a tailored quote.
           </p>
           <div className="mt-6">
             <ScheduleButton>Host it for my team</ScheduleButton>
@@ -197,20 +197,29 @@ export default function NvidiaDliPage() {
           aria-label="NVIDIA resources"
           className="mt-14 border-t border-zinc-200 pt-10 dark:border-zinc-800"
         >
-          <ul className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
-            {DLI.references.map((ref) => (
-              <li key={ref.href}>
-                <a
-                  href={ref.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-zinc-600 underline decoration-zinc-300 underline-offset-4 hover:text-zinc-900 dark:text-zinc-400 dark:decoration-zinc-700 dark:hover:text-zinc-100"
-                >
-                  {ref.label}
-                </a>
-              </li>
+          <div className="grid gap-8 sm:grid-cols-2">
+            {DLI.referenceGroups.map((group) => (
+              <div key={group.heading}>
+                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                  {group.heading}
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {group.links.map((ref) => (
+                    <li key={ref.href}>
+                      <a
+                        href={ref.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-zinc-600 underline decoration-zinc-300 underline-offset-4 hover:text-zinc-900 dark:text-zinc-400 dark:decoration-zinc-700 dark:hover:text-zinc-100"
+                      >
+                        {ref.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
 
         <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-4">

@@ -4,10 +4,12 @@
  * missing or generic, so visitors always get a next step they can tap.
  */
 
+import { nextField, type Registration } from "@/lib/registration";
+
 export const OPENING_CHIPS = [
-  "Schedule the NVIDIA workshop",
-  "What's covered in the workshop?",
-  "Do we need our own GPUs?",
+  "What can AI do for my team?",
+  "Which NVIDIA training fits us?",
+  "Help me scope an AI project",
 ] as const;
 
 const GENERIC = [
@@ -131,16 +133,54 @@ export function fallbackSuggestions(opts: {
   );
 }
 
-/** Prefer model chips; fall back to contextual defaults. */
+/**
+ * Chips driven by the booking record: each one is the next thing the form
+ * needs, in the visitor's voice, so follow-ups always advance the current
+ * workshop request instead of restarting it.
+ */
+export function suggestionsForRegistration(
+  r: Registration,
+  used: readonly string[] = [],
+): string[] {
+  const field = nextField(r);
+  let pool: readonly string[];
+  switch (field) {
+    case null:
+      pool = ["Looks good, book it", "Change a detail", "What should we prepare?"];
+      break;
+    case "headcount":
+      pool = ["About 15 people", "About 30 people", "More than 40 people"];
+      break;
+    case "delivery":
+      pool = ["In person", "Remote", "Not sure yet"];
+      break;
+    case "timing":
+      pool = ["In about two months", "This quarter", "Just exploring"];
+      break;
+    default:
+      pool = []; // name / email: the visitor types these, no chips
+  }
+  return sanitizeSuggestions(pool, used);
+}
+
+/**
+ * Prefer form-state chips while a booking is active, then the model's own
+ * chips, then contextual defaults.
+ */
 export function resolveSuggestions(
   modelChips: readonly string[],
   context: {
     lastAssistant?: string;
     lastUser?: string;
     used?: readonly string[];
+    registration?: Registration;
   },
 ): string[] {
   const used = context.used ?? [];
+  if (context.registration) {
+    const stateChips = suggestionsForRegistration(context.registration, used);
+    if (stateChips.length) return stateChips;
+  }
   const fromModel = sanitizeSuggestions(modelChips, used);
   if (fromModel.length >= 2) return fromModel;
   const fallback = fallbackSuggestions({ ...context, used: [...used, ...fromModel] });

@@ -21,7 +21,7 @@ export async function classifyInquiry(input: { name: string; message: string; mo
 
 Classify this contact form message into exactly one category:
 - consulting: AI consulting, adoption advice, architecture review, when to use AI
-- workshop: workshops, team training, in-house training, NVIDIA DLI generative AI workshops for industry (the "Building Agentic AI Applications With LLMs" workshop — NVIDIA takes care of everything: cloud GPU VMs so the customer needs no compute, plus pricing/purchase, content, curriculum, assessment, and certificate; Nexus only hosts and teaches in person or online and has no control over price or content). A Certified Instructor hosts; seats are purchased through NVIDIA. Also custom-designed training.
+- workshop: workshops, team training, in-house training, NVIDIA DLI generative AI workshops for industry (the "Building Agentic AI Applications With LLMs" workshop — NVIDIA takes care of everything: cloud GPU VMs so the customer needs no compute, plus content, curriculum, assessment, and certificate; Nexus hosts and teaches in person or online and prices/invoices delivery at $500 per seat for up to 20, larger groups quoted). A Certified Instructor hosts. Also custom-designed training.
 - careers: jobs, hiring, AI engineer role, resume, application
 - partnership: collaboration, vendor, agency, joint work
 - general: other or unclear

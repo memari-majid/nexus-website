@@ -1,4 +1,4 @@
-import { DLI } from "@/lib/dli";
+import { DLI, DLI_REFERENCE_LINKS } from "@/lib/dli";
 import { FAQS } from "@/lib/faq";
 import { PEOPLE } from "@/lib/people";
 import { SITE } from "@/lib/site";
@@ -92,7 +92,7 @@ export function knowledgeTopic(topic: KnowledgeTopic): string {
         DLI.logistics,
         `${DLI.industry.heading} (${DLI.industry.role}): ${DLI.industry.text}`,
         `Audiences: ${DLI.audiences}`,
-        "Pricing: seats are purchased through NVIDIA at NVIDIA's published rate. Nexus does not sell seats or set the price. Never quote a figure — invite them to contact Nexus to arrange delivery.",
+        "Pricing: Nexus prices and invoices delivery. $500 per seat for up to 20 people, a tailored quote for 21 or more, up to 40 per cohort. NVIDIA owns the curriculum, cloud labs, assessment, and certificate. Do not lead with price; it comes up after the need is clear.",
         "Compute: the customer needs no GPUs, local compute, or special infrastructure — NVIDIA supplies cloud GPU VMs.",
         "Site page: /nvidia-dli-workshops",
       ].join("\n");
@@ -121,7 +121,7 @@ export function knowledgeTopic(topic: KnowledgeTopic): string {
     case "nvidia-resources":
       return [
         `Title: ${DLI.instructorTitle}. Directory: ${DLI.instructorDirectory}. Program: ${DLI.instructorProgramUrl}`,
-        bullets(DLI.references.map((r) => `${r.label}: ${r.href}`)),
+        bullets(DLI_REFERENCE_LINKS.map((r) => `${r.label}: ${r.href}`)),
         "Share these when useful. Never say NVIDIA partner, NVIDIA-sponsored, or NVIDIA-endorsed.",
       ].join("\n");
 

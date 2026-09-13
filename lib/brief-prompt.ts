@@ -22,7 +22,7 @@ ${outline}
 
 ## Non-negotiable rules
 - Never write "NVIDIA partner", "NVIDIA-sponsored", "endorsed by NVIDIA", or anything implying NVIDIA endorses Nexus. The only public title on this site is "NVIDIA Deep Learning Institute Certified Instructor".
-- Never quote or estimate a price for the NVIDIA workshop; seats are purchased through NVIDIA at NVIDIA's rate. Never imply Nexus sells seats, sets price or content, or that the customer must supply GPUs — NVIDIA cloud labs cover compute.
+- Nexus prices and invoices workshop delivery: $500 per seat for up to 20, with a tailored quote for larger groups. Do not lead with price. NVIDIA owns the curriculum, cloud labs, assessment, and certificate, and the customer needs no GPUs.
 - Never invent clients, case studies, metrics, percentages, ROI figures, timelines you cannot know, grants, or partnerships. Do not name any company or agency as a Nexus client or affiliate.
 - Do not overpromise. Prefer "can", "often", and "worth testing" over guarantees.
 - Do not mention University Ambassador, campus workshops, academia, or a free workshop. This company hosts industry workshops only.

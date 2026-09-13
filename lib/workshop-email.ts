@@ -1,4 +1,4 @@
-import { DLI } from "@/lib/dli";
+import { DLI, DLI_REFERENCE_LINKS } from "@/lib/dli";
 import { renderEmail, escapeHtml } from "@/lib/email";
 
 /**
@@ -30,7 +30,7 @@ export function workshopInfoEmail(opts: {
     `Nexus provides: ${DLI.weProvide.items.join("; ")}.`,
     ``,
     `Official NVIDIA pages:`,
-    ...DLI.references.map((r) => `• ${r.label}: ${r.href}`),
+    ...DLI_REFERENCE_LINKS.map((r) => `• ${r.label}: ${r.href}`),
     ``,
     `Reply with your timing (we need about six weeks' notice), in person or remote, and how many people (up to 40 per cohort) — and we'll get it scheduled.`,
   ].join("\n");
@@ -55,7 +55,7 @@ export function workshopInfoEmail(opts: {
     <p style="margin:16px 0 4px;"><strong>Nexus provides</strong></p>
     ${liText(DLI.weProvide.items)}
     <p style="margin:16px 0 4px;"><strong>Official NVIDIA pages</strong></p>
-    <ul style="margin:8px 0;padding-left:20px;">${DLI.references
+    <ul style="margin:8px 0;padding-left:20px;">${DLI_REFERENCE_LINKS
       .map(
         (r) =>
           `<li><a href="${escapeHtml(r.href)}" style="color:#4f7a00;">${escapeHtml(r.label)}</a></li>`,
