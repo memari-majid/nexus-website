@@ -4,6 +4,7 @@ import { ChatWidget } from "@/app/components/ChatWidget";
 import { NavBar } from "@/app/components/NavBar";
 import { NvidiaLogo, TRADEMARK_SHORT } from "@/app/components/NvidiaLogo";
 import { ScheduleButton } from "@/app/components/ScheduleButton";
+import { ASSISTANT_THE } from "@/lib/chat-persona";
 import { DLI } from "@/lib/dli";
 import { MAJID } from "@/lib/majid";
 import {
@@ -42,7 +43,7 @@ export default function NvidiaDliPage() {
       "@type": "WebPage",
       "@id": `${url}#page`,
       url,
-      name: `NVIDIA DLI Generative AI Workshops — ${SITE.name}`,
+      name: `NVIDIA DLI Generative AI Workshops | ${SITE.name}`,
       isPartOf: { "@id": `${SITE_URL}/#website` },
       inLanguage: "en-US",
     },
@@ -136,7 +137,7 @@ export default function NvidiaDliPage() {
                   {group.items.map((item) => (
                     <li key={item} className="flex gap-3">
                       <span aria-hidden className="text-zinc-400 dark:text-zinc-600">
-                        —
+                        •
                       </span>
                       <span>{item}</span>
                     </li>
@@ -162,7 +163,7 @@ export default function NvidiaDliPage() {
             on NVIDIA&apos;s GPU cloud. Nexus handles enrollment and invoices at $500 per seat, up to 20; larger groups get a tailored quote.
           </p>
           <div className="mt-6">
-            <ScheduleButton>Ask Dr. MJ about it</ScheduleButton>
+            <ScheduleButton>Ask {ASSISTANT_THE} about it</ScheduleButton>
           </div>
         </Section>
 
@@ -211,7 +212,7 @@ export default function NvidiaDliPage() {
 
         <Section title="The instructor">
           <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-            {MAJID.fullName} — {MAJID.roles.nexus} — is an {DLI.instructorTitle}.{" "}
+            {MAJID.fullName} ({MAJID.roles.nexus}) is an {DLI.instructorTitle}.{" "}
             {MAJID.teachingBackground}
           </p>
           <p className="mt-4 text-sm">

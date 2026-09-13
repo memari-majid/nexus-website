@@ -4,7 +4,11 @@ import { z } from "zod";
 import { BRIEF_TOOL_NAME } from "@/lib/brief-schema";
 import { SAMPLE_BRIEF } from "@/lib/brief-schema.test";
 import { APPROVAL_TOOLS, chatTools, isFailureReason, notSentHint, toolContext } from "@/lib/chat-tools";
+import { MAX_FACTS } from "@/lib/site-facts";
+import { OUTREACH_TOOL_NAME } from "@/lib/outreach";
+import { SAMPLE_NOTE } from "@/lib/outreach.test";
 import { PER_IP_EMAILS_PER_DAY, PER_IP_HANDOFFS_PER_DAY } from "@/lib/chat-limits";
+import { ASSISTANT_NAME, FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { getRateLimiter } from "@/lib/rate-limit";
 
 // The Resend client, so a configured send is observable without the network.
@@ -85,11 +89,209 @@ describe("tool schemas", () => {
     }
   });
 
-  it("require approval on exactly the three sending tools", () => {
+  it("require approval on exactly the four sending tools", () => {
     for (const [name, t] of Object.entries(tools)) {
       const expected = (APPROVAL_TOOLS as readonly string[]).includes(name);
       expect(t.needsApproval === true, name).toBe(expected);
     }
+  });
+
+  it("is the ten tools the prompt and the docs name, in one place", () => {
+    expect(Object.keys(chatTools)).toEqual([
+      "lookupSiteFacts",
+      "recommendWorkshop",
+      "draftConsultingBrief",
+      "assessReadiness",
+      "estimateProject",
+      "draftOutreachNote",
+      "handOffToMajid",
+      "emailMajidNote",
+      "emailBriefToVisitor",
+      "emailWorkshopInfo",
+    ]);
+  });
+});
+
+describe("lookupSiteFacts", () => {
+  it("returns grounded facts with the page each one is published on", async () => {
+    const out = (await tools.lookupSiteFacts.execute!(
+      { query: "how much does a workshop cost?" },
+      options(),
+    )) as { found: number; facts: { id: string; text: string; path: string }[] };
+    expect(out.found).toBeGreaterThan(0);
+    expect(out.facts[0].path.startsWith("/")).toBe(true);
+    expect(out.facts.length).toBeLessThanOrEqual(MAX_FACTS);
+  });
+
+  it("tells the model to say it does not know rather than cite nothing", async () => {
+    const out = (await tools.lookupSiteFacts.execute!(
+      { query: "what is the weather in Lisbon" },
+      options(),
+    )) as { found: number };
+    expect(out.found).toBe(0);
+    const res = (await tools.lookupSiteFacts.toModelOutput!({
+      toolCallId: "c",
+      input: {},
+      output: out,
+    })) as { value: string };
+    expect(res.value).toMatch(/do not guess/i);
+    expect(res.value).toMatch(/not sure/i);
+  });
+
+  it("costs nothing to call: no model, no network, and a bounded output", async () => {
+    const out = (await tools.lookupSiteFacts.execute!(
+      { query: "nexus training pricing team founder workshop coverage", limit: 99 },
+      options(),
+    )) as { facts: unknown[] };
+    expect(out.facts.length).toBeLessThanOrEqual(MAX_FACTS);
+    expect(JSON.stringify(out).length).toBeLessThan(2_000);
+  });
+});
+
+describe("estimateProject", () => {
+  it("returns weeks from the band table and never a price", async () => {
+    const out = (await tools.estimateProject.execute!(
+      {
+        goal: "Answer ops questions from our SOPs",
+        components: [{ name: "SOP search", kind: "retrieval", complexity: "medium" }],
+        dataReadiness: "messy",
+        teamCapacity: "one-engineer",
+      },
+      options(),
+    )) as { totalLow: number; totalHigh: number; disclaimer: string };
+    expect(out.totalHigh).toBeGreaterThan(out.totalLow);
+    expect(out.disclaimer).toMatch(/not a quote/);
+    expect(JSON.stringify(out)).not.toMatch(/\$\d/);
+  });
+
+  it("tells the model to call it a planning range, not a quote", async () => {
+    const res = (await tools.estimateProject.toModelOutput!({
+      toolCallId: "c",
+      input: {},
+      output: { totalLow: 6, totalHigh: 14, drivers: ["Data is messy."] },
+    })) as { value: string };
+    expect(res.value).toContain("6 to 14 weeks");
+    expect(res.value).toMatch(/planning range/);
+    expect(res.value).toMatch(/not a quote/);
+  });
+});
+
+describe("draftOutreachNote", () => {
+  it("reports the audience and the length, and keeps the note in the input", async () => {
+    const out = (await tools.draftOutreachNote.execute!(SAMPLE_NOTE, options())) as {
+      audience: string;
+      words: number;
+    };
+    expect(out.audience).toBe("leadership");
+    expect(out.words).toBeGreaterThan(10);
+    // The card renders `part.input`, so the output stays tiny.
+    expect(JSON.stringify(out).length).toBeLessThan(200);
+  });
+
+  it("offers the email only when the note is addressed to the founder", async () => {
+    const toFounder = (await tools.draftOutreachNote.toModelOutput!({
+      toolCallId: "c",
+      input: {},
+      output: { audience: "founder" },
+    })) as { value: string };
+    expect(toFounder.value).toContain("emailMajidNote");
+    expect(toFounder.value).toContain(FOUNDER_CHAT_NAME);
+
+    const toLeadership = (await tools.draftOutreachNote.toModelOutput!({
+      toolCallId: "c",
+      input: {},
+      output: { audience: "leadership" },
+    })) as { value: string };
+    expect(toLeadership.value).not.toContain("emailMajidNote");
+  });
+});
+
+describe("emailMajidNote.execute", () => {
+  const to = { name: "Ada", email: "ada@acme.com" };
+  const noteMessage: ModelMessage = {
+    role: "assistant",
+    content: [
+      { type: "tool-call", toolCallId: "note_1", toolName: OUTREACH_TOOL_NAME, input: SAMPLE_NOTE },
+    ],
+  };
+
+  it("refuses to send a note that was never drafted", async () => {
+    const out = (await tools.emailMajidNote.execute!(to, options())) as SendOutput;
+    expect(out).toMatchObject({ delivered: false, reason: "no-note" });
+  });
+
+  it("re-validates the approved input before touching a field", async () => {
+    const out = (await tools.emailMajidNote.execute!(
+      { name: 42, email: "ada@acme.com" },
+      options([noteMessage]),
+    )) as SendOutput;
+    expect(out).toMatchObject({ delivered: false, reason: "invalid-input" });
+  });
+
+  it("checks the address inside execute, not in the schema", async () => {
+    const out = (await tools.emailMajidNote.execute!(
+      { ...to, email: "ada at acme" },
+      options([noteMessage]),
+    )) as SendOutput;
+    expect(out).toMatchObject({ delivered: false, reason: "invalid-email" });
+  });
+
+  it("sends the drafted note to the founder inbox with the visitor as reply-to", async () => {
+    configureEmail();
+    const out = (await tools.emailMajidNote.execute!(to, {
+      ...options([noteMessage]),
+      toolCallId: "toolu_note_1",
+      experimental_context: { ip: "198.51.100.31" },
+    })) as SendOutput;
+    expect(out).toMatchObject({ delivered: true });
+    const sent = resendSend.mock.calls[0][0] as {
+      to: string[];
+      replyTo: string;
+      subject: string;
+      text: string;
+    };
+    expect(sent.to).toEqual(["memari.majid@hotmail.com"]);
+    expect(sent.replyTo).toBe("ada@acme.com");
+    expect(sent.subject).toContain(FOUNDER_CHAT_NAME);
+    expect(sent.text).toContain(SAMPLE_NOTE.ask);
+  });
+
+  it("keeps the visitor's words out of the idempotency store and replays the outcome", async () => {
+    configureEmail();
+    const opts = {
+      ...options([noteMessage]),
+      toolCallId: "toolu_note_2",
+      experimental_context: { ip: "198.51.100.32" },
+    };
+    const first = (await tools.emailMajidNote.execute!(to, opts)) as SendOutput;
+    expect(first).toMatchObject({ delivered: true });
+    expect(await getRateLimiter().recallSent("emailMajidNote", "toolu_note_2")).toEqual({
+      delivered: true,
+      label: "Note",
+    });
+    const again = (await tools.emailMajidNote.execute!(to, opts)) as SendOutput;
+    expect(again).toMatchObject({ delivered: true });
+    expect(resendSend).toHaveBeenCalledTimes(1);
+  });
+
+  it("never spends the founder allowance while Resend is unset", async () => {
+    const ip = "198.51.100.33";
+    const opts = { ...options([noteMessage]), experimental_context: { ip } };
+    for (let i = 0; i < PER_IP_HANDOFFS_PER_DAY + 2; i++) {
+      const out = (await tools.emailMajidNote.execute!(to, opts)) as SendOutput;
+      expect(out.reason, `attempt ${i}`).toBe("not-configured");
+    }
+    expect(await getRateLimiter().reserveEmail(ip, "handoff")).toBe(true);
+  });
+
+  it("says the note is not sent, never that it was noted", () => {
+    // "Noted" belongs to the not-configured hand-off alone: that one records
+    // the request on the server. A note that did not send was not recorded.
+    for (const reason of ["not-configured", "rate-limited", "send-failed", "no-note", undefined]) {
+      expect(notSentHint("note", reason), String(reason)).not.toMatch(/it was noted but/i);
+    }
+    expect(notSentHint("note", "not-configured")).toContain("Do not say it was noted");
+    expect(notSentHint("note", "no-note")).toContain("draftOutreachNote");
   });
 });
 
@@ -251,7 +453,9 @@ describe("emailBriefToVisitor.execute and emailWorkshopInfo.execute", () => {
     const sent = logs[0][1] as { to: string; cc: string[]; preview: string };
     expect(sent.to).toBe("ada@acme.com");
     expect(sent.cc).toEqual(["memari.majid@hotmail.com"]);
-    expect(sent.preview.startsWith("You asked for this in a chat with Dr. MJ")).toBe(true);
+    expect(sent.preview.startsWith(`You asked for this in a chat with the ${ASSISTANT_NAME}`)).toBe(
+      true,
+    );
   });
 
   it("never spends the visitor email allowance while Resend is unset", async () => {

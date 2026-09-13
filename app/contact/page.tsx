@@ -21,7 +21,7 @@ export default function ContactPage() {
           Contact Nexus AI Solutions
         </h1>
         <p className="mt-3 text-lg text-zinc-600 dark:text-zinc-400">
-          AI consulting and training — advisory, workshops, and in-house sessions.
+          AI consulting and training: advisory, workshops, and in-house sessions.
         </p>
         <div className="mt-6">
           <NvidiaBadge />
@@ -34,8 +34,8 @@ export default function ContactPage() {
               <a className="text-sky-600 underline dark:text-sky-400" href={`tel:${SITE.phone}`}>
                 {SITE.phoneDisplay}
               </a>
-              {" — "}
-              leave a message and we will call back.
+              {". "}
+              Leave a message and we will call back.
             </dd>
           </div>
           <div>

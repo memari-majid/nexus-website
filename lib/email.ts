@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { ASSISTANT_NAME } from "@/lib/chat-persona";
 import { SITE, SITE_URL } from "@/lib/site";
 
 /**
@@ -31,9 +32,12 @@ export type SendResult = { ok: true; delivered: boolean } | { ok: false; error: 
  */
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** First line of every visitor-addressed template. */
-export const EMAIL_ORIGIN_NOTE =
-  "You asked for this in a chat with Dr. MJ, the AI assistant on nexusaisolution.net, and approved it on screen before it was sent. If that was not you, you can ignore this message.";
+/**
+ * First line of every visitor-addressed template. The assistant's name comes
+ * from `lib/chat-persona.ts`: these are emails the agent sends, so they are
+ * inside the chat surface (AGENTS.md 9.1).
+ */
+export const EMAIL_ORIGIN_NOTE = `You asked for this in a chat with the ${ASSISTANT_NAME}, the AI assistant on nexusaisolution.net, and approved it on screen before it was sent. If that was not you, you can ignore this message.`;
 
 /**
  * info@nexusaisolution.net has no inbound MX, so every CC and reply-to uses

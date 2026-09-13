@@ -72,11 +72,31 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * `interactiveWidget` is deliberately left at the browser default
+ * (`resizes-visual`). `resizes-content` would shrink the layout viewport when
+ * the on-screen keyboard opens, and every `dvh` length on the site resolves
+ * against it: the chat sheet, the inline demo cap, and the `scroll-padding-top`
+ * on `html`. Focusing the contact form would then re-lay-out the whole page
+ * behind the keyboard, which is a worse trade than the pan the default does.
+ * The chat sheet already clears the keyboard by other means: it is a flex
+ * column with one scroller, so the composer is pinned inside whatever height
+ * it is given.
+ */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
+
+/**
+ * Marks the document as scripted, before the first paint. Anything that hides
+ * content until JavaScript moves it, which today is the scroll reveal, is
+ * gated on this class in `app/globals.css`, so a visitor with scripting off,
+ * or one whose bundle never arrives, reads the copy instead of a blank
+ * section.
+ */
+const SCRIPTING_FLAG = "document.documentElement.classList.add('js')";
 
 export default function RootLayout({
   children,
@@ -86,6 +106,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-w-0 overflow-x-hidden antialiased">
+        <script dangerouslySetInnerHTML={{ __html: SCRIPTING_FLAG }} />
         <ThemeProvider>{children}</ThemeProvider>
         <Analytics />
         <SpeedInsights />

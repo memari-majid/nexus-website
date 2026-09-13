@@ -1,9 +1,16 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { createContext, useContext, type ReactNode } from "react";
+import { NO_SIDEWAYS_OVERFLOW, stepRole } from "@/lib/chat-ui";
 
 /**
- * Shared chrome for the agent steps Dr. MJ shows in the chat: a one-line step
- * row (running, done, failed, declined) and the card that holds a result.
- * No hooks here, so these can sit under any switch.
+ * Shared chrome for the agent steps the assistant shows in the chat: a
+ * one-line step row (running, done, failed, declined) and the card that holds
+ * a result. The only hook is the live-region context `ToolStep` reads, so
+ * these can still sit under any switch.
+ *
+ * Both shells are width constrained, the inline one hard, so every row and
+ * card carries `min-w-0` and wraps rather than widening its column.
  */
 
 export type StepState = "running" | "waiting" | "done" | "failed" | "denied";
@@ -15,6 +22,25 @@ const STEP_TEXT: Record<StepState, string> = {
   failed: "text-amber-700 dark:text-amber-400",
   denied: "text-zinc-500 dark:text-zinc-400",
 };
+
+/**
+ * Whether the surface rendering these steps owns the spoken live region.
+ *
+ * Both shells render the same transcript from one shared store, so while the
+ * floating panel is open every running step exists twice in the DOM, and
+ * `role="status"` carries an implicit `aria-live="polite"`. The silent
+ * surface has to drop the role, and `ToolStep` is rendered by eight different
+ * cards, six of which never receive the tool context, so the flag travels as
+ * a context instead of a prop: a step added later is silent on the silent
+ * surface without anyone having to remember to thread it. The default is
+ * `true`, so a step rendered outside a provider still announces.
+ */
+const ToolStepLiveContext = createContext(true);
+
+/** Wraps a surface's transcript and tells the steps inside whether to speak. */
+export function ToolStepLive({ live, children }: { live: boolean; children: ReactNode }) {
+  return <ToolStepLiveContext.Provider value={live}>{children}</ToolStepLiveContext.Provider>;
+}
 
 /** What every card gets from the widget besides its own part. */
 export type ToolPartContext = {
@@ -87,9 +113,9 @@ function StepIcon({ state }: { state: StepState }) {
 }
 
 /**
- * One visible agent step. `role="status"` only while it is running. `action`
- * adds a small inline button, used for the retry on a send that did not go
- * through.
+ * One visible agent step. `role="status"` only while it is running, and only
+ * on the surface that owns the live region. `action` adds a small inline
+ * button, used for the retry on a send that did not go through.
  */
 export function ToolStep({
   label,
@@ -100,7 +126,8 @@ export function ToolStep({
   state: StepState;
   action?: { label: string; onClick: () => void };
 }) {
-  const className = `mr-4 flex flex-wrap items-center gap-2 px-1 text-xs ${STEP_TEXT[state]}`;
+  const live = useContext(ToolStepLiveContext);
+  const className = `mr-4 flex flex-wrap items-center gap-2 px-1 text-xs ${NO_SIDEWAYS_OVERFLOW} ${STEP_TEXT[state]}`;
   const text = state === "running" ? `${label}…` : label;
   const button = action ? (
     <button
@@ -111,17 +138,8 @@ export function ToolStep({
       {action.label}
     </button>
   ) : null;
-  if (state === "running") {
-    return (
-      <div role="status" className={className}>
-        <StepIcon state={state} />
-        <span>{text}</span>
-        {button}
-      </div>
-    );
-  }
   return (
-    <div className={className}>
+    <div role={stepRole(state === "running", live)} className={className}>
       <StepIcon state={state} />
       <span>{text}</span>
       {button}
@@ -149,7 +167,7 @@ export function Card({
 }) {
   return (
     <section
-      className={`mr-4 rounded-xl border bg-white p-3 text-sm text-zinc-800 shadow-sm dark:bg-zinc-900/80 dark:text-zinc-200 ${CARD_TONE[tone]}`}
+      className={`mr-4 rounded-xl border bg-white p-3 text-sm text-zinc-800 shadow-sm dark:bg-zinc-900/80 dark:text-zinc-200 ${NO_SIDEWAYS_OVERFLOW} ${CARD_TONE[tone]}`}
     >
       <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
         {title}

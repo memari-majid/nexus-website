@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { nexusAssistantSystem, nexusChatSystem, nexusVoiceSystem, SUGGESTION_MARKER } from "@/lib/assistant";
 import { AFTER_BRIEF_CHIPS, DISCOVERY_CHIPS, chipLine } from "@/lib/chat-chips";
+import { ASSISTANT_NAME, FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
+import { chatTools } from "@/lib/chat-tools";
 import { hasDash, plainPunctuation } from "@/lib/plain-punctuation";
 
 describe("plainPunctuation", () => {
@@ -41,16 +43,10 @@ describe("rendered system prompts", () => {
 
   it("names every tool, the honesty rule, and the shared chips", () => {
     const p = nexusChatSystem();
-    for (const tool of [
-      "recommendWorkshop",
-      "draftConsultingBrief",
-      "assessReadiness",
-      "handOffToMajid",
-      "emailBriefToVisitor",
-      "emailWorkshopInfo",
-    ]) {
-      expect(p).toContain(tool);
+    for (const tool of Object.keys(chatTools)) {
+      expect(p, `prompt names ${tool}`).toContain(tool);
     }
+    expect(Object.keys(chatTools)).toHaveLength(10);
     expect(p).toContain("noted but not sent");
     expect(p).toContain("never claim an email went out");
     expect(p).toContain(SUGGESTION_MARKER);
@@ -61,11 +57,28 @@ describe("rendered system prompts", () => {
 
   it("keeps the editorial rules: no Dr. for Majid himself, never free, industry only", () => {
     const p = nexusChatSystem();
-    // "Dr. Majid" appears exactly once: inside the rule that forbids it.
+    // "Dr. Majid" appears exactly twice, and both are rules forbidding it: the
+    // site-wide one in the shared facts, and the chat override that says the
+    // founder is Dr. Memari in here and never Dr. Majid.
     expect(p).toContain('never "Dr. Majid Memari, PhD"');
-    expect(p.match(/Dr\. Majid/g)).toHaveLength(1);
-    expect(p).toContain("Dr. MJ");
+    expect(p).toContain('Never write "Dr. Majid Memari"');
+    expect(p.match(/Dr\. Majid/g)).toHaveLength(2);
     expect(p).toContain('never call consulting "free"');
     expect(p).toContain("never imply NVIDIA endorses Nexus");
+  });
+
+  it("renames the assistant and the founder inside the chat only (AGENTS.md 9.1)", () => {
+    const chat = nexusChatSystem();
+    const voice = nexusVoiceSystem();
+    expect(chat).toContain(`You are the ${ASSISTANT_NAME}`);
+    expect(chat).toContain(FOUNDER_CHAT_NAME);
+    expect(chat).not.toContain("Dr. MJ");
+    // The voice agent shares the facts, not the persona: it is never
+    // introduced as the assistant and it never calls him Dr. Memari.
+    // `ASSISTANT_NAME` itself is not asserted absent: "AI Consultant" is also
+    // the founder's factual prior role at One-U RAI, which both prompts carry.
+    expect(voice).not.toContain(`You are the ${ASSISTANT_NAME}`);
+    expect(voice).not.toContain(FOUNDER_CHAT_NAME);
+    expect(voice).not.toContain("Dr. MJ");
   });
 });

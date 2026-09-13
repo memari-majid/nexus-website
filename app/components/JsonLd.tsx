@@ -31,7 +31,7 @@ export function JsonLd({ page = "/" }: { page?: JsonLdPage }) {
         "@type": "ProfilePage",
         "@id": `${url}#page`,
         url,
-        name: "About Nexus AI Solutions — Majid Memari and Hamid Memari",
+        name: "About Nexus AI Solutions: Majid Memari and Hamid Memari",
         isPartOf: { "@id": `${SITE_URL}/#website` },
         about: { "@id": `${SITE_URL}/#person` },
         mainEntity: { "@id": `${SITE_URL}/#person` },

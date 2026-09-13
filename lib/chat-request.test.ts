@@ -6,12 +6,14 @@ import {
   MAX_CHARS_PER_ASSISTANT_TEXT_PART,
   MAX_CHARS_PER_TEXT_PART,
   MAX_CHARS_TOTAL,
+  MAX_TOOL_CHARS_TOTAL,
 } from "@/lib/chat-limits";
 import {
   INTERRUPTED_APPROVAL_TEXT,
   INVALID,
   STALE_APPROVAL_REASON,
   TOO_LONG,
+  TRIMMED_OUTPUT,
   clientIp,
   parseChatBody,
   sanitizeTranscript,
@@ -327,6 +329,107 @@ function danglingCalls(messages: ModelMessage[]): string[] {
   }
   return [...calls];
 }
+
+describe("sanitizeTranscript, echoed tool payloads", () => {
+  /**
+   * One realistic tool result: an `estimateProject`-sized input and a card
+   * output. Both are echoed on every later turn and both are billed.
+   */
+  const bulky = (id: string, inputSize: number = 3_500, outputSize: number = 1_500): Part => ({
+    type: "tool-estimateProject",
+    toolCallId: id,
+    state: "output-available",
+    input: { goal: "x".repeat(inputSize) },
+    output: { detail: "y".repeat(outputSize) },
+  });
+
+  /** `count` assistant turns each carrying one tool result, with user turns between. */
+  const conversation = (count: number, inputSize?: number, outputSize?: number): Loose[] => {
+    const messages: Loose[] = [];
+    for (let i = 0; i < count; i++) {
+      messages.push(user(`turn ${i}`));
+      messages.push(assistant(bulky(`call_${i}`, inputSize, outputSize)));
+    }
+    messages.push(user("and then"));
+    return messages;
+  };
+
+  const toolOutputs = (messages: { parts: unknown }[]) =>
+    messages
+      .flatMap((m) => m.parts as { type: string; output?: unknown }[])
+      .filter((p) => p.type.startsWith("tool-"))
+      .map((p) => p.output);
+
+  it("counts inputs and outputs toward the tool total, not the text cap", () => {
+    const out = sanitizeTranscript([user("hi"), assistant(bulky("a"))]);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.textChars).toBe(2);
+    expect(out.toolChars).toBeGreaterThan(5_000);
+  });
+
+  it("leaves a conversation that fits completely untouched", () => {
+    const out = sanitizeTranscript(conversation(2));
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.toolChars).toBeLessThanOrEqual(MAX_TOOL_CHARS_TOTAL);
+    for (const output of toolOutputs(out.messages)) {
+      expect(output).not.toEqual(TRIMMED_OUTPUT);
+    }
+  });
+
+  it("trims the oldest outputs first and stops as soon as it fits", () => {
+    const out = sanitizeTranscript(conversation(6));
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.toolChars).toBeLessThanOrEqual(MAX_TOOL_CHARS_TOTAL);
+    const outputs = toolOutputs(out.messages);
+    expect(outputs[0]).toEqual(TRIMMED_OUTPUT);
+    // The newest card keeps its detail: it is the one the visitor is looking at.
+    expect(outputs[outputs.length - 1]).not.toEqual(TRIMMED_OUTPUT);
+  });
+
+  it("never trims an input: the cards render it and approvals re-validate from it", () => {
+    const out = sanitizeTranscript(conversation(6));
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    for (const message of out.messages) {
+      for (const part of message.parts as unknown as { type: string; input?: unknown }[]) {
+        if (!part.type.startsWith("tool-")) continue;
+        expect(part.input).toEqual({ goal: "x".repeat(3_500) });
+      }
+    }
+  });
+
+  it("leaves the final message alone, where an approved call is about to run", () => {
+    const messages = [user("one"), assistant(bulky("old")), user("two"), assistant(bulky("last"))];
+    const out = sanitizeTranscript([...conversation(5), ...messages.slice(1)]);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const last = out.messages[out.messages.length - 1].parts as unknown as { output?: unknown }[];
+    expect(last[0].output).not.toEqual(TRIMMED_OUTPUT);
+  });
+
+  it("bills the precharge on the trimmed total, not the raw one", () => {
+    const messages = conversation(6);
+    const parsed = parseChatBody(body(messages));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.prechargeChars).toBeLessThanOrEqual(MAX_TOOL_CHARS_TOTAL + parsed.textChars);
+  });
+
+  it("is best effort, not a guarantee: inputs alone can exceed the cap", () => {
+    // Only the raw body cap bounds that case, which is why it is set where it
+    // is. No schema in the tool set can produce an input this large.
+    const out = sanitizeTranscript(conversation(6, 9_000, 1_000));
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.toolChars).toBeGreaterThan(MAX_TOOL_CHARS_TOTAL);
+    for (const output of toolOutputs(out.messages).slice(0, -1)) {
+      expect(output).toEqual(TRIMMED_OUTPUT);
+    }
+  });
+});
 
 describe("with the real SDK", () => {
   const stale = [

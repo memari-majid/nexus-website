@@ -51,7 +51,7 @@ export const DLI = {
   nvidiaProvides: {
     heading: "NVIDIA provides",
     items: [
-      "Cloud GPU VMs — you need no compute",
+      "Cloud GPU VMs: you need no compute",
       "Course content and curriculum",
       "Assessment",
       "DLI certificate",
@@ -91,7 +91,7 @@ export const DLI = {
   whyNexus: {
     heading: "Why Nexus",
     points: [
-      "We consult first to scope the right training, then deliver it — not a one-size course off a shelf.",
+      "We consult first to scope the right training, then deliver it, not a one-size course off a shelf.",
       "In person and hands-on. NVIDIA's public workshops are virtual; we come to your team anywhere in the United States (or run it online if you prefer).",
       "The full NVIDIA catalog, with the certified instructor matched to your topic.",
       "A private cohort built around your team's real work, not a room of strangers.",
@@ -244,7 +244,7 @@ export const DLI = {
   outline: [
     {
       title: "Agent fundamentals",
-      text: "What an LLM agent is, where language models are strong, and where they fail — so your team can tell an agent-shaped problem from one that needs ordinary software.",
+      text: "What an LLM agent is, where language models are strong, and where they fail, so your team can tell an agent-shaped problem from one that needs ordinary software.",
     },
     {
       title: "Structured outputs and tool use",
@@ -260,7 +260,7 @@ export const DLI = {
     },
     {
       title: "Deployment and final assessment",
-      text: "Deploying an agent that schedules multiple retrieval operations and reports back — the hands-on assessment behind the NVIDIA DLI certificate.",
+      text: "Deploying an agent that schedules multiple retrieval operations and reports back, the hands-on assessment behind the NVIDIA DLI certificate.",
     },
   ],
   tools: ["NVIDIA NIM", "build.nvidia.com", "LangChain", "LangGraph", "Python", "PyTorch"],

@@ -7,6 +7,7 @@ import {
   type SystemModelMessage,
 } from "ai";
 import { nexusChatSystem } from "@/lib/assistant";
+import { ASSISTANT_NAME } from "@/lib/chat-persona";
 import { chatTools, type NexusUIMessage } from "@/lib/chat-tools";
 import { MAX_OUTPUT_TOKENS, MAX_STEPS, STREAM_TIMEOUT_MS, prechargeUsd } from "@/lib/chat-limits";
 import {
@@ -149,7 +150,7 @@ export async function POST(req: Request) {
       });
     }
     return json(503, {
-      error: "Dr. MJ has reached today's usage limit. Please use the contact form, or try again tomorrow.",
+      error: `The ${ASSISTANT_NAME} has reached today's usage limit. Please use the contact form, or try again tomorrow.`,
     });
   }
   // Past the soft budget, dearer picks run on the fallback model. A pick that
@@ -243,7 +244,7 @@ export async function POST(req: Request) {
     // Never stream provider error text to visitors; log it and show a plain fallback.
     onError: (error) => {
       console.error("[chat] stream error:", error);
-      return "Dr. MJ is unavailable right now. Please use the contact form instead.";
+      return `The ${ASSISTANT_NAME} is unavailable right now. Please use the contact form instead.`;
     },
     // Streamed in pieces and merged on the client: model on start, time to
     // first token with the first text delta, totals on finish.

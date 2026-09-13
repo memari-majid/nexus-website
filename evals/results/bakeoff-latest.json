@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-09-13",
+  "gitSha": "5a098964e80721d2fe9a5afb38c5bdc7e0305a94",
+  "promptHash": "ffa3cac37eda736603b9764fe49cd65a73bf4bbb3d4419c9dd1c48c37bdd8020",
+  "shape": {
+    "turns": 2,
+    "maxOutputTokens": 2500,
+    "promptCall": "nexusChatSystem({ emailEnabled: false })",
+    "scenario": "A 40-person logistics company asks whether to build retrieval over its SOPs or fine-tune a model, in two turns"
+  },
+  "rows": [
+    {
+      "modelId": "anthropic/claude-opus-5",
+      "label": "Claude Opus 5",
+      "costUsd": 0.107005,
+      "approximate": false,
+      "ttftMs": 4464,
+      "read": "The one that sounds like a consultant. It answers in the first line, RAG not fine-tuning, then says build retrieval with no chatbot at all and go collect 40 questions your ops team already asked. It is also seven times the price of the cheapest row here.",
+      "rubricScores": {
+        "consults": 5,
+        "specific": 5,
+        "human": 5,
+        "grounded": 5,
+        "forward": 5
+      }
+    },
+    {
+      "modelId": "anthropic/claude-sonnet-5",
+      "label": "Claude Sonnet 5",
+      "costUsd": 0.043646,
+      "approximate": false,
+      "ttftMs": 3272,
+      "read": "The same advice in more words, and it promised an effort breakdown it never gave, which is what the judge marked it down for. Still the sensible fallback when the day's budget is tight.",
+      "rubricScores": {
+        "consults": 4,
+        "specific": 3,
+        "human": 5,
+        "grounded": 5,
+        "forward": 4
+      }
+    },
+    {
+      "modelId": "openai/gpt-5.6-sol",
+      "label": "GPT-5.6 Sol",
+      "costUsd": 0.026514,
+      "approximate": false,
+      "ttftMs": 2305,
+      "read": "Fastest to first token and the tightest answer of the four: a numbered sequence that ends by abstaining when the evidence is weak. Scored level with Opus at a quarter of the cost, and reads more like a memo than a conversation.",
+      "rubricScores": {
+        "consults": 5,
+        "specific": 5,
+        "human": 5,
+        "grounded": 5,
+        "forward": 5
+      }
+    },
+    {
+      "modelId": "google/gemini-3.8-flash",
+      "label": "Gemini 3.8 Flash",
+      "costUsd": 0.015276,
+      "approximate": false,
+      "ttftMs": 3930,
+      "read": "Cheapest by a wide margin and technically right, but it commits to a recommendation before asking anything, and spends more than twice Opus's words to say less.",
+      "rubricScores": {
+        "consults": 2,
+        "specific": 5,
+        "human": 4,
+        "grounded": 4,
+        "forward": 5
+      }
+    }
+  ],
+  "unscored": [],
+  "notes": [
+    "Cost is the sum of 2 turns, priced from CHAT_MODELS in lib/chat-models.ts, the same table the picker and /how-it-works use.",
+    "Time to first token is the first turn, on a cold prompt cache.",
+    "The prompt was rendered nexusChatSystem({ emailEnabled: false }), which is how the chat route renders it in production. promptHash is the sha256 of that exact text.",
+    "Scored 2026-09-13 by evals/judge.ts, one reply at a time and blind: anthropic/claude-opus-5 by google/gemini-3.8-flash; anthropic/claude-sonnet-5 by google/gemini-3.8-flash; openai/gpt-5.6-sol by google/gemini-3.8-flash; google/gemini-3.8-flash by anthropic/claude-sonnet-5. No model scored its own reply.",
+    "Read the scores as a rough sort, not a ranking. Three rows were scored by Gemini 3.8 Flash, which gave two of them full marks, and the fourth by Claude Sonnet 5, which is the stricter judge. A 25 and a 20 from different judges are not the same measurement.",
+    "A judge score is a judgement, not a measurement. It sits beside the cost and latency numbers and is never merged into them."
+  ]
+}

@@ -28,7 +28,7 @@ export async function generateMetadata({
   const person = getPerson(slug);
   if (!person) return {};
 
-  const title = `${person.displayName} — ${person.role}, Nexus AI Solutions`;
+  const title = `${person.displayName}: ${person.role}, Nexus AI Solutions`;
   const path = `/about/${person.slug}`;
   // The 1200x630 card leads so large-image previews are never a cropped face;
   // the 640x640 headshot follows for platforms that let the sharer pick.
@@ -69,7 +69,7 @@ export default async function PersonPage({ params }: { params: Promise<{ person:
       "@type": "ProfilePage",
       "@id": `${url}#page`,
       url,
-      name: `${person.displayName} — ${person.role}, ${SITE.name}`,
+      name: `${person.displayName}: ${person.role}, ${SITE.name}`,
       isPartOf: { "@id": `${SITE_URL}/#website` },
       about: { "@id": `${SITE_URL}/${person.schemaId}` },
       mainEntity: { "@id": `${SITE_URL}/${person.schemaId}` },

@@ -1,5 +1,6 @@
 import { DLI, DLI_REFERENCE_LINKS } from "@/lib/dli";
 import { EMAIL_ORIGIN_NOTE, escapeHtml, renderEmail, scrubForEmail } from "@/lib/email";
+import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 
 /**
  * Branded "here are the NVIDIA workshop details" email, built entirely from
@@ -7,7 +8,7 @@ import { EMAIL_ORIGIN_NOTE, escapeHtml, renderEmail, scrubForEmail } from "@/lib
  * Industry delivery only; do not add a campus or free variant.
  *
  * Fixed template: the only variable is the visitor's scrubbed name. The
- * visitor approves the send on screen and Majid is copied (see chat tools).
+ * visitor approves the send on screen and the founder is copied (see chat tools).
  */
 export function workshopInfoEmail(opts: {
   name: string;
@@ -16,7 +17,7 @@ export function workshopInfoEmail(opts: {
   const w = DLI.workshop;
   const offerText = `${DLI.industry.heading} (${DLI.industry.role}): ${DLI.industry.text} ${DLI.logistics}`;
   const closing =
-    "Reply to this email and Majid Memari will follow up on timing, format, and group size.";
+    `Reply to this email and ${FOUNDER_CHAT_NAME} will follow up on timing, format, and group size.`;
 
   const text = [
     EMAIL_ORIGIN_NOTE,

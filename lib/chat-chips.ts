@@ -3,6 +3,9 @@
  * the model to emit these lines, and the fallback (`lib/chat-suggestions.ts`)
  * uses the same lists when the model forgets, so the two can never drift.
  *
+ * A chip is visitor-facing chat copy, so the founder is `FOUNDER_CHAT_NAME`
+ * here (AGENTS.md 9.1), read from `lib/chat-persona.ts` and never spelled out.
+ *
  * Every chip is under seven words and reads as something a visitor would tap.
  * Client-safe, dependency-free.
  *
@@ -10,6 +13,8 @@
  * no chip may name a state, a region, or a travel radius, or invite a visitor
  * to wonder whether their location qualifies.
  */
+
+import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 
 /** Shown before the first message. */
 export const OPENING_CHIPS = [
@@ -36,12 +41,12 @@ export const AFTER_ADVICE_CHIPS = [
 export const READY_CHIPS = [
   "Draft a consulting brief",
   "Rate our AI readiness",
-  "Have Majid follow up",
+  `Have ${FOUNDER_CHAT_NAME} follow up`,
 ] as const;
 
 /** Right after the brief card appears. */
 export const AFTER_BRIEF_CHIPS = [
-  "Send it to Majid",
+  `Send it to ${FOUNDER_CHAT_NAME}`,
   "Email me the brief",
   "Rate our AI readiness",
 ] as const;
@@ -52,7 +57,7 @@ export const AFTER_BRIEF_CHIPS = [
  * prompt and the fallback use.
  */
 export const AFTER_BRIEF_CHIPS_NO_EMAIL = [
-  "Send it to Majid",
+  `Send it to ${FOUNDER_CHAT_NAME}`,
   "Rate our AI readiness",
   "What should we fix first?",
 ] as const;
@@ -61,7 +66,7 @@ export const AFTER_BRIEF_CHIPS_NO_EMAIL = [
 export const AFTER_SNAPSHOT_CHIPS = [
   "Draft a consulting brief",
   "What should we fix first?",
-  "Have Majid follow up",
+  `Have ${FOUNDER_CHAT_NAME} follow up`,
 ] as const;
 
 /** After the hand-off went out (or was noted). */

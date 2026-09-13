@@ -27,7 +27,7 @@ export function NvidiaBadge({
       href={MAJID.nvidiaInstructorDirectory}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${DLI.instructorTitle} — NVIDIA Certified Instructor Directory`}
+      aria-label={`${DLI.instructorTitle}, NVIDIA Certified Instructor Directory`}
       className={`inline-flex items-center justify-center gap-2 text-xs text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 ${shell} ${className}`}
     >
       <NvidiaLogo className="nvidia-mark h-4 w-4 shrink-0" />

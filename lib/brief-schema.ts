@@ -2,7 +2,7 @@ import type { ModelMessage } from "ai";
 import { z } from "zod";
 
 /**
- * The consulting brief: the structured deliverable Dr. MJ drafts in chat via
+ * The consulting brief: the structured deliverable the assistant drafts in chat via
  * the `draftConsultingBrief` tool. The tool's input IS the brief, so the card
  * can render `part.input` while it streams, and the hand-off and the visitor
  * email re-read it from the message history (`findBrief`) instead of asking

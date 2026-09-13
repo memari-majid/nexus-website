@@ -6,6 +6,8 @@ import { NvidiaLogo, TRADEMARK_SHORT } from "@/app/components/NvidiaLogo";
 import { Reveal } from "@/app/components/Reveal";
 import { ScheduleButton } from "@/app/components/ScheduleButton";
 import { ScrollToTop } from "@/app/components/ScrollToTop";
+import { TryOurAi } from "@/app/components/demo/TryOurAi";
+import { ASSISTANT_NAME, FOUNDER_SITE_NAME } from "@/lib/chat-persona";
 import { DLI } from "@/lib/dli";
 import { SITE } from "@/lib/site";
 import { TEAM } from "@/lib/team";
@@ -16,7 +18,7 @@ const FOOTER_LINKS = [
   { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "How Dr. MJ works", href: "/how-it-works" },
+  { label: `How the ${ASSISTANT_NAME} works`, href: "/how-it-works" },
 ];
 
 /** Consulting is the lead offer; training and FDE follow from it. */
@@ -32,6 +34,25 @@ const OFFERINGS = [
   {
     title: "Build",
     text: "A Forward Deployed Engineer embeds with your team to build and ship the solution with you.",
+  },
+];
+
+/**
+ * What the inline demo actually does, in three lines. The agent itself is the
+ * proof; this is only the caption under it (AGENTS.md 9.3).
+ */
+const DEMO_CAPABILITIES = [
+  {
+    title: "Grounded",
+    text: "It answers from this site's own facts: the team, the NVIDIA catalog, how delivery works. It cannot invent a course or a price.",
+  },
+  {
+    title: "Real work product",
+    text: "A consulting brief, a readiness score, a project estimate, an outreach note. Cards you can read and keep.",
+  },
+  {
+    title: "It acts, with approval",
+    text: `It can send a note to ${FOUNDER_SITE_NAME} or email you the brief. Nothing leaves the chat until you tap approve.`,
   },
 ];
 
@@ -146,6 +167,59 @@ export function HomePageContent() {
           </div>
         </Reveal>
       </Section>
+
+      <section
+        id="try-our-ai"
+        className="scroll-mt-24 border-t border-zinc-200/70 px-6 py-24 dark:border-zinc-800/50 sm:py-32"
+      >
+        <div className="mx-auto min-w-0 max-w-3xl">
+          <Reveal>
+            <div className="text-center">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
+                Interactive
+              </p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+                Try our AI
+              </h2>
+              <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
+                The {ASSISTANT_NAME} is the first product we ship. It is running right here, on
+                the same stack we build for clients.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="mt-12 min-w-0">
+            <TryOurAi />
+          </div>
+
+          <div className="mt-12 grid gap-6 text-left sm:grid-cols-3">
+            {DEMO_CAPABILITIES.map((c, i) => (
+              <Reveal key={c.title} delay={80 + i * 60}>
+                <div className="h-full min-w-0 rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700 dark:text-brand-400">
+                    {c.title}
+                  </p>
+                  <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">{c.text}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={260}>
+            <p className="mx-auto mt-10 max-w-xl text-center text-sm leading-relaxed text-zinc-500">
+              Every reply carries its model, its time to first token, and what it cost. Rate
+              limits and a daily budget keep the bill boring. Outgoing email is off on this site
+              today, so a send reports not sent and points you to the contact form.{" "}
+              <Link
+                href="/how-it-works"
+                className="text-zinc-700 underline decoration-zinc-300 underline-offset-4 dark:text-zinc-300 dark:decoration-zinc-600"
+              >
+                See how it works
+              </Link>
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
       <section
         id="training"

@@ -23,7 +23,7 @@ export default function AboutPage() {
           The people behind {SITE.name}
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-          AI consulting and training — advisory, workshops, and in-house sessions.
+          AI consulting and training: advisory, workshops, and in-house sessions.
         </p>
         <div className="mt-6">
           <NvidiaBadge />
@@ -70,7 +70,7 @@ export default function AboutPage() {
             {UNIVERSITY_COLLABORATIONS.items.map((item) => (
               <li key={item.name} className="flex gap-3">
                 <span aria-hidden className="text-zinc-400 dark:text-zinc-600">
-                  —
+                  •
                 </span>
                 <span>
                   <strong className="font-medium text-zinc-800 dark:text-zinc-200">

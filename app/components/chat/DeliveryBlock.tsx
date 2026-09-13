@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import {
   TOOL_STEP_COPY,
   isNotSentReason,
@@ -11,7 +12,11 @@ import {
 import { ApprovalCard, type DeliveryPart } from "./ApprovalCard";
 import { Card, ToolStep, asRecord, str, type ToolPartContext } from "./primitives";
 
-type DeliveryName = "handOffToMajid" | "emailBriefToVisitor" | "emailWorkshopInfo";
+type DeliveryName =
+  | "handOffToMajid"
+  | "emailMajidNote"
+  | "emailBriefToVisitor"
+  | "emailWorkshopInfo";
 
 type Delivery = {
   delivered: boolean;
@@ -47,15 +52,16 @@ function ChatLink({ href, children }: { href: string; children: ReactNode }) {
 }
 
 /**
- * Hand-off only: the other way to reach Majid. Never an email address here;
- * the site's public inbox does not receive mail yet, and the contact form
- * says on its own screen whether a message was emailed or only logged.
+ * Hand-off only: the other way to reach the founder. Never an email address
+ * here; the site's public inbox does not receive mail yet, and the contact
+ * form says on its own screen whether a message was emailed or only logged.
  */
-function ReachMajid() {
+function ReachFounder() {
   return (
     <>
       {" "}
-      The <ChatLink href="/contact">contact form</ChatLink> is the other way to reach Majid.
+      The <ChatLink href="/contact">contact form</ChatLink> is the other way to reach{" "}
+      {FOUNDER_CHAT_NAME}.
     </>
   );
 }
@@ -75,7 +81,9 @@ function Outcome({
   if (name === "handOffToMajid") {
     return delivery.delivered ? (
       <Card title={title} tone="ok">
-        <p>Sent to Majid. He will follow up by email{at}.</p>
+        <p>
+          Sent to {FOUNDER_CHAT_NAME}. He will follow up by email{at}.
+        </p>
         {delivery.briefAttached && (
           <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
             Your consulting brief went with it.
@@ -87,7 +95,26 @@ function Outcome({
         <p>
           {wasNoted(delivery.reason) ? "Noted, but the email did not go out: " : "Not sent: "}
           {delivery.reasonCopy}
-          <ReachMajid />
+          <ReachFounder />
+        </p>
+      </Card>
+    );
+  }
+
+  if (name === "emailMajidNote") {
+    return delivery.delivered ? (
+      <Card title={title} tone="ok">
+        <p>
+          Sent to {FOUNDER_CHAT_NAME}, as written, with your address{at ? ` (${email})` : ""} as the
+          reply-to.
+        </p>
+      </Card>
+    ) : (
+      <Card title={title} tone="warn">
+        <p>
+          Not sent: {delivery.reasonCopy} The note above stays here in the chat, so you can copy it
+          and send it yourself.
+          <ReachFounder />
         </p>
       </Card>
     );
@@ -96,7 +123,7 @@ function Outcome({
   if (name === "emailBriefToVisitor") {
     return delivery.delivered ? (
       <Card title={title} tone="ok">
-        <p>Sent{at}, with Majid copied.</p>
+        <p>Sent{at}, with {FOUNDER_CHAT_NAME} copied.</p>
       </Card>
     ) : (
       <Card title={title} tone="warn">
@@ -111,7 +138,9 @@ function Outcome({
 
   return delivery.delivered ? (
     <Card title={title} tone="ok">
-      <p>Sent the NVIDIA workshop details{at}, with Majid copied.</p>
+      <p>
+        Sent the NVIDIA workshop details{at}, with {FOUNDER_CHAT_NAME} copied.
+      </p>
     </Card>
   ) : (
     <Card title={title} tone="warn">
@@ -181,7 +210,7 @@ export function DeliveryBlock({ part, tools }: { part: DeliveryPart; tools: Tool
     case "output-available": {
       const delivery = readDelivery(part.output);
       // "Noted" belongs to the hand-off alone: that is the one send the
-      // server records for Majid. The two visitor-addressed emails read "Not
+      // server records for the founder. The two visitor-addressed emails read "Not
       // sent" here, matching their card below and what the model is told.
       const stepLabel = delivery.delivered
         ? copy.done

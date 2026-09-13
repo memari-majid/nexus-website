@@ -1,5 +1,5 @@
 /**
- * Follow-up chips for Dr. MJ. The model is asked to emit `SUGGESTIONS: a | b | c`.
+ * Follow-up chips for the assistant. The model is asked to emit `SUGGESTIONS: a | b | c`.
  * This module sanitizes that line and fills in useful defaults when it is
  * missing or generic, so visitors always get a next step they can tap.
  *

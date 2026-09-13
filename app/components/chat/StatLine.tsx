@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { formatUsd } from "@/lib/chat-models";
-import { formatMs, formatTokens, modelLabel, readChatMetadata, statSummary } from "@/lib/chat-ui";
+import {
+  NO_SIDEWAYS_OVERFLOW,
+  formatMs,
+  formatTokens,
+  modelLabel,
+  readChatMetadata,
+  statSummary,
+} from "@/lib/chat-ui";
 
 /**
  * Per-reply stats from the message metadata the route attaches: model, time to
@@ -33,7 +40,7 @@ export function StatLine({ metadata }: { metadata: unknown }) {
   if (meta.finishReason) rows.push(["Finish", meta.finishReason]);
 
   return (
-    <div className="mr-4 px-1 text-xs text-zinc-600 dark:text-zinc-400">
+    <div className={`mr-4 px-1 text-xs text-zinc-600 dark:text-zinc-400 ${NO_SIDEWAYS_OVERFLOW}`}>
       <button
         type="button"
         onClick={() => setFull((v) => !v)}

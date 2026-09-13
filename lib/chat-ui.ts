@@ -9,7 +9,9 @@
  */
 
 import type { DeepPartial, ToolUIPart } from "ai";
+import { SUGGESTION_MARKER } from "@/lib/assistant";
 import type { ConsultingBrief } from "@/lib/brief-schema";
+import { ASSISTANT_NAME, FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { chatMessageMetadataSchema, type ChatMessageMetadata } from "@/lib/chat-metadata";
 import { findModel, formatUsd } from "@/lib/chat-models";
 import type { ChatUITools, NexusUIMessage, NotSentReason } from "@/lib/chat-tools";
@@ -37,10 +39,14 @@ export type ChatToolPartOf<NAME extends ChatToolName> = Extract<ChatToolPart, { 
 export type PartialBrief = DeepPartial<ConsultingBrief>;
 
 export const CHAT_TOOL_NAMES: readonly ChatToolName[] = [
+  "lookupSiteFacts",
   "recommendWorkshop",
   "draftConsultingBrief",
   "assessReadiness",
+  "estimateProject",
+  "draftOutreachNote",
   "handOffToMajid",
+  "emailMajidNote",
   "emailBriefToVisitor",
   "emailWorkshopInfo",
 ];
@@ -54,6 +60,12 @@ export const TOOL_STEP_COPY: Record<
   ChatToolName,
   { title: string; running: string; done: string; sending: string }
 > = {
+  lookupSiteFacts: {
+    title: "Checking the site",
+    running: "Looking up what this site publishes",
+    done: "Grounded in published facts",
+    sending: "",
+  },
   recommendWorkshop: {
     title: "Training match",
     running: "Checking the NVIDIA catalog",
@@ -72,11 +84,29 @@ export const TOOL_STEP_COPY: Record<
     done: "Readiness scored",
     sending: "",
   },
+  estimateProject: {
+    title: "Effort estimate",
+    running: "Sizing the work",
+    done: "Estimate ready",
+    sending: "",
+  },
+  draftOutreachNote: {
+    title: "Note to send",
+    running: "Drafting your note",
+    done: "Note drafted",
+    sending: "",
+  },
   handOffToMajid: {
-    title: "Hand-off to Majid",
+    title: `Hand-off to ${FOUNDER_CHAT_NAME}`,
     running: "Preparing the hand-off",
     done: "Hand-off filed",
-    sending: "Sending to Majid",
+    sending: `Sending to ${FOUNDER_CHAT_NAME}`,
+  },
+  emailMajidNote: {
+    title: `Note to ${FOUNDER_CHAT_NAME}`,
+    running: "Preparing the note",
+    done: "Note emailed",
+    sending: "Sending the note",
   },
   emailBriefToVisitor: {
     title: "Your copy of the brief",
@@ -105,6 +135,7 @@ export const NOT_SENT_COPY: Record<NotSentReason, string> = {
   "not-configured": "email delivery is not connected on this site yet.",
   "send-failed": "the email service rejected the message.",
   "no-brief": "no brief has been drafted yet. Ask me to draft one first.",
+  "no-note": "no note has been drafted yet. Ask me to draft one first.",
 };
 
 const GENERIC_NOT_SENT = "it could not be sent.";
@@ -313,7 +344,7 @@ export type Announcement = { id: string; text: string };
  * Silence there would leave a screen reader with a Send button and no reason
  * for it.
  */
-export const APPROVAL_WAITING = "Dr. MJ needs your approval before sending. Choose Send or Not now.";
+export const APPROVAL_WAITING = `The ${ASSISTANT_NAME} needs your approval before sending. Choose Send or Not now.`;
 
 /**
  * What the live region should carry for the last assistant turn: the reply's
@@ -392,4 +423,262 @@ export function lockedBodyStyle(scrollY: number): Record<string, string> {
 /** Smooth scrolling only for visitors who have not asked for reduced motion. */
 export function scrollBehavior(reducedMotion: boolean): ScrollBehavior {
   return reducedMotion ? "auto" : "smooth";
+}
+
+/* ---------- Surfaces, ids, and fit ---------- */
+
+/**
+ * The two places the same conversation is rendered: the floating panel that
+ * follows the visitor around the site, and the inline demo that sits in the
+ * page flow on the homepage. Both read one store, so a conversation started
+ * in one continues in the other.
+ */
+export type ChatSurface = "floating" | "inline";
+
+/**
+ * Both shells can be mounted at once, so every id is prefixed with the
+ * shell's own `useId()` value. Hardcoded ids would give the model picker two
+ * labels and leave `aria-labelledby` pointing at the wrong heading.
+ */
+export function chatTitleId(prefix: string): string {
+  return `${prefix}-title`;
+}
+
+export function chatModelId(prefix: string): string {
+  return `${prefix}-model`;
+}
+
+/**
+ * Height of the floating panel. Full screen below `sm` (a sheet), and above
+ * it a panel capped against the dynamic viewport minus its own insets: `p-4`
+ * at `sm` is 2rem of inset, `p-6` at `md` is 3rem. `dvh` units, not `vh`, so
+ * the browser chrome and the on-screen keyboard shrink the panel instead of
+ * pushing the composer out of sight.
+ */
+export const FLOATING_PANEL_HEIGHT =
+  "h-full sm:h-[min(36rem,calc(100dvh-2rem))] md:h-[min(38rem,calc(100dvh-3rem))]";
+
+/**
+ * Height of the inline demo frame: fixed and predictable, 512 px on a phone
+ * and 600 px from `sm`, so the section never grows as the conversation does.
+ * The `dvh` cap shrinks the frame on a short laptop, and the floor is what
+ * stops the cap from shrinking it into nothing.
+ *
+ * The floor is the load bearing half. The frame is `overflow-hidden` and its
+ * rows are fixed: tab strip, header, toolbar and composer measure about
+ * 250 px at 640 px wide, and about 290 px once the header subtitle and the
+ * composer's fine print wrap on a 360 px phone. Only the transcript can give
+ * space back, so under a viewport of roughly 420 px the cap alone took the
+ * rest out of the composer: the input sat past the frame edge and the fine
+ * print, with its contact-form fallback link, was clipped out of reach with
+ * no way to scroll to it. 20rem keeps the composer and its fine print inside
+ * the frame at every size measured; what it does not buy is a roomy
+ * transcript, which is left 67.9 px at 640x360 and 30 px at 360x400 against
+ * 491 px of content, and scrolls hard. Below the floor the page scrolls
+ * instead of the frame clipping, which is what majidmemari.com does with the
+ * same 320 px value. With JavaScript off the no-JS line takes the fine
+ * print's place rather than stacking above it, for the same reason: two of
+ * them do not fit here.
+ *
+ * Whatever owns the inline box applies this and nothing inside it sets a
+ * second height, or the composer is pushed past the frame. Nothing may put a
+ * second min-height on that element either: two `min-h` utilities tie on
+ * specificity, so the winner would be whichever one Tailwind happens to emit
+ * last, not the one written last in the class list.
+ */
+export const INLINE_DEMO_HEIGHT =
+  "h-[32rem] sm:h-[37.5rem] min-h-[20rem] max-h-[calc(100dvh-9rem)]";
+
+/**
+ * A box whose content really is wider than the column it sits in and scrolls
+ * sideways, such as the published evaluations table. Measure before reaching
+ * for it: a table that fits its box wants a plain wrapper, because this one
+ * announces a region called "scroll sideways" and takes a tab stop, and both
+ * are a lie when nothing scrolls. A scroll container is operable by mouse and
+ * by touch for free, and by nobody else unless it can take focus, so the
+ * element that carries this must also carry
+ * `tabIndex={0}`, `role="region"` and an `aria-label` naming what scrolls.
+ * Without them a keyboard-only visitor on a phone never reaches the columns
+ * past the right edge. The ring is `focus-visible` so a mouse click inside
+ * the box does not light it up, and it sits on the box edge rather than an
+ * offset, so it reads the same on white and on the page's tinted background.
+ */
+export const SIDEWAYS_SCROLL_REGION =
+  "min-w-0 overflow-x-auto rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500";
+
+/**
+ * The transcript scroller. `min-h-0` is what keeps the composer pinned: a
+ * flex child defaults to `min-height: auto` and would otherwise grow with its
+ * content and push the composer past the bottom edge.
+ */
+export const TRANSCRIPT_SCROLLER = "min-h-0 flex-1 overflow-y-auto overscroll-contain";
+
+/**
+ * The header row. `shrink-0` is not decoration: the transcript is the only
+ * child with `flex-basis: 0`, so it carries no weight when the box has to give
+ * space back, and every pixel of a short frame would come out of the other
+ * rows. The header is itself a flex container, so its automatic minimum size
+ * is content-based and it refuses to shrink; the surplus would then overflow
+ * the frame, which is `overflow-hidden`, and clip the bottom of the composer.
+ * A 640x360 phone in landscape is the case this covers.
+ */
+export const CHAT_HEADER_ROW =
+  "flex shrink-0 min-w-0 items-start justify-between gap-2 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800";
+
+/** The toolbar row, under the header. Fixed height for the same reason. */
+export const CHAT_TOOLBAR_ROW =
+  "flex shrink-0 items-center gap-2 border-b border-zinc-200 px-3 py-2 dark:border-zinc-800";
+
+/** The composer row: never scrolls away, and clears the home indicator on iOS. */
+export const COMPOSER_ROW =
+  "shrink-0 space-y-3 border-t border-zinc-200 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-zinc-800";
+
+/**
+ * The value cell of the approval card's field list. `min-w-0` is the load
+ * bearing half: per CSS Text 3 the soft wrap opportunities `break-words`
+ * introduces are excluded from min-content sizing, so the `1fr` track's
+ * automatic minimum is the longest unbroken word. The card always renders an
+ * email address, and a 45-character address is wider than the ~244 px that
+ * column gets inside the floating panel on a 360 px phone, so without this the
+ * card pushes past its own border and the transcript grows a sideways
+ * scrollbar.
+ */
+export const APPROVAL_VALUE_CELL = "min-w-0 break-words";
+
+/**
+ * The same cell for a value with no spaces to wrap at. `break-words` only
+ * breaks between words; an email address is one word, so it needs a hard
+ * break or it stays one unbreakable run.
+ */
+export const APPROVAL_VALUE_CELL_UNBROKEN = "min-w-0 break-all";
+
+/**
+ * Nothing may overflow its column sideways. Cards, bubbles and step rows all
+ * carry this, and wide children (code, tables) scroll inside themselves.
+ */
+export const NO_SIDEWAYS_OVERFLOW = "min-w-0 max-w-full break-words";
+
+/** How close to the bottom still counts as "following the conversation", in px. */
+export const STICK_TO_BOTTOM_PX = 64;
+
+/**
+ * True when the scroller is at or near its bottom. Measured in the scroll
+ * handler, before new content lands, so a visitor who scrolled up to read is
+ * not yanked back down by the next token.
+ */
+export function isNearBottom(
+  box: { scrollTop: number; scrollHeight: number; clientHeight: number },
+  threshold: number = STICK_TO_BOTTOM_PX,
+): boolean {
+  const distance = box.scrollHeight - box.scrollTop - box.clientHeight;
+  return !Number.isFinite(distance) || distance <= threshold;
+}
+
+/**
+ * Politeness for a live region. Both shells render the same transcript, so
+ * the inline region goes quiet while the floating panel is open: one finished
+ * reply must be announced once, not twice. The region stays mounted either
+ * way, because several screen readers re-announce the last reply when a
+ * region is removed and put back with content in it.
+ */
+export function liveRegionMode(active: boolean): "polite" | "off" {
+  return active ? "polite" : "off";
+}
+
+/**
+ * Role for a running tool step. `role="status"` carries an implicit
+ * `aria-live="polite"`, and both shells render the same transcript, so a
+ * running step is in the DOM twice whenever the floating panel is open over
+ * the inline demo. Only the surface that owns the live region may speak, so
+ * the silent one drops the role entirely rather than trusting `aria-modal` on
+ * the dialog to prune the copy behind it.
+ */
+export function stepRole(running: boolean, live: boolean): "status" | undefined {
+  return running && live ? "status" : undefined;
+}
+
+/** The same rule for the transcript's error line, which is an alert. */
+export function errorRole(live: boolean): "alert" | undefined {
+  return live ? "alert" : undefined;
+}
+
+/* ---------- Reading what the model streamed ---------- */
+
+/** The visible text of a message, in part order. */
+export function messageText(message: { parts: readonly { type: string; text?: string }[] }): string {
+  return message.parts
+    .filter((p): p is { type: "text"; text: string } => p.type === "text" && typeof p.text === "string")
+    .map((p) => p.text)
+    .join("");
+}
+
+/**
+ * The assistant ends replies with `SUGGESTIONS: a | b | c`. Split that off so
+ * the chips render as buttons and the marker never reaches the visitor,
+ * including mid-stream, while the line is still being typed out.
+ */
+export function splitSuggestions(raw: string): { body: string; suggestions: string[] } {
+  const i = raw.lastIndexOf(SUGGESTION_MARKER);
+  if (i === -1) return { body: raw, suggestions: [] };
+  const body = raw.slice(0, i).trimEnd();
+  const suggestions = raw
+    .slice(i + SUGGESTION_MARKER.length)
+    .split("|")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 1 && s.length < 60);
+  return { body, suggestions };
+}
+
+const HARMONY_FINAL = "<|channel|>final<|message|>";
+
+/**
+ * Some gateway models (notably gpt-oss "harmony" format) leak channel control
+ * tokens and spill their hidden analysis and draft channels before the final
+ * answer. Keep only the final channel and strip any stray control tokens so
+ * raw markup and duplicated drafts never reach the visitor, even mid-stream.
+ */
+export function stripControlTokens(raw: string): string {
+  let t = raw;
+  const i = t.lastIndexOf(HARMONY_FINAL);
+  if (i !== -1) t = t.slice(i + HARMONY_FINAL.length);
+  return t
+    .replace(/<\|channel\|>\s*\w+\s*<\|message\|>/g, "") // channel headers incl. name
+    .replace(/<\|[^|]*\|>/g, "") // any remaining control tokens
+    .trimStart();
+}
+
+/** The setup line a misconfigured gateway should show, or the error as it came. */
+export function formatChatConfigMessage(error: string): string {
+  if (
+    error.includes("OIDC") ||
+    error.includes("AI_GATEWAY_API_KEY") ||
+    error.includes("AI Gateway") ||
+    error.toLowerCase().includes("unauthorized")
+  ) {
+    return "Chat isn’t configured: enable AI Gateway in Vercel → Project → AI Gateway, then run `vercel env pull .env.local` (or redeploy). You can still reach us via the contact form below.";
+  }
+  return error;
+}
+
+/** Strip control tokens, then normalize the JSON some error paths surface. */
+export function displayAssistantText(raw: string): string {
+  const cleaned = stripControlTokens(raw);
+  const t = cleaned.trim();
+  if (!t.startsWith("{") || !t.includes('"error"')) return cleaned;
+  try {
+    const j = JSON.parse(t) as { error?: string };
+    if (typeof j.error === "string") return formatChatConfigMessage(j.error);
+  } catch {
+    /* ignore */
+  }
+  return cleaned;
+}
+
+/** Visitor-facing error line. The 413 from the route points at the New button. */
+export function friendlyError(message: string): string {
+  const m = formatChatConfigMessage(message);
+  if (/start a new chat|getting long/i.test(m)) {
+    return "This conversation is getting long. Tap New above to start a fresh one.";
+  }
+  return m || "Something went wrong. Try again or use the contact form.";
 }

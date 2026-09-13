@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-09-13",
+  "gitSha": "5a098964e80721d2fe9a5afb38c5bdc7e0305a94",
+  "promptHash": "ffa3cac37eda736603b9764fe49cd65a73bf4bbb3d4419c9dd1c48c37bdd8020",
+  "shape": {
+    "turns": 2,
+    "maxOutputTokens": 2500,
+    "promptCall": "nexusChatSystem({ emailEnabled: false })",
+    "scenario": "A 40-person logistics company asks whether to build retrieval over its SOPs or fine-tune a model, in two turns"
+  },
+  "runs": [
+    {
+      "modelId": "anthropic/claude-opus-5",
+      "label": "Claude Opus 5",
+      "turns": [
+        {
+          "user": "hi, we run a 40-person logistics company in Utah. our ops team keeps asking chatgpt questions about our own SOPs and getting wrong answers.",
+          "assistant": "That's not really a model problem, it's a retrieval problem. ChatGPT has never seen your SOPs, so when someone asks about your pallet exception process it fills the gap with a confident average of everyone else's. It will do that every time until the actual documents are in front of it.\n\nWhere do those SOPs live right now? Shared drive, a wiki, PDFs in someone's inbox?\n\nSUGGESTIONS: Mostly PDFs on SharePoint | A mix of docs and tribal knowledge | Would a chatbot on our docs work?",
+          "inTokens": 8003,
+          "outTokens": 361,
+          "ttftMs": 4464,
+          "totalMs": 7043
+        },
+        {
+          "user": "should we build a RAG chatbot over our SOP docs or fine-tune a model? what would you actually do first, and what would it cost us in effort?",
+          "assistant": "Short answer: RAG, not fine-tuning. Fine-tuning teaches a model style and behavior, not facts, and your SOPs change. Every revision would mean retraining, and the model would still state the old version with total confidence. Retrieval means you update a document and the answer updates with it.\n\nWhat I'd actually do first, before any chatbot exists:\n\n- Collect 40 or so real questions your ops team has already asked, with the correct answers from whoever actually knows. That is your eval set, and without it you cannot tell whether the thing works.\n- Sort out document ownership. The most common failure is three versions of the same SOP in the corpus, and retrieval faithfully returns the stale one.\n- Build retrieval only, no chatbot. Type a question, look at the chunks that come back. If the right passage is not in the top five, no model on earth saves you.\n\nGeneration is the last and easiest part. Teams reverse that order and spend six weeks on prompts while the retrieval quietly returns the wrong document.\n\nLet me size the effort for you.\n\nSUGGESTIONS: How do we build the eval set? | Who on our team should own this? | What if the docs contradict each other?",
+          "inTokens": 8228,
+          "outTokens": 673,
+          "ttftMs": 6154,
+          "totalMs": 12143
+        }
+      ]
+    },
+    {
+      "modelId": "anthropic/claude-sonnet-5",
+      "label": "Claude Sonnet 5",
+      "turns": [
+        {
+          "user": "hi, we run a 40-person logistics company in Utah. our ops team keeps asking chatgpt questions about our own SOPs and getting wrong answers.",
+          "assistant": "That's a really common failure mode, and it makes sense why it's happening: ChatGPT doesn't know your SOPs, so it's guessing or blending in generic logistics knowledge that sounds plausible but isn't yours.\n\nQuick question before anything else: where do those SOPs actually live right now? Like, are they in a shared drive as PDFs and Word docs, a wiki, printed binders, something else?\n\nSUGGESTIONS: They're in a shared drive | We're not sure honestly | How would AI fix this?",
+          "inTokens": 8003,
+          "outTokens": 275,
+          "ttftMs": 3272,
+          "totalMs": 5019
+        },
+        {
+          "user": "should we build a RAG chatbot over our SOP docs or fine-tune a model? what would you actually do first, and what would it cost us in effort?",
+          "assistant": "RAG, not fine-tuning, pretty clearly. Fine-tuning bakes knowledge into the model's weights, it's expensive to redo every time an SOP changes, and it doesn't actually stop hallucination, it just biases the model's style. RAG keeps your SOPs as the source of truth in a retrievable index, the model answers from what it actually retrieves, and when you update a doc, you re-index that one file instead of retraining anything. For a use case like \"answer questions from our own documents accurately,\" RAG is the standard, correct tool.\n\nWhat I'd do first: get the SOP corpus into a clean state (dedupe, kill stale versions, tag by department), then build retrieval, then evaluate it hard before anyone touts it as reliable. That eval step is the one people skip and it's the one that actually matters, since a RAG bot that's wrong 15% of the time is arguably worse than \"just ask a person,\" because it sounds confident.\n\nLet me size the effort pieces for you so this isn't just a vibe.\n\n---\n\nThat gives you a real range. The evaluation phase is usually where teams underestimate, and it's non-negotiable if ops is going to trust the answers instead of double-checking everything anyway.\n\nSUGGESTIONS: Which training fits us? | Would an FDE help? | Draft a consulting brief",
+          "inTokens": 8220,
+          "outTokens": 845,
+          "ttftMs": 6292,
+          "totalMs": 11961
+        }
+      ]
+    },
+    {
+      "modelId": "openai/gpt-5.6-sol",
+      "label": "GPT-5.6 Sol",
+      "turns": [
+        {
+          "user": "hi, we run a 40-person logistics company in Utah. our ops team keeps asking chatgpt questions about our own SOPs and getting wrong answers.",
+          "assistant": "That sounds like a grounding problem, not a ChatGPT problem. The likely fix is a controlled SOP assistant that retrieves approved documents, cites the exact source, and refuses to guess when evidence is missing.\n\nWhere do your SOPs live today, and how serious is a wrong answer operationally?\n\nSUGGESTIONS: SharePoint and PDFs | Mostly Google Drive | Errors create compliance risk",
+          "inTokens": 5011,
+          "outTokens": 147,
+          "ttftMs": 2305,
+          "totalMs": 3566
+        },
+        {
+          "user": "should we build a RAG chatbot over our SOP docs or fine-tune a model? what would you actually do first, and what would it cost us in effort?",
+          "assistant": "I would build RAG first, not fine-tune. Fine-tuning is poor for frequently changing SOP facts. It can make answers sound more consistent without making them reliably current or traceable.\n\nMy sequence would be:\n\n1. Audit the SOPs for duplicates, obsolete versions, ownership, and access rules.\n2. Create a test set of real ops questions, including ambiguous and unanswerable ones.\n3. Build a small retrieval prototype that answers only from approved SOPs, cites the document and section, and abstains when evidence is weak.\n4. Evaluate retrieval and answer accuracy against that test set before adding a polished chat interface.\n5. Pilot with a few operators, log failures, then add permissions, document-sync, monitoring, and escalation to a person.\n\nThe prototype is usually the lighter part. Production effort is driven by document quality, permissions, source-system integration, and the consequences of a wrong answer. I would consider fine-tuning later only for behavior such as response format or classification, not for storing SOP knowledge.\n\nWhere do the SOPs live today, and do different employees have different access rights?\n\nSUGGESTIONS: SharePoint with permissions | Google Drive folders | Estimate the project effort",
+          "inTokens": 5131,
+          "outTokens": 476,
+          "ttftMs": 5417,
+          "totalMs": 10427
+        }
+      ]
+    },
+    {
+      "modelId": "google/gemini-3.8-flash",
+      "label": "Gemini 3.8 Flash",
+      "turns": [
+        {
+          "user": "hi, we run a 40-person logistics company in Utah. our ops team keeps asking chatgpt questions about our own SOPs and getting wrong answers.",
+          "assistant": "That is a classic failure mode. Public ChatGPT does not know your internal rules, so when it does not know the answer, it guesses based on standard logistics practices. That can be genuinely risky when someone relies on a made-up warehouse procedure or compliance rule. There is also the data privacy side if staff are pasting proprietary procedures into public tools.\n\nTo fix this reliably, the model needs to be restricted to an internal retrieval system (often called retrieval-augmented generation, or RAG) that searches your verified documents first and cites the exact section, refusing to answer if the procedure is not in the text.\n\nWhere do your SOPs live right now, and what format are they in?\n\nSUGGESTIONS: They are in PDFs and SharePoint | We're new to RAG | Should we build or buy?",
+          "inTokens": 5129,
+          "outTokens": 479,
+          "ttftMs": 3930,
+          "totalMs": 5151
+        },
+        {
+          "user": "should we build a RAG chatbot over our SOP docs or fine-tune a model? what would you actually do first, and what would it cost us in effort?",
+          "assistant": "Definitely build RAG, do not fine-tune. Fine-tuning adjusts style, tone, or task structure, but it is unreliable for factual recall. It still hallucinates, and every time an SOP updates, you would have to retrain the model. RAG pulls the exact text from your current SOPs into the prompt, forces the model to cite the specific page or section, and lets you update procedures instantly without retraining.\n\nHere is what I would do first:\n\n1. SOP hygiene and ground truth. Gather your active, canonical documents and clear out conflicting versions. Collect 20 to 30 actual questions ops staff ask, paired with the verified correct answer. That gives you an objective test set.\n2. Document parsing and chunking. Logistics SOPs often have tables, checklists, and decision trees. Standard text splitters break these, so you need a parser that respects document layout.\n3. Prototype and evaluate. Build a baseline retrieval pipeline with a strict system prompt that instructs the model to state clearly when an answer is not in the text. Test it against your question set before letting anyone touch it.\n\nFor effort, a realistic planning range for a production-grade prototype is roughly 4 to 8 weeks, depending on document cleanliness and integration requirements. That is a planning range, not a formal quote, but it covers document preparation, retrieval engineering, testing, and a simple internal interface.\n\nDoes your team have in-house software engineers who would build this, or are you looking for outside help to build it?\n\nSUGGESTIONS: We have developers | We need someone to build it | Draft a consulting brief",
+          "inTokens": 5329,
+          "outTokens": 1503,
+          "ttftMs": 9135,
+          "totalMs": 11409
+        }
+      ]
+    }
+  ]
+}

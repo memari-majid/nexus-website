@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-09-13",
+  "gitSha": "5a098964e80721d2fe9a5afb38c5bdc7e0305a94",
+  "forced": [
+    "assessReadiness",
+    "draftConsultingBrief"
+  ],
+  "toolsAttached": [
+    "lookupSiteFacts",
+    "recommendWorkshop",
+    "draftConsultingBrief",
+    "assessReadiness",
+    "estimateProject",
+    "draftOutreachNote",
+    "handOffToMajid",
+    "emailMajidNote",
+    "emailBriefToVisitor",
+    "emailWorkshopInfo"
+  ],
+  "results": [
+    {
+      "modelId": "anthropic/claude-opus-5",
+      "toolName": "assessReadiness",
+      "outcome": "ok",
+      "ms": 13234,
+      "inputKeys": [
+        "headline",
+        "dimensions",
+        "nextStep"
+      ],
+      "detail": "14581 tokens"
+    },
+    {
+      "modelId": "anthropic/claude-opus-5",
+      "toolName": "draftConsultingBrief",
+      "outcome": "ok",
+      "ms": 16213,
+      "inputKeys": [
+        "organization",
+        "goal",
+        "currentState",
+        "opportunities",
+        "risks",
+        "keepWithPeople",
+        "recommendedPath",
+        "firstStep",
+        "openQuestions"
+      ],
+      "detail": "14773 tokens"
+    },
+    {
+      "modelId": "anthropic/claude-sonnet-5",
+      "toolName": "assessReadiness",
+      "outcome": "ok",
+      "ms": 11511,
+      "inputKeys": [
+        "headline",
+        "dimensions",
+        "nextStep"
+      ],
+      "detail": "14714 tokens"
+    },
+    {
+      "modelId": "anthropic/claude-sonnet-5",
+      "toolName": "draftConsultingBrief",
+      "outcome": "ok",
+      "ms": 11904,
+      "inputKeys": [
+        "organization",
+        "goal",
+        "currentState",
+        "opportunities",
+        "risks",
+        "keepWithPeople",
+        "recommendedPath",
+        "firstStep",
+        "openQuestions"
+      ],
+      "detail": "14664 tokens"
+    },
+    {
+      "modelId": "openai/gpt-5.6-sol",
+      "toolName": "assessReadiness",
+      "outcome": "ok",
+      "ms": 9045,
+      "inputKeys": [
+        "headline",
+        "dimensions",
+        "nextStep"
+      ],
+      "detail": "8008 tokens"
+    },
+    {
+      "modelId": "openai/gpt-5.6-sol",
+      "toolName": "draftConsultingBrief",
+      "outcome": "ok",
+      "ms": 11660,
+      "inputKeys": [
+        "organization",
+        "goal",
+        "currentState",
+        "opportunities",
+        "risks",
+        "keepWithPeople",
+        "recommendedPath",
+        "firstStep",
+        "openQuestions"
+      ],
+      "detail": "8168 tokens"
+    },
+    {
+      "modelId": "google/gemini-3.8-flash",
+      "toolName": "assessReadiness",
+      "outcome": "ok",
+      "ms": 11495,
+      "inputKeys": [
+        "headline",
+        "dimensions",
+        "nextStep"
+      ],
+      "detail": "6739 tokens"
+    },
+    {
+      "modelId": "google/gemini-3.8-flash",
+      "toolName": "draftConsultingBrief",
+      "outcome": "ok",
+      "ms": 16351,
+      "inputKeys": [
+        "organization",
+        "goal",
+        "currentState",
+        "opportunities",
+        "risks",
+        "keepWithPeople",
+        "recommendedPath",
+        "firstStep",
+        "openQuestions"
+      ],
+      "detail": "7785 tokens"
+    }
+  ],
+  "failures": 0
+}

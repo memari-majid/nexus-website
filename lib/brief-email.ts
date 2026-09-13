@@ -1,4 +1,5 @@
 import { EMAIL_ORIGIN_NOTE, escapeHtml, renderEmail, scrubForEmail } from "@/lib/email";
+import { ASSISTANT_NAME, FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { effortLabel, pathLabel, renderBriefText } from "@/lib/brief-prompt";
 import type { ConsultingBrief } from "@/lib/brief-schema";
 
@@ -7,14 +8,13 @@ import type { ConsultingBrief } from "@/lib/brief-schema";
  * variables are the scrubbed name and the schema-validated, scrubbed brief
  * fields; no model free text reaches a visitor-supplied address. Every
  * interpolated value goes through `escapeHtml`, and none sits inside a quoted
- * attribute. Majid is CC'd by the caller.
+ * attribute. The founder is CC'd by the caller.
  */
 
 export const BRIEF_EMAIL_SUBJECT = "Your consulting brief from Nexus AI Solutions";
 
-const INTRO =
-  "Here is the consulting brief Dr. MJ drafted with you. Majid Memari is copied on this email and will follow up.";
-const CLOSING = "Reply to this email to reach Majid Memari.";
+const INTRO = `Here is the consulting brief the ${ASSISTANT_NAME} drafted with you. ${FOUNDER_CHAT_NAME} is copied on this email and will follow up.`;
+const CLOSING = `Reply to this email to reach ${FOUNDER_CHAT_NAME}.`;
 
 export function briefEmail(opts: { name: string; brief: ConsultingBrief }): {
   subject: string;

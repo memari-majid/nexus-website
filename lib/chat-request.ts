@@ -20,6 +20,17 @@
  * part is kept only in the final message, where the SDK executes it;
  * anywhere earlier it was never run, and the model is told so.
  *
+ * Why the tool-payload cap: echoed tool inputs and outputs are sent to the
+ * model, and billed, on every later turn, and only `textChars` is checked
+ * against `MAX_CHARS_TOTAL`. With ten tools a conversation can carry a 3.5k
+ * estimate input and a 1.5k note draft and still be nowhere near the raw body
+ * cap. `trimToolPayloads` brings the total under `MAX_TOOL_CHARS_TOTAL` by
+ * replacing the OLDEST tool OUTPUTS with a marker, never an input: the cards
+ * render `part.input`, `findBrief` and `findOutreachNote` re-read inputs from
+ * history, and an approved call is re-validated from its input. A trimmed
+ * output falls through each tool's `toModelOutput` to its generic line, which
+ * is exactly what those lines are for.
+ *
  * Server-only (imports the tool set for its names).
  */
 
@@ -31,10 +42,13 @@ import {
   MAX_CHARS_TOTAL,
   MAX_MESSAGES,
   MAX_PARTS_PER_MESSAGE,
+  MAX_TOOL_CHARS_TOTAL,
 } from "@/lib/chat-limits";
 import { chatTools, type NexusUIMessage } from "@/lib/chat-tools";
 
 export const TOO_LONG = "This conversation is getting long. Tap New to start a fresh chat.";
+/** What an old tool result becomes once its payload is trimmed for size. */
+export const TRIMMED_OUTPUT = { trimmed: true } as const;
 export const INVALID = "Invalid request body.";
 
 /** Model-facing reason on a stale, unanswered approval. */
@@ -215,12 +229,40 @@ function sanitizeAssistantPart(raw: LoosePart, isLastMessage: boolean): Sanitize
   return sanitizeToolPart(raw, isLastMessage);
 }
 
+const toolPartChars = (part: ToolPart): number =>
+  jsonLength(part.input) + jsonLength(part.output) + (part.errorText?.length ?? 0);
+
+/**
+ * Brings echoed tool payloads under `MAX_TOOL_CHARS_TOTAL` by replacing the
+ * oldest OUTPUTS with `TRIMMED_OUTPUT`, newest untouched, and returns the new
+ * total. Inputs are never touched: the cards render them, two tools re-read
+ * them from history, and an approved send re-validates from them. Parts in the
+ * final message are left alone, since that is where an approved call is about
+ * to execute. Returns the total unchanged when it already fits.
+ */
+export function trimToolPayloads(parts: readonly ToolPart[], total: number): number {
+  if (total <= MAX_TOOL_CHARS_TOTAL) return total;
+  let running = total;
+  for (const part of parts) {
+    if (running <= MAX_TOOL_CHARS_TOTAL) break;
+    if (part.output === undefined && part.errorText === undefined) continue;
+    const before = toolPartChars(part);
+    if (part.output !== undefined) part.output = TRIMMED_OUTPUT;
+    if (part.errorText !== undefined) part.errorText = "Result trimmed for length.";
+    running -= before - toolPartChars(part);
+  }
+  return running;
+}
+
 /**
  * Rebuilds every message from whitelisted parts. Messages left with no parts
  * are dropped (a user turn that only carried a file part, say).
  */
 export function sanitizeTranscript(messages: readonly LooseMessage[]): SanitizedTranscript {
   const out: { id?: string; role: "user" | "assistant"; parts: SanitizedPart[] }[] = [];
+  // Oldest first, and never the final message: that is where an approved call
+  // is executed and where the visitor is looking.
+  const trimmable: ToolPart[] = [];
   let textChars = 0;
   let toolChars = 0;
   for (let index = 0; index < messages.length; index++) {
@@ -234,12 +276,14 @@ export function sanitizeTranscript(messages: readonly LooseMessage[]): Sanitized
       if (!part) continue;
       if (part.type === "text") textChars += part.text.length;
       else if (part.type !== "step-start") {
-        toolChars += jsonLength(part.input) + jsonLength(part.output) + (part.errorText?.length ?? 0);
+        toolChars += toolPartChars(part);
+        if (!isLastMessage) trimmable.push(part);
       }
       parts.push(part);
     }
     if (parts.length > 0) out.push({ ...(message.id ? { id: message.id } : {}), role: message.role, parts });
   }
+  toolChars = trimToolPayloads(trimmable, toolChars);
   return { ok: true, messages: out as unknown as NexusUIMessage[], textChars, toolChars };
 }
 
