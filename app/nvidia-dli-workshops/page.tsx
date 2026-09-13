@@ -159,7 +159,7 @@ export default function NvidiaDliPage() {
             on NVIDIA&apos;s GPU cloud. Nexus handles enrollment and invoices at $500 per seat, up to 20; larger groups get a tailored quote.
           </p>
           <div className="mt-6">
-            <ScheduleButton>Host it for my team</ScheduleButton>
+            <ScheduleButton>Ask Dr. MJ about it</ScheduleButton>
           </div>
         </Section>
 
@@ -257,7 +257,7 @@ export default function NvidiaDliPage() {
         </section>
 
         <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <ScheduleButton>Schedule the workshop</ScheduleButton>
+          <ScheduleButton>Start a conversation</ScheduleButton>
           <Link
             href="/#training"
             className="text-sm text-zinc-800 underline decoration-zinc-300 underline-offset-4 dark:text-zinc-200 dark:decoration-zinc-600"

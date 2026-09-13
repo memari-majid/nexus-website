@@ -84,7 +84,7 @@ function rateLimited(ip: string): boolean {
 }
 
 /**
- * Grounds a recommendation in the real NVIDIA catalog so Nex never invents a
+ * Grounds a recommendation in the real NVIDIA catalog so Dr. MJ never invents a
  * title. Returns the pick, why it fits, whether Nexus teaches it in-house, and
  * alternatives.
  */

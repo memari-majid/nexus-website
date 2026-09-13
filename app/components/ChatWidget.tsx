@@ -1,32 +1,18 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
+import { DefaultChatTransport } from "ai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { RegistrationCard } from "@/app/components/RegistrationCard";
 import { SUGGESTION_MARKER } from "@/lib/assistant";
 import { OPEN_CHAT_EVENT } from "@/lib/chat-events";
 import { OPENING_CHIPS, resolveSuggestions } from "@/lib/chat-suggestions";
-import type { Registration } from "@/lib/registration";
 
 function textFromMessage(m: { parts: { type: string; text?: string }[] }) {
   return m.parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text" && typeof p.text === "string")
     .map((p) => p.text)
     .join("");
-}
-
-type CollectRegistrationPart = {
-  type: "tool-collectRegistration";
-  toolCallId: string;
-  state: "input-streaming" | "input-available" | "output-available" | "output-error";
-  input?: Registration;
-};
-
-/** Pull the assistant's smart-form tool parts out of a message. */
-function collectRegistrationParts(m: { parts: { type: string }[] }): CollectRegistrationPart[] {
-  return (m.parts as CollectRegistrationPart[]).filter((p) => p.type === "tool-collectRegistration");
 }
 
 /**
@@ -51,9 +37,8 @@ const HARMONY_FINAL = "<|channel|>final<|message|>";
 /**
  * Some gateway models (notably gpt-oss "harmony" format) leak channel control
  * tokens and spill their hidden analysis/draft channels before the final
- * answer — e.g. `...enroll.<|channel|>final<|message|>Here's what I need`.
- * Keep only the final channel and strip any stray control tokens so raw markup
- * and duplicated drafts never reach the visitor, even mid-stream.
+ * answer. Keep only the final channel and strip any stray control tokens so raw
+ * markup and duplicated drafts never reach the visitor, even mid-stream.
  */
 function stripControlTokens(raw: string): string {
   let t = raw;
@@ -115,11 +100,7 @@ export function ChatWidget() {
     () => new DefaultChatTransport({ api: "/api/chat", fetch: chatFetch }),
     [],
   );
-  const { messages, sendMessage, status, stop, error, addToolOutput } = useChat({
-    transport,
-    // When the smart-form card returns its result, continue the turn so Nex confirms.
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
-  });
+  const { messages, sendMessage, status, stop, error } = useChat({ transport });
 
   const busy = status === "streaming" || status === "submitted";
 
@@ -148,15 +129,8 @@ export function ChatWidget() {
     .map((m) => textFromMessage(m))
     .filter(Boolean);
 
-  // While the smart-form card is open and awaiting input, hide the chip row —
-  // the card itself is the state-aware next step.
-  const activeCollect = messages.flatMap(collectRegistrationParts).at(-1);
-  const cardOpen =
-    !!activeCollect &&
-    (activeCollect.state === "input-available" || activeCollect.state === "input-streaming");
-
   const suggestions =
-    !busy && lastAssistant && !cardOpen
+    !busy && lastAssistant
       ? resolveSuggestions(
           splitSuggestions(stripControlTokens(textFromMessage(lastAssistant))).suggestions,
           {
@@ -198,14 +172,14 @@ export function ChatWidget() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 id="chat-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    Nex
+                    Dr. MJ
                   </h2>
                   <span className="inline-flex items-center rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-700 dark:border-brand-900/50 dark:bg-brand-950/40 dark:text-brand-400">
                     Nexus AI assistant
                   </span>
                 </div>
                 <p className="text-xs text-zinc-600 dark:text-zinc-500">
-                  Tell me what you&apos;re building. I&apos;ll help you find the right AI training.
+                  Tell me what you&apos;re working on. I&apos;ll give you straight AI guidance.
                 </p>
               </div>
               <div className="flex gap-2">
@@ -235,8 +209,9 @@ export function ChatWidget() {
               {messages.length === 0 && (
                 <div className="space-y-3">
                   <p className="text-sm text-zinc-600 dark:text-zinc-500">
-                    Hey, I&apos;m Nex. Tell me what your team does and where you want to go with AI.
-                    I&apos;ll give you straight, useful guidance first. What are you working on?
+                    Hey, I&apos;m Dr. MJ, the AI assistant for Nexus. Tell me what your team does and
+                    where you want to go with AI. I&apos;ll give you straight, useful guidance first.
+                    What are you working on?
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {OPENING_CHIPS.map((q) => (
@@ -254,51 +229,32 @@ export function ChatWidget() {
                 </div>
               )}
               {messages.map((m) => {
-                const cards = m.role === "assistant" ? collectRegistrationParts(m) : [];
                 const body =
                   m.role === "assistant"
                     ? splitSuggestions(displayAssistantText(textFromMessage(m))).body
                     : textFromMessage(m);
+                if (m.role === "assistant" && body.trim().length === 0) return null;
                 return (
-                  <div key={m.id} className="space-y-2">
-                    {(m.role === "user" || body.trim().length > 0) && (
-                      <div
-                        className={`rounded-xl px-3 py-2 text-sm ${
-                          m.role === "user"
-                            ? "ml-6 border border-brand-200 bg-brand-50 text-zinc-900 dark:border-brand-900/40 dark:bg-brand-950/50 dark:text-zinc-100"
-                            : "mr-4 border border-zinc-200 bg-zinc-100 text-zinc-800 dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:text-zinc-300"
-                        }`}
-                      >
-                        {m.role === "assistant" ? (
-                          <div className="max-w-none text-sm leading-relaxed [&_a]:text-brand-600 [&_a]:underline dark:[&_a]:text-brand-400 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-1.5 [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-zinc-200 [&_code]:px-1 dark:[&_code]:bg-zinc-800">
-                            <ReactMarkdown
-                              components={{
-                                a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                              }}
-                            >
-                              {body}
-                            </ReactMarkdown>
-                          </div>
-                        ) : (
-                          body
-                        )}
+                  <div
+                    key={m.id}
+                    className={`rounded-xl px-3 py-2 text-sm ${
+                      m.role === "user"
+                        ? "ml-6 border border-brand-200 bg-brand-50 text-zinc-900 dark:border-brand-900/40 dark:bg-brand-950/50 dark:text-zinc-100"
+                        : "mr-4 border border-zinc-200 bg-zinc-100 text-zinc-800 dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:text-zinc-300"
+                    }`}
+                  >
+                    {m.role === "assistant" ? (
+                      <div className="max-w-none text-sm leading-relaxed [&_a]:text-brand-600 [&_a]:underline dark:[&_a]:text-brand-400 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-1.5 [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-zinc-200 [&_code]:px-1 dark:[&_code]:bg-zinc-800">
+                        <ReactMarkdown
+                          components={{
+                            a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                          }}
+                        >
+                          {body}
+                        </ReactMarkdown>
                       </div>
-                    )}
-                    {cards.map((part) =>
-                      part.state === "output-available" || part.state === "output-error" ? null : (
-                        <div key={part.toolCallId} className="mr-4">
-                          <RegistrationCard
-                            initial={part.input ?? {}}
-                            onFiled={(note) =>
-                              addToolOutput({
-                                tool: "collectRegistration",
-                                toolCallId: part.toolCallId,
-                                output: { filed: true, note },
-                              })
-                            }
-                          />
-                        </div>
-                      ),
+                    ) : (
+                      body
                     )}
                   </div>
                 );

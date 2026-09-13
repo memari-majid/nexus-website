@@ -1,5 +1,5 @@
 /**
- * Follow-up chips for Nex. The model is asked to emit `SUGGESTIONS: a | b | c`.
+ * Follow-up chips for Dr. MJ. The model is asked to emit `SUGGESTIONS: a | b | c`.
  * This module sanitizes that line and fills in useful defaults when it is
  * missing or generic, so visitors always get a next step they can tap.
  */
@@ -111,23 +111,23 @@ export function fallbackSuggestions(opts: {
 
   if (/consult|adopt|when not to|scoping/.test(a)) {
     return pick(
-      ["When should we skip AI?", "Would the workshop help?", "Schedule a scoping chat"],
+      ["When should we skip AI?", "Would the workshop help?", "Have Majid follow up"],
       used,
     );
   }
 
   if (/workshop|nvidia|dli|agentic|certificate/.test(a)) {
     return pick(
-      ["Schedule the workshop", "What's covered?", "Do we need our own GPUs?"],
+      ["What would you recommend?", "What's covered?", "Do we need our own GPUs?"],
       used,
     );
   }
 
   return pick(
     [
-      "Schedule the NVIDIA workshop",
-      "What's covered in the workshop?",
+      "What can AI do for my team?",
       "How does consulting work?",
+      "Have Majid follow up",
     ],
     used,
   );

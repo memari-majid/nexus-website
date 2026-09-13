@@ -216,7 +216,7 @@ export function HomePageContent() {
 
           <Reveal delay={180}>
             <div className="mt-12 flex flex-wrap justify-center gap-3">
-              <ScheduleButton>Schedule the workshop</ScheduleButton>
+              <ScheduleButton>Start a conversation</ScheduleButton>
               <Link href="/nvidia-dli-workshops" className="btn-secondary">
                 Details
               </Link>
