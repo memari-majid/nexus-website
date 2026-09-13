@@ -29,6 +29,42 @@ const RL_WINDOW_MS = 60_000;
 const RL_MAX = 20;
 const rlHits = new Map<string, number[]>();
 
+/**
+ * Model and budget controls. Production runs Claude Opus 5 via `AI_CHAT_MODEL`
+ * (see AI-WEBSITES-HANDOFF.md); the code default matches so a missing env var
+ * never silently downgrades the experience. MAX_OUTPUT_TOKENS also bounds the
+ * reasoning that precedes a reply on thinking models, so it leaves room for both.
+ */
+const CHAT_MODEL = process.env.AI_CHAT_MODEL || "anthropic/claude-opus-5";
+const MAX_MESSAGES = 40;
+const MAX_CHARS_PER_TEXT_PART = 4_000;
+const MAX_CHARS_TOTAL = 12_000;
+const MAX_OUTPUT_TOKENS = 2_500;
+
+/**
+ * Only user and assistant turns are accepted, so a client cannot inject system
+ * messages. Tool parts (the in-chat booking card) pass through untouched.
+ */
+const partSchema = z.looseObject({
+  type: z.string().max(64),
+  text: z.string().max(MAX_CHARS_PER_TEXT_PART).optional(),
+});
+const messageSchema = z.looseObject({
+  id: z.string().max(128).optional(),
+  role: z.enum(["user", "assistant"]),
+  parts: z.array(partSchema).max(50),
+});
+const bodySchema = z.object({
+  messages: z.array(messageSchema).min(1).max(MAX_MESSAGES),
+});
+
+function json(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 function clientIp(req: Request): string {
   const xff = req.headers.get("x-forwarded-for");
   return xff?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
@@ -39,6 +75,11 @@ function rateLimited(ip: string): boolean {
   const recent = (rlHits.get(ip) ?? []).filter((t) => now - t < RL_WINDOW_MS);
   recent.push(now);
   rlHits.set(ip, recent);
+  if (rlHits.size > 5_000) {
+    for (const [key, hits] of rlHits) {
+      if (hits.every((t) => now - t >= RL_WINDOW_MS)) rlHits.delete(key);
+    }
+  }
   return recent.length > RL_MAX;
 }
 
@@ -70,64 +111,31 @@ const recommendWorkshop = tool({
 });
 
 /**
- * The assisted smart form. No `execute`: this is a client-side interaction
- * tool. The UI renders a booking card pre-filled with whatever Nex passes, the
- * visitor completes it, and the card files the request itself (via
- * /api/workshop-request). Nex just confirms afterward.
- */
-const collectRegistration = tool({
-  description:
-    "Open the in-chat booking form, pre-filled with whatever you already know. Call this only after consulting, when the visitor wants to move forward. The form files the request itself and reports back, so after it is filed just confirm warmly. Do not also call requestAppointment for the same request.",
-  inputSchema: z.object({
-    name: z.string().optional(),
-    email: z.string().optional(),
-    organization: z.string().optional(),
-    headcount: z.number().int().min(1).max(60).optional(),
-    timing: z.string().optional(),
-    delivery: z.enum(["in-person", "remote"]).optional(),
-    workshop: z.string().optional().describe("The recommended workshop, if any"),
-    role: z.string().optional(),
-    need: z.string().optional(),
-  }),
-});
-
-/**
- * Fallback filing for when the visitor gives everything in chat and will not
- * use the form card. Routes to the workshop inbox (Dr. Memari) like the card.
+ * Consultation hand-off. After consulting, capture just enough for Majid to
+ * follow up — name, email, and what they need. No scheduling, no booking form.
+ * Routes to the founder's inbox (Dr. Memari).
  */
 const requestAppointment = tool({
   description:
-    "Fallback: file a consulting or training request when the visitor gave the details in chat and will not use the form card. Never promise a specific time or a phone call.",
+    "Capture the visitor's details so Majid can follow up for a consultation. Call this only after consulting, when the visitor wants to move forward. This is not a booking and does not schedule a workshop.",
   inputSchema: z.object({
     name: z.string().min(1).describe("Visitor's name"),
     email: z.string().email().describe("Visitor's email address"),
-    topic: z.string().min(1).describe("What they need, in one line"),
-    workshop: z.string().optional().describe("Which workshop, if named"),
-    need: z.string().optional().describe("What they want to build or improve"),
+    topic: z.string().min(1).describe("What they want to talk about or need, in one line"),
     role: z.string().optional().describe("Their role or team"),
-    when: z.string().optional().describe("Requested timeframe. ~6 weeks lead time."),
-    delivery: z.enum(["in-person", "remote"]).optional(),
-    headcount: z.number().int().min(1).max(60).optional().describe("Team size"),
-    phone: z.string().optional().describe("Phone if offered"),
     organization: z.string().optional().describe("Company if mentioned"),
   }),
-  execute: async ({ name, email, topic, workshop, need, role, when, delivery, headcount, phone, organization }) => {
+  execute: async ({ name, email, topic, role, organization }) => {
     const lines = [
-      `Request: ${topic}`,
-      workshop ? `Workshop: ${workshop}` : null,
-      need ? `Need: ${need}` : null,
+      `Wants a consultation about: ${topic}`,
       role ? `Role: ${role}` : null,
       organization ? `Organization: ${organization}` : null,
-      when ? `When: ${when}` : null,
-      delivery ? `Delivery: ${delivery}` : null,
-      headcount ? `Team size: ${headcount}` : null,
     ].filter(Boolean);
 
     const result = await submitInquiry({
       name,
       email,
-      phone,
-      message: `[Chat request]\n${lines.join("\n")}`,
+      message: `[Chat consultation request]\n${lines.join("\n")}`,
       source: "chat-workshop",
     });
 
@@ -136,7 +144,7 @@ const requestAppointment = tool({
     }
     return {
       ok: true as const,
-      note: "Filed. Confirm in one short sentence that it's sent and Dr. Memari will follow up by email. Do not invent a time or promise a call.",
+      note: "Sent. Confirm in one short sentence that it's filed and Majid will follow up by email. Do not promise a time or a call.",
     };
   },
 });
@@ -173,41 +181,76 @@ const emailWorkshopInfo = tool({
 
 export async function POST(req: Request) {
   if (rateLimited(clientIp(req))) {
-    return new Response(
-      JSON.stringify({
-        error: "You're sending messages pretty fast. Give it a few seconds and try again.",
-      }),
-      { status: 429, headers: { "Content-Type": "application/json" } },
-    );
+    return json(429, {
+      error: "You're sending messages pretty fast. Give it a few seconds and try again.",
+    });
   }
 
-  const body = await req.json();
-  const uiMessages = body.messages as UIMessage[];
-  const modelMessages = await convertToModelMessages(uiMessages);
-  const modelId = process.env.AI_CHAT_MODEL ?? "anthropic/claude-haiku-4-5";
-
+  let raw: unknown;
   try {
-    const result = streamText({
-      model: gateway(modelId),
-      system: nexusChatSystem(),
-      messages: modelMessages,
-      tools: { recommendWorkshop, collectRegistration, requestAppointment, emailWorkshopInfo },
-      // Room for: recommend -> talk -> open form -> (form result) -> confirm.
-      stopWhen: stepCountIs(6),
-      maxOutputTokens: 900,
-      providerOptions: {
-        gateway: {
-          tags: ["site:nexus", "feature:chat", `env:${process.env.VERCEL_ENV ?? "dev"}`],
-        },
-      },
-    });
-
-    return result.toUIMessageStreamResponse();
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Chat request failed.";
-    return new Response(JSON.stringify({ error: message }), {
-      status: 503,
-      headers: { "Content-Type": "application/json" },
-    });
+    raw = await req.json();
+  } catch {
+    return json(400, { error: "Invalid request body." });
   }
+  const parsed = bodySchema.safeParse(raw);
+  if (!parsed.success) return json(400, { error: "Invalid request body." });
+
+  const totalChars = parsed.data.messages.reduce(
+    (sum, m) =>
+      sum + m.parts.reduce((s, p) => s + (p.type === "text" && p.text ? p.text.length : 0), 0),
+    0,
+  );
+  if (totalChars > MAX_CHARS_TOTAL) {
+    return json(413, { error: "This conversation is getting long. Please start a new chat." });
+  }
+
+  let modelMessages;
+  try {
+    modelMessages = await convertToModelMessages(parsed.data.messages as unknown as UIMessage[]);
+  } catch {
+    return json(400, { error: "Invalid request body." });
+  }
+
+  const turns = parsed.data.messages.length;
+  const result = streamText({
+    model: gateway(CHAT_MODEL),
+    system: nexusChatSystem(),
+    messages: modelMessages,
+    tools: { recommendWorkshop, requestAppointment, emailWorkshopInfo },
+    // Room for: recommend -> talk -> capture -> confirm.
+    stopWhen: stepCountIs(5),
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
+    providerOptions: {
+      gateway: {
+        tags: ["site:nexus", "feature:chat", `env:${process.env.VERCEL_ENV ?? "dev"}`],
+      },
+    },
+    // One structured line per request so usage can be graphed from Vercel logs.
+    onFinish: ({ totalUsage, finishReason, steps }) => {
+      console.log(
+        JSON.stringify({
+          event: "chat.usage",
+          site: "nexus",
+          model: CHAT_MODEL,
+          turns,
+          inputTokens: totalUsage.inputTokens,
+          cachedInputTokens: totalUsage.cachedInputTokens,
+          outputTokens: totalUsage.outputTokens,
+          reasoningTokens: totalUsage.reasoningTokens,
+          totalTokens: totalUsage.totalTokens,
+          steps: steps.length,
+          toolCalls: steps.reduce((n, s) => n + s.toolCalls.length, 0),
+          finishReason,
+        }),
+      );
+    },
+  });
+
+  return result.toUIMessageStreamResponse({
+    // Never stream provider error text to visitors; log it and show a plain fallback.
+    onError: (error) => {
+      console.error("[chat] stream error:", error);
+      return "Dr. MJ is unavailable right now. Please use the contact form instead.";
+    },
+  });
 }
