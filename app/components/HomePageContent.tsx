@@ -12,10 +12,26 @@ import { TEAM } from "@/lib/team";
 import { CUSTOM_TRAINING } from "@/lib/training";
 
 const FOOTER_LINKS = [
-  { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "Consulting", href: "/#consulting" },
+  { label: "Training", href: "/nvidia-dli-workshops" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+];
+
+/** Consulting is the lead offer; training and FDE follow from it. */
+const OFFERINGS = [
+  {
+    title: "Consult",
+    text: "We scope where AI actually helps, and where it does not, then shape a plan you can act on.",
+  },
+  {
+    title: "Train",
+    text: "The right NVIDIA DLI workshop for your team, taught in person by a Certified Instructor.",
+  },
+  {
+    title: "Build",
+    text: "A Forward Deployed Engineer embeds with your team to build and ship the solution with you.",
+  },
 ];
 
 /** Shared section shell: eyebrow, headline, one supporting line. */
@@ -81,26 +97,52 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={80}>
             <h1 className="mt-8 text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-7xl sm:leading-[1.05]">
-              NVIDIA AI workshops, <span className="gradient-text">brought to Utah</span>
+              AI consulting and training, <span className="gradient-text">brought to Utah</span>
             </h1>
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-8 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-              A DLI Certified Instructor hosts NVIDIA&apos;s official workshop for industry
-              teams. NVIDIA provides the curriculum, GPU labs, and certificate. Your company
-              needs no hardware.
+              We start with what your team actually needs and give you straight AI guidance.
+              Then we deliver the right NVIDIA training in person, or embed an engineer to build
+              it with you.
             </p>
           </Reveal>
           <Reveal delay={220}>
             <div className="mt-12 flex flex-wrap justify-center gap-3">
-              <ScheduleButton>Schedule the workshop</ScheduleButton>
+              <ScheduleButton>Talk to us</ScheduleButton>
               <Link href="/nvidia-dli-workshops" className="btn-secondary">
-                See the workshop
+                See the training
               </Link>
             </div>
           </Reveal>
         </div>
       </section>
+
+      <Section id="consulting" eyebrow="Consulting" title="Start with what you actually need">
+        <Reveal delay={80}>
+          <p className="mt-6 text-lg text-zinc-600 dark:text-zinc-400">
+            What to adopt, what to skip, and where AI truly fits the work you already do.
+            Straight guidance from people who build LLM and agent systems for a living.
+          </p>
+        </Reveal>
+        <div className="mt-14 grid gap-6 text-left sm:grid-cols-3">
+          {OFFERINGS.map((o, i) => (
+            <Reveal key={o.title} delay={100 + i * 60}>
+              <div className="h-full rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700 dark:text-brand-400">
+                  {o.title}
+                </p>
+                <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">{o.text}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={280}>
+          <div className="mt-12 flex justify-center">
+            <ScheduleButton>Talk to us</ScheduleButton>
+          </div>
+        </Reveal>
+      </Section>
 
       <section
         id="training"
@@ -182,14 +224,6 @@ export function HomePageContent() {
           </Reveal>
         </div>
       </section>
-
-      <Section id="consulting" eyebrow="Consulting" title="Advice you can act on">
-        <Reveal delay={80}>
-          <p className="mt-6 text-lg text-zinc-600 dark:text-zinc-400">
-            What to adopt. What to skip. How it fits the work you already do.
-          </p>
-        </Reveal>
-      </Section>
 
       <Section id="about" eyebrow="Team" title="The people">
         <div className="mt-16 grid gap-12 sm:grid-cols-3">

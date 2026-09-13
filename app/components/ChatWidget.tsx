@@ -235,9 +235,8 @@ export function ChatWidget() {
               {messages.length === 0 && (
                 <div className="space-y-3">
                   <p className="text-sm text-zinc-600 dark:text-zinc-500">
-                    Hey, I&apos;m Nex. Tell me what your team does and what you want to do with AI.
-                    I&apos;ll give you real guidance and point you to the right NVIDIA training. What
-                    are you working on?
+                    Hey, I&apos;m Nex. Tell me what your team does and where you want to go with AI.
+                    I&apos;ll give you straight, useful guidance first. What are you working on?
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {OPENING_CHIPS.map((q) => (
