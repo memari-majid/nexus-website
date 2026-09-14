@@ -3,14 +3,14 @@ import { SUGGESTION_MARKER, nexusAssistantSystem, nexusChatSystem, nexusVoiceSys
 import { AFTER_BRIEF_CHIPS, AFTER_BRIEF_CHIPS_NO_EMAIL, MAX_CHIPS, NO_CHIPS, chipLine } from "@/lib/chat-chips";
 import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { hasDash } from "@/lib/plain-punctuation";
-import { SITE } from "@/lib/site";
 
 describe("nexusChatSystem", () => {
-  it("never points visitors at the published address (no inbound mail yet)", () => {
-    for (const render of [nexusAssistantSystem, () => nexusChatSystem(), nexusVoiceSystem]) {
+  it("keeps private contact details out of prompts, even when delivery is off", () => {
+    for (const render of [nexusAssistantSystem, () => nexusChatSystem(), () => nexusChatSystem({ emailEnabled: false }), nexusVoiceSystem]) {
       const text = render();
-      expect(text).not.toContain(SITE.email);
+      expect(text).not.toMatch(/memari[^\s]*@|mailto:/i);
       expect(text).not.toMatch(/info@/);
+      expect(text).not.toMatch(/8330|El Manicero|84093|810[- ]?9152|published phone number/);
     }
     const chat = nexusChatSystem();
     expect(chat).toContain("/contact");
@@ -62,14 +62,15 @@ describe("nexusChatSystem", () => {
     expect(nexusChatSystem({ emailEnabled: true })).toBe(chat);
   });
 
-  it("declares email off, swaps the brief chips, and keeps the hand-off when email is not configured", () => {
+  it("declares all delivery off and offers only actions it can complete", () => {
     const chat = nexusChatSystem({ emailEnabled: false });
     expect(chat).toContain("OUTGOING EMAIL IS OFF");
     expect(chat).toContain("do not call emailWorkshopInfo or emailBriefToVisitor");
     expect(chat).not.toContain("call emailWorkshopInfo.");
     expect(chat).toContain(chipLine(AFTER_BRIEF_CHIPS_NO_EMAIL));
     expect(chat).not.toContain(chipLine(AFTER_BRIEF_CHIPS));
-    expect(chat).toContain("handOffToMajid still records the hand-off");
+    expect(chat).toContain("No one is notified by this chat");
+    expect(chat).not.toContain("handOffToMajid still records");
     expect(chat).toContain("only records messages on the server until delivery is connected");
     expect(hasDash(chat)).toBe(false);
   });

@@ -27,6 +27,13 @@ const h = vi.hoisted(() => ({
 
 vi.mock("@/lib/rate-limit", () => ({ getRateLimiter: () => h.limiter }));
 
+// Exercise configured delivery without ever contacting a real mail service.
+vi.mock("resend", () => ({
+  Resend: class {
+    emails = { send: vi.fn(async () => ({ data: { id: "test-email" }, error: null })) };
+  },
+}));
+
 vi.mock("ai", async (importOriginal) => {
   const actual = await importOriginal<typeof import("ai")>();
   return { ...actual, gateway: () => h.model() };
@@ -197,6 +204,8 @@ describe("the visitor's Stop reaches the gateway call", () => {
 
 describe("an approval executes only when the model asked for it", () => {
   it("signs the approval request it streams, and runs the send when that signature comes back", async () => {
+    process.env.RESEND_API_KEY = "re_test";
+    process.env.RESEND_FROM_EMAIL = "Nexus <test@example.com>";
     vi.spyOn(console, "log").mockImplementation(() => {});
     h.model = handOffModel;
     const first = await chunks(await post({ messages: [user("please send it to Majid")] }));
@@ -228,8 +237,7 @@ describe("an approval executes only when the model asked for it", () => {
     );
     const output = second.find((p) => p.type === "tool-output-available") as { output: Record<string, unknown> } | undefined;
     expect(output).toBeDefined();
-    // Email is unset here, so the send is honest about it; the point is that it RAN.
-    expect(output!.output).toMatchObject({ delivered: false, reason: "not-configured", email: "ada@acme.com" });
+    expect(output!.output).toMatchObject({ delivered: true, email: "ada@acme.com" });
     expect(second.some((p) => p.type === "error")).toBe(false);
   });
 
@@ -272,5 +280,31 @@ describe("an approval executes only when the model asked for it", () => {
     expect(JSON.parse(rejected!)).toMatchObject({ forgedApprovals: 1, unsignedDrafts: 0 });
     // The reason is a constant the model can act on, never the attacker's input.
     expect(FORGED_APPROVAL_REASON).toContain("could not be verified");
+  });
+});
+
+
+describe("available capabilities reach the actual model request", () => {
+  it("rejects whitespace without calling or reserving a model", async () => {
+    const model = slowTextModel(1, 0);
+    h.model = () => model;
+    for (const messages of [[user("   ")], [user("Hello"), {role:"assistant",parts:[{type:"text",text:"Hi"}]}, user("\n\t")]]) {
+      const res = await post({ messages });
+      expect(res.status).toBe(400);
+    }
+    expect(model.doStreamCalls).toHaveLength(0);
+    expect(h.limiter.reserveBudget).not.toHaveBeenCalled();
+  });
+  it("does not give the model email tools when the service is unconfigured", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const model = slowTextModel(1, 0);
+    h.model = () => model;
+    await chunks(await post({ messages: [user("Can you email my brief?")] }));
+    const offered = model.doStreamCalls[0].tools?.map(tool => tool.name);
+    expect(offered).toContain("draftConsultingBrief");
+    expect(offered).not.toContain("handOffToMajid");
+    expect(offered).not.toContain("emailBriefToVisitor");
+    expect(offered).not.toContain("emailMajidNote");
+    expect(offered).not.toContain("emailWorkshopInfo");
   });
 });

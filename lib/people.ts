@@ -1,11 +1,10 @@
 import { HAMID } from "@/lib/hamid";
 import { MAJID } from "@/lib/majid";
-import { MOHAMMAD } from "@/lib/mohammad";
 
 /**
- * One registry for the three leadership profiles. Everything that renders a
+ * One registry for the leadership profiles. Everything that renders a
  * person — the homepage row, /about, and each /about/<slug> page — reads from
- * here so the three stay structurally identical.
+ * here so the profiles stay structurally identical.
  *
  * `displayName` is what the site shows; `schemaName` is the legal name used in
  * structured data. Keep both accurate: never invent titles or affiliations,
@@ -19,14 +18,20 @@ export type BioBlock = { heading?: string; text: string };
 export type Person = {
   slug: string;
   displayName: string;
+  /** Names without credentials when the team is shown side by side. */
+  teamName: string;
   schemaName: string;
   schemaId: string;
   role: string;
   roleLong: string;
   photo: string;
+  portraitScale?: number;
   initials: string;
   /** One line for cards and page descriptions. */
   summary: string;
+  experience: string;
+  expertiseHighlight?: string;
+  expertiseLogo?: { src: string; alt: string };
   bio: BioBlock[];
   links: PersonLink[];
   image: string;
@@ -42,13 +47,16 @@ export const PEOPLE: Person[] = [
   {
     slug: "majid-memari",
     displayName: MAJID.fullName,
+    teamName: MAJID.name,
     schemaName: MAJID.name,
     schemaId: "#person",
-    role: "Founder & CEO",
+    role: MAJID.companyRole,
     roleLong: MAJID.roles.nexus,
-    photo: "/team-majid-memari.jpg",
+    photo: MAJID.photo,
+    portraitScale: MAJID.portraitScale,
     initials: "MM",
     summary: MAJID.shortBio,
+    experience: MAJID.experience,
     bio: [
       { heading: "Research", text: MAJID.bio.academia },
       { heading: "Industry", text: MAJID.bio.industry },
@@ -61,39 +69,27 @@ export const PEOPLE: Person[] = [
       { label: "ORCID", href: MAJID.orcid },
       { label: "NVIDIA Certified Instructor Directory", href: MAJID.nvidiaInstructorDirectory },
     ],
-    image: "/team-majid-memari.jpg",
+    image: MAJID.photo,
     nvidiaCertified: true,
   },
   {
     slug: "hamid-memari",
     displayName: HAMID.fullName,
+    teamName: HAMID.fullName,
     schemaName: HAMID.fullName,
     schemaId: "#hamid",
     role: HAMID.role,
     roleLong: HAMID.roles.nexus,
     photo: HAMID.photo,
+    portraitScale: HAMID.portraitScale,
     initials: "HM",
     summary: HAMID.shortBio,
-    bio: HAMID.bio.map((text) => ({ text })),
+    experience: HAMID.experience,
+    expertiseHighlight: HAMID.expertiseHighlight,
+    expertiseLogo: HAMID.expertiseLogo,
+    bio: [...HAMID.bio.map((text) => ({ text })), { heading: "Stanford coursework", text: HAMID.coursework }],
     links: [{ label: "LinkedIn", href: HAMID.linkedin }],
     image: HAMID.photo,
-  },
-  {
-    slug: "mohammad-jafarinejad",
-    displayName: MOHAMMAD.displayName,
-    schemaName: MOHAMMAD.name,
-    schemaId: "#mohammad",
-    role: MOHAMMAD.role,
-    roleLong: MOHAMMAD.roles.nexus,
-    photo: MOHAMMAD.photo,
-    initials: MOHAMMAD.initials,
-    summary: MOHAMMAD.shortBio,
-    bio: MOHAMMAD.bio.map((text) => ({ text })),
-    links: [
-      { label: "LinkedIn", href: MOHAMMAD.linkedin },
-      { label: "Google Scholar", href: MOHAMMAD.scholar },
-    ],
-    image: MOHAMMAD.photo,
   },
 ];
 

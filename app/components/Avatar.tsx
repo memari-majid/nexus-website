@@ -1,8 +1,8 @@
 import Image from "next/image";
 
 /**
- * Round team portrait. All headshots are pre-cropped to the same square
- * framing (`public/team-*.jpg`) so the three profiles look consistent.
+ * Round team portrait. Preserve the supplied image and frame portrait originals
+ * in CSS; retain extra image detail for high-density displays and browser zoom.
  * Falls back to initials when someone has no photo yet.
  */
 export function Avatar({
@@ -11,22 +11,28 @@ export function Avatar({
   name,
   role,
   size,
+  scale = 1,
 }: {
   photo: string | null;
   initials: string;
   name: string;
   role: string;
   size: number;
+  scale?: number;
 }) {
+  const resolution = Math.max(Math.ceil(size * scale * 3), 640);
+
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
+    <div className="relative shrink-0 overflow-hidden rounded-full ring-1 ring-zinc-200 dark:ring-zinc-700" style={{ width: size, height: size }}>
       {photo ? (
         <Image
           src={photo}
           alt={`${name}, ${role}`}
-          fill
-          className="rounded-full object-cover ring-1 ring-zinc-200 dark:ring-zinc-700"
-          sizes={`${size}px`}
+          width={resolution}
+          height={resolution}
+          quality={95}
+          className="h-full w-full object-cover object-[50%_30%]"
+          style={{ transform: `scale(${scale})`, transformOrigin: "50% 0%" }}
         />
       ) : (
         <div

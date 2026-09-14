@@ -34,10 +34,9 @@ Homepage should stay sparse: hero + Consulting + **Try our AI** + Training + Tea
 
 | If you need to change… | Edit this file first | Then check |
 |------------------------|----------------------|------------|
-| Company name, email, phone, address, tagline | `lib/site.ts` | Footer, contact, SEO, JSON-LD |
+| Company name, public email, tagline | `lib/site.ts` | Contact, SEO, JSON-LD; no public phone or address |
 | Founder bio / credentials / name style | `lib/majid.ts` | `lib/people.ts` pulls it |
-| CTO | `lib/hamid.ts` | `lib/people.ts` |
-| CFO | `lib/mohammad.ts` | `lib/people.ts` |
+| Technical Consultant & Training Lead | `lib/hamid.ts` | `lib/people.ts` |
 | Who appears on team / about / schema | `lib/people.ts` | `lib/team.ts`, `/about`, `/about/[person]` |
 | NVIDIA workshop facts, delivery model | `lib/dli.ts` | Training page, FAQ, chat knowledge, homepage teaser |
 | Custom (non-NVIDIA) training | `lib/training.ts` | Do not mix into DLI copy |
@@ -103,7 +102,7 @@ Allowed and encouraged when accurate: **Penn** (postdoc appointment), **Stanford
 
 This commercial site is **industry only**. Public title:
 
-- **DLI Certified Instructor** → hosts industry workshops (NVIDIA sells seats)
+- **DLI Certified Instructor** → hosts industry workshops (Nexus enrolls and invoices)
 
 **Do not publish** University Ambassador, free workshops, campus workshops, or academia as an audience. If asked in chat, stay on industry hosting — do not describe another program.
 
@@ -127,7 +126,7 @@ Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLM
   quote a dollar figure at all, which the shipped site, `lib/site-facts.ts` and the chat prompt
   have all contradicted since the business model changed to Nexus enrolling and invoicing.)
 - **Never quote a dollar figure for the quote tiers** above 20 seats: those are scoped, not listed.
-- Chat must never invent that Nexus sells seats or requires client hardware.
+- Chat must never call Nexus's price an NVIDIA-set rate or require client GPUs.
 - **Never** mention a free workshop, campus delivery, or Ambassador program on this site.
 - Custom training (`lib/training.ts`) ≠ DLI; no DLI certificate language there.
 - Do not add a legal NVIDIA trademark disclaimer paragraph. Footer / training page may keep the short credential line (`TRADEMARK_SHORT`).
@@ -136,6 +135,8 @@ Only workshop Nexus delivers today: ***Building Agentic AI Applications With LLM
 ### 8. Design / copy voice
 
 - Apple-like: one idea per section, short declarative lines, generous space.
+- Owner reinforced this direction on 2026-09-14: large keywords, quiet surfaces, very little copy. Overview pages introduce the offer; deeper delivery, pricing and curriculum information belongs behind clearly labeled links. Do not restore repeated workshop pitches, a full catalog dump or long team bios to the overview pages.
+- Workshop overview: `/nvidia-dli-workshops`. Delivery, pricing and expandable syllabus: `/nvidia-dli-workshops/details`. Short workshop copy comes from `DLI.overview`; full facts remain in `lib/dli.ts`. Shared footer and typography keep pages consistent.
 - **No trailing periods in headlines.**
 - Sky primary; NVIDIA green `#76b900` only for NVIDIA accents.
 - Prefer editing existing sections over adding new homepage chrome (stats, partner strips, news widgets, etc.). One sanctioned exception: the "Try our AI" demo section, §9.3.
@@ -380,7 +381,7 @@ a live evaluation without the owner asking for it by name.
 
 ### 10. Market geography (owner rule, 2026-09-13)
 
-**Utah is the home base, not the market boundary.** Nexus is based in Sandy, Utah and serves companies **across the United States**, in person at the client offices or online.
+**Utah is the home base, not the market boundary.** Nexus serves companies **across the United States**, in person at the client offices or online. Do not publish a street address or office location; contact policy §11 supersedes the earlier address requirement.
 
 - Positioning copy says **the United States**: hero, page titles and meta descriptions, keywords, schema `areaServed` (`Country: United States`), chat and voice prompt geography, plan SEO intent.
 - Never write "Utah AI consulting", "brought to Utah", "Utah-based" as the market, or any line that reads as a Utah-only service area.
@@ -390,7 +391,6 @@ a live evaluation without the owner asking for it by name.
 
 | Keep | Where |
 |------|-------|
-| Sandy UT business address + `PostalAddress` schema | `lib/site.ts`, `lib/seo.ts`, footer |
 | 2026 AI Utah 100 honoree | `lib/majid.ts`, schema, FAQ |
 | University of Utah One-U Responsible AI | founder bio / FAQ (per §4) |
 | Utah public-sector collaborations (Gary R. Herbert Institute for Public Policy, Utah Office of Data Privacy, Utah Department of Health and Human Services) | `lib/collaborations.ts` |
@@ -401,17 +401,26 @@ UVU employment stays off this commercial site per §3; it lives on the personal 
 
 ---
 
+### 11. Email contact (owner override, 2026-09-14)
+
+- Remove the public phone number and street address from pages, metadata, structured data, client bundles, assistant facts and email footers. Do not reintroduce them.
+- Personal team email addresses are private. Do not put them in public SITE data, HTML, metadata, chatbot prompts or direct email links. The contact form sends to the business Gmail through server-side delivery. Never use UVU email for Nexus business.
+- Contact-form notifications use `CONTACT_TO_EMAIL`; chat hand-offs and reply-to use `WORKSHOP_TO_EMAIL`. Production uses the same business Gmail for both. `CONTACT_CC_EMAIL` privately copies Hamid using BCC, with duplicate recipients removed. Visitor email headers must not expose team personal addresses.
+- Existing Resend delivery and on-screen chat approval remain. Show a sent confirmation only when the mail provider accepted the message. On failure, keep the visitor's text and offer a retry. Never invent a meeting or promise a response time.
+- The old voice integration is retained without advertising a public number. No new phone setup is part of the current contact plan.
+
 ## People & headshots
 
 | Person | Role | Display name | Photo |
 |--------|------|--------------|-------|
-| Majid Memari, PhD | Founder & CEO | `Majid Memari, PhD` | `public/team-majid-memari.jpg` |
-| Hamid Memari | CTO | `Hamid Memari` | `public/team-hamid-memari.jpg` |
-| Mohammad JN, PhD | CFO | Short UI name; legal `Mohammad Jafarinejad` in schema | `public/team-mohammad-jafarinejad.jpg` |
+| Majid Memari, PhD | AI Educator & Consultant | `Majid Memari, PhD` | `public/team-majid-memari-closeup.png` |
+| Hamid Memari | Technical Consultant & Training Lead | `Hamid Memari` | `public/team-hamid-memari-professional.png` |
 
 - Registry: `lib/people.ts` (`displayName` vs `schemaName`).
+- Public team: Majid and Hamid only. Lead with expertise, not founder or C-suite titles. Majid is AI Educator & Consultant and the NVIDIA DLI Certified Instructor. Hamid is Technical Consultant & Training Lead: software engineering since 2012, technical consulting, workshop hosting and delivery support, client partnerships, proposals, deal negotiations, onboarding and ongoing client relationships. Do not imply Hamid holds Majid's NVIDIA certification.
 - Group master (outside repo): `~/Downloads/team-headshots-source.png`.
-- Recipe: crop three panels → **640×640 JPEG q88**, head-and-shoulders. Do not scrape LinkedIn photos.
+- The individual professional portraits supersede the panels in that group master. Hamid's original is a 1086×1448 PNG. Majid's is a square crop with an owner-requested, localized smile correction, based on the original `public/majid-memari.png` recovered from Git history. Preserve both original sources. `Avatar` frames the images in CSS and Next Image optimizes delivery. Photo references come from `MAJID.photo` and `HAMID.photo`.
+- For existing group-derived photos, the recipe remains **640×640 JPEG q88**, head-and-shoulders. Do not scrape LinkedIn photos or generate a replacement face for a supplied photograph.
 - Set `nvidiaCertified: true` only for the person who holds the NVIDIA instructor cert.
 
 ---
@@ -434,7 +443,7 @@ npx vercel deploy --prod --yes   # or push main after owner commits
 
 ### Update a bio sentence
 
-1. Edit `lib/majid.ts` / `hamid.ts` / `mohammad.ts`.
+1. Edit `lib/majid.ts` / `hamid.ts`.
 2. Confirm `lib/people.ts` still maps the right fields.
 3. Grep for any leftover hardcoded string.
 4. Skim chat knowledge / FAQ if the fact is customer-facing.

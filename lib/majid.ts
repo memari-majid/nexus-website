@@ -41,14 +41,18 @@ export const MAJID = {
   /** Bare name for mid-sentence or spoken use: no title, no postnominal. */
   name: "Majid Memari",
   displayName: "Majid (MJ) Memari",
+  experience: "Academic AI research since 2015",
   shortBio:
     "NVIDIA DLI Certified Instructor. LLMs, agents, and retrieval. PhD in Computer Science with doctoral research in generative AI, in applied AI since 2015.",
   headlineRole: "AI Scientist & Solution Architect",
+  companyRole: "AI Educator & Consultant",
+  portraitScale: 1.2,
+  photo: "/team-majid-blue-red.png",
   roles: {
     nvidia: "NVIDIA DLI Certified Instructor",
     herbert: "Principal AI Architect, Gary R. Herbert Institute for Public Policy",
     rai: "AI Consultant, University of Utah One-U Responsible AI Initiative",
-    nexus: "Founder & CEO, Nexus AI Solutions LLC",
+    nexus: "AI Educator & Consultant, Nexus AI Solutions LLC",
   },
   clientOffer: {
     label: "AI consulting and training",
@@ -130,6 +134,19 @@ export const MAJID = {
    * teaching and research as background, never a named current employer,
    * department, course catalog, or campus program.
    */
+  studentFeedback: {
+    headline: "How students rate Majid’s teaching",
+    ratingsContext: "Selected ratings from one Spring 2026 course · 9 of 14 students responded",
+    ratings: [
+      { score: "5.00", label: "Respectful responses" },
+      { score: "4.78", label: "Feedback that helps learning" },
+    ],
+    context: "Selected excerpts from Majid’s anonymous course evaluations · Spring 2026",
+    quotes: [
+      "The examples and applied experiments were really good for understanding concepts through experience.",
+      "The examples he gave and how he walked through every step of the process helped a lot.",
+    ],
+  },
   teachingBackground:
     "He teaches applied AI, machine learning, and AI entrepreneurship, and brings that method into Nexus team training.",
 } as const;

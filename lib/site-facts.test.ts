@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { INDEXABLE_PATHS } from "@/lib/seo";
+import { INDEXABLE_PATHS, organizationJsonLd } from "@/lib/seo";
 import { MAX_FACTS, SITE_FACTS, citationLine, lookupFacts } from "@/lib/site-facts";
 import { hasDash } from "@/lib/plain-punctuation";
 
 describe("SITE_FACTS", () => {
+  it("keeps email, phone and street address out of search metadata", () => {
+    const org = organizationJsonLd();
+    expect(org).not.toHaveProperty("email");
+    expect(org).not.toHaveProperty("telephone");
+    expect(org).not.toHaveProperty("address");
+    expect(JSON.stringify(SITE_FACTS)).not.toMatch(/8330|El Manicero|84093|810[- ]?9152/);
+  });
   it("cites only pages that exist and are indexable", () => {
     for (const fact of SITE_FACTS) {
       expect(INDEXABLE_PATHS as readonly string[], fact.id).toContain(fact.source.path);

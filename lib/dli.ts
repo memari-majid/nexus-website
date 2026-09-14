@@ -5,7 +5,8 @@ import { MAJID } from "@/lib/majid";
  *
  * This commercial site sells INDUSTRY delivery only. Public title:
  * **DLI Certified Instructor**. Do not publish University Ambassador,
- * free campus workshops, or academia as an audience.
+ * free campus workshops, or academia as an industry audience.
+ * Owner-approved exception: the specific academicEvent announcement below.
  *
  * MARKET: Nexus is based in Sandy, Utah and delivers to companies across the
  * United States. In person means at the client site anywhere in the US, and
@@ -23,6 +24,47 @@ import { MAJID } from "@/lib/majid";
  */
 
 export const DLI = {
+  // Specific academic event requested by the owner; separate from industry sales.
+  academicEvent: {
+    headline: "Next stop: the U",
+    date: "October 10, 2026",
+    time: "9am to 5pm MDT",
+    location: "University of Utah",
+    format: "In person",
+    audience: "For academic students, staff and researchers",
+    prerequisites: "Intermediate Python and basic deep learning knowledge",
+    registration: "Use your institutional email. Host approval is required.",
+    url: "https://luma.com/uf00uhel",
+  },
+  gallery: {
+    headline: "Inside a workshop",
+    caption: "From a previous session led by Majid",
+    feedback: {
+      quote: "Great to see more hands-on AI education being made accessible.",
+      author: "Razan Alsulieman, PhD",
+      context: "Public LinkedIn comment",
+      url: "https://www.linkedin.com/feed/update/urn:li:ugcPost:7445686197596868608/",
+    },
+    photos: [
+      { src: "/workshops/workshop-4.jpg", width: 1200, height: 681, alt: "Workshop participants learning at computer workstations" },
+      { src: "/workshops/workshop-2-face-retouched.png", width: 1536, height: 1024, alt: "Majid explaining a concept at the whiteboard during a workshop" },
+      { src: "/workshops/workshop-1.jpg", width: 1200, height: 800, alt: "A participant joining a discussion during the workshop" },
+    ],
+  },
+  /** Short overview copy. Full delivery and curriculum facts stay below. */
+  overview: {
+    eyebrow: "NVIDIA DLI training",
+    headline: "Learn by doing",
+    duration: "8 hours",
+    format: "Private teams",
+    delivery: "At your office or online",
+    audience: "For developers and technical teams",
+    prerequisites: "Intermediate Python and basic deep learning knowledge",
+    topics: ["Agents", "Retrieval", "Tool use"],
+    labs: "NVIDIA cloud GPU labs",
+    detailsPath: "/nvidia-dli-workshops/details",
+  },
+  prerequisites: "Intermediate Python, including classes and ML libraries. Basic deep learning, including attention and transformers. Check NVIDIA’s course page for full requirements.",
   instructorTitle: "NVIDIA DLI Certified Instructor",
   credential: "NVIDIA DLI Certified Instructor",
   instructorDirectory: MAJID.nvidiaInstructorDirectory,
@@ -47,7 +89,7 @@ export const DLI = {
     "NVIDIA owns the labs, curriculum, assessment, and certificate. Nexus hosts and teaches, on site anywhere in the United States or online, and handles enrollment and invoicing. Your company needs nothing: no GPUs, no local compute, no special infrastructure.",
   /** What NVIDIA controls vs what Nexus does. */
   boundary:
-    "NVIDIA owns the content, cloud GPU labs, assessment, and the DLI certificate. Nexus hosts, teaches as a Certified Instructor, and invoices you directly at $500 per seat.",
+    "NVIDIA owns the content, cloud GPU labs, assessment, and the DLI certificate. Nexus hosts and teaches with a Certified Instructor, handles enrollment and invoices the client.",
   nvidiaProvides: {
     heading: "NVIDIA provides",
     items: [

@@ -10,7 +10,7 @@ import {
 import { approvalSecret } from "@/lib/approval-signature";
 import { nexusChatSystem } from "@/lib/assistant";
 import { ASSISTANT_NAME } from "@/lib/chat-persona";
-import { chatTools, type NexusUIMessage } from "@/lib/chat-tools";
+import { activeChatTools, chatTools, type NexusUIMessage } from "@/lib/chat-tools";
 import { MAX_OUTPUT_TOKENS, MAX_STEPS, STREAM_TIMEOUT_MS, prechargeUsd } from "@/lib/chat-limits";
 import {
   abortedBilledUsd,
@@ -64,8 +64,8 @@ let rendered: RenderedPrompt | undefined;
  * told via `emailEnabled` so it can pick chips that do not invite an email.
  */
 function renderedPrompt(): RenderedPrompt {
-  if (!rendered) {
-    const emailEnabled = isEmailConfigured();
+  const emailEnabled = isEmailConfigured();
+  if (!rendered || rendered.emailEnabled !== emailEnabled) {
     rendered = {
       emailEnabled,
       system: {
@@ -217,6 +217,7 @@ export async function POST(req: Request) {
     system: prompt.system,
     messages: modelMessages,
     tools: chatTools,
+    activeTools: activeChatTools(prompt.emailEnabled),
     // Brief + snapshot + reply fits with one spare step; approvals end the turn early.
     stopWhen: stepCountIs(MAX_STEPS),
     maxOutputTokens: MAX_OUTPUT_TOKENS,
@@ -275,7 +276,7 @@ export async function POST(req: Request) {
       if (InvalidToolApprovalSignatureError.isInstance(error)) {
         return "That approval could not be verified, so nothing was sent. Tap New and ask again.";
       }
-      return `The ${ASSISTANT_NAME} is unavailable right now. Please use the contact form instead.`;
+      return `The ${ASSISTANT_NAME} is unavailable right now. Please try again in a moment.`;
     },
     // The client learns one thing about the server, on start: whether
     // outgoing email is on, so it can choose chips. The first text delta is

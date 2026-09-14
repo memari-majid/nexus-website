@@ -19,13 +19,13 @@
  * Client-safe: pure data and string matching, no env, no `ai` import.
  */
 
+import { HAMID } from "@/lib/hamid";
 import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { UNIVERSITY_COLLABORATIONS } from "@/lib/collaborations";
 import { DLI } from "@/lib/dli";
 import { FDE } from "@/lib/fde";
 import { MAJID } from "@/lib/majid";
 import { plainPunctuation } from "@/lib/plain-punctuation";
-import { SITE } from "@/lib/site";
 import { CUSTOM_TRAINING } from "@/lib/training";
 
 /** The indexable pages a fact may point a visitor at. Mirrors `INDEXABLE_PATHS`. */
@@ -61,6 +61,13 @@ function fact(entry: SiteFact): SiteFact {
  */
 export const SITE_FACTS: readonly SiteFact[] = [
   fact({
+    id: "academic-event",
+    topic: "University of Utah workshop",
+    text: `${MAJID.name} hosts ${DLI.workshop.title} at ${DLI.academicEvent.location} on ${DLI.academicEvent.date}, ${DLI.academicEvent.time}, ${DLI.academicEvent.format}. ${DLI.academicEvent.audience}; ${DLI.academicEvent.prerequisites}. ${DLI.academicEvent.registration} Details and registration: ${DLI.academicEvent.url}. Separate from industry booking.`,
+    source: { label: "Workshop announcement", path: "/nvidia-dli-workshops" },
+    keywords: ["academic", "students", "researchers", "institutional", "Utah", "October", "the U", "luma"],
+  }),
+  fact({
     id: "what-we-do",
     topic: "What Nexus does",
     text: `${MAJID.clientOffer.label}: ${MAJID.clientOffer.summary} Implementation is a follow-on statement of work.`,
@@ -77,7 +84,7 @@ export const SITE_FACTS: readonly SiteFact[] = [
   fact({
     id: "coverage",
     topic: "Where Nexus works",
-    text: `Based in ${SITE.addressLocality}, ${SITE.addressRegion}, working with companies across the United States. On site at your offices anywhere in the US, or online. Utah is the home base, not the market.`,
+    text: `Based in Utah, working with companies across the United States. On site at your offices anywhere in the US, or online. Utah is the home base, not the market.`,
     source: { label: "Home", path: "/" },
     keywords: ["location", "remote", "onsite", "travel", "states", "nationwide", "where"],
   }),
@@ -87,6 +94,13 @@ export const SITE_FACTS: readonly SiteFact[] = [
     text: `${DLI.workshop.title}. ${DLI.workshop.length}. ${DLI.workshop.summary}`,
     source: { label: "Workshops", path: "/nvidia-dli-workshops" },
     keywords: ["dli", "nvidia", "course", "class", "agentic", "llm", "workshop"],
+  }),
+  fact({
+    id: "workshop-prerequisites",
+    topic: "Workshop prerequisites",
+    text: DLI.prerequisites,
+    source: { label: "Workshops", path: "/nvidia-dli-workshops" },
+    keywords: ["prerequisites", "python", "beginner", "requirements", "experience", "deep learning"],
   }),
   fact({
     id: "delivery-model",
@@ -151,9 +165,16 @@ export const SITE_FACTS: readonly SiteFact[] = [
   fact({
     id: "team",
     topic: "Who delivers the work",
-    text: "Every statement of work is executed under Nexus AI Solutions LLC by the named team on the About page, not a revolving cast of subcontractors.",
+    text: "Hamid brings industry software engineering experience since 2012. Majid brings academic AI research experience since 2015 and teaching expertise. Together they provide AI consulting and training through Nexus AI Solutions LLC.",
     source: { label: "About", path: "/about" },
     keywords: ["team", "who does the work", "subcontractor", "staff", "cto", "cfo"],
+  }),
+  fact({
+    id: "hamid-coursework",
+    topic: "Hamid’s Stanford coursework",
+    text: `${HAMID.fullName}: ${HAMID.coursework} This describes completed coursework, not a Stanford degree or employment.`,
+    source: { label: "About", path: "/about" },
+    keywords: ["hamid", "stanford", "nlp", "education", "coursework", "transformers"],
   }),
   fact({
     id: "collaborations",
@@ -165,7 +186,7 @@ export const SITE_FACTS: readonly SiteFact[] = [
   fact({
     id: "contact",
     topic: "How to reach the team",
-    text: `The contact form at /contact and ${SITE.phoneDisplay}. The published address does not receive mail yet, so the form is the reliable path.`,
+    text: `Send a message through /contact. The team inbox is private; never disclose personal email addresses. Contact is by email. No phone number or street address is published. Chat and form delivery depend on outgoing email being connected.`,
     source: { label: "Contact", path: "/contact" },
     keywords: ["email", "phone", "call", "reach", "get in touch", "contact"],
   }),

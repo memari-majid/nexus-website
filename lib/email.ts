@@ -8,9 +8,8 @@ import { SITE, SITE_URL } from "@/lib/site";
  * consulting brief) goes through `sendEmail`, so there is one place that owns
  * the Resend client, the not-configured fallback, and the branded template.
  *
- * `delivered` means Resend accepted the message. Production has neither
- * `RESEND_API_KEY` nor `RESEND_FROM_EMAIL` today, so every caller must treat
- * `delivered: false` as the normal case and say "noted, not sent".
+ * `delivered` means Resend accepted the message. Callers must handle missing
+ * configuration or a provider failure without claiming a message was sent.
  */
 
 type SendArgs = {
@@ -40,12 +39,10 @@ export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const EMAIL_ORIGIN_NOTE = `You asked for this in a chat with the ${ASSISTANT_NAME}, the AI assistant on nexusaisolution.net, and approved it on screen before it was sent. If that was not you, you can ignore this message.`;
 
 /**
- * info@nexusaisolution.net has no inbound MX, so every CC and reply-to uses
- * the founder's inbox. A CC to info@ would bounce and hurt the reputation of
- * a brand-new Resend domain.
+ * Replies use the owner's verified business inbox, never a sending-only domain.
  */
 export function founderInbox(): string {
-  return process.env.WORKSHOP_TO_EMAIL?.trim() || "memari.majid@hotmail.com";
+  return process.env.WORKSHOP_TO_EMAIL?.trim() || process.env.CONTACT_TO_EMAIL?.trim() || "memari.mj@gmail.com";
 }
 
 /**
@@ -119,7 +116,17 @@ export function scrubForEmail(s: string): string {
  */
 export async function sendEmail(args: SendArgs): Promise<SendResult> {
   const subject = cleanSubject(args.subject);
-  const cc = (args.cc ?? []).map((c) => c.trim()).filter(Boolean);
+  // Copy the configured business team on notifications and visitor emails.
+  // Do not duplicate a recipient already present in To or the caller's CC.
+  const seen = new Set([args.to.trim().toLowerCase()]);
+  const cc = [...(args.cc ?? []), ...(process.env.CONTACT_CC_EMAIL ?? "").split(",")]
+    .map((c) => c.trim())
+    .filter((c) => {
+      const key = c.toLowerCase();
+      if (!EMAIL_RE.test(c) || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 
   if (!isEmailConfigured()) {
     console.info("[email] not configured (RESEND_API_KEY and RESEND_FROM_EMAIL both required); logged only:", {
@@ -140,7 +147,7 @@ export async function sendEmail(args: SendArgs): Promise<SendResult> {
       text: args.text,
       ...(args.html ? { html: args.html } : {}),
       ...(args.replyTo ? { replyTo: args.replyTo } : {}),
-      ...(cc.length ? { cc } : {}),
+      ...(cc.length ? { bcc: cc } : {}),
     });
     if (error) {
       console.error("[email] Resend error:", error);
@@ -179,7 +186,6 @@ export function renderEmail({ heading, bodyHtml }: { heading: string; bodyHtml: 
         </td></tr>
         <tr><td style="padding:18px 28px;border-top:1px solid #e4e4e7;font-size:12px;line-height:1.6;color:#71717a;">
           ${esc(SITE.name)} · <a href="${esc(SITE_URL)}/contact" style="color:#4f7a00;text-decoration:underline;">${esc(SITE_URL)}/contact</a><br/>
-          ${esc(SITE.addressDisplay)}<br/>
           NVIDIA DLI Certified Instructor · independent, not endorsed by NVIDIA.
         </td></tr>
       </table>

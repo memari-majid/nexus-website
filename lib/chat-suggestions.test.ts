@@ -50,7 +50,8 @@ describe("resolveSuggestions", () => {
       emailEnabled: false,
       used: [],
     });
-    expect(chips).toEqual(["Send it to Majid", "Rate our AI readiness"]);
+    expect(chips).toContain("Rate our AI readiness");
+    expect(chips.join(" ")).not.toMatch(/send|email|follow.up/i);
     const on = resolveSuggestions(["Send it to Majid", "Email me the brief", "Rate our AI readiness"], {
       used: [],
     });
@@ -146,4 +147,22 @@ describe("after-brief detection (spec 4.3)", () => {
       fallbackSuggestions({ lastAssistant: "Noted but not sent: email is not set up yet." }),
     ).toEqual(AFTER_HANDOFF_CHIPS.slice(0, MAX_CHIPS));
   });
+});
+
+
+describe("unavailable delivery paths", () => {
+  it("filters model and fallback follow-ups even when the word email is absent", () => {
+    for (const lastAssistant of ["Here's your brief.", "Here is your readiness snapshot.", "Your next step is clear."]) {
+      const result = resolveSuggestions(["Send to Dr. Memari", "Have Majid follow up"], {lastAssistant, emailEnabled:false});
+      expect(result.length).toBeGreaterThan(0);
+      expect(result.join(" ")).not.toMatch(/send|email|follow.up|hand.off/i);
+    }
+  });
+});
+
+
+it("drops long model chips while retaining useful short choices", () => {
+  const result = resolveSuggestions(["Which support problem would you tackle first?", "Rate our AI readiness"], {});
+  expect(result).toContain("Rate our AI readiness");
+  for (const chip of result) expect(chip.split(/\s+/).length).toBeLessThanOrEqual(5);
 });

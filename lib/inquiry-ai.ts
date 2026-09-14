@@ -32,6 +32,8 @@ import {
 } from "@/lib/chat-limits";
 import { tokenBreakdown } from "@/lib/chat-metadata";
 import { gatewayProviderOptions } from "@/lib/gateway";
+import { HAMID } from "@/lib/hamid";
+import { MAJID } from "@/lib/majid";
 
 export const INQUIRY_CATEGORIES = ["consulting", "workshop", "careers", "partnership", "general"] as const;
 
@@ -56,7 +58,7 @@ export type InquiryClassification = z.infer<typeof inquirySchema> & {
  * same characters the model will actually read.
  */
 function inquiryPrompt(input: { name: string; message: string }): string {
-  return `You are the intake assistant for Nexus AI Solutions LLC, based in Sandy, Utah and working with companies across the United States. In-person delivery happens at the client site anywhere in the US, and consulting and training also run online, anywhere in the US. Utah is the home base, not the service area: never tell a visitor they are outside it, and never treat an out-of-state company as a poor fit. Primary client work is AI consulting and team training (advisory engagements, workshops, in-house training) for industry. Implementation (RAG, agents, evaluation, multimodal) is a follow-on statement of work. Led by Majid Memari, PhD (Founder & CEO; NVIDIA DLI Certified Instructor; researcher working on LLMs, agents, and retrieval; PhD in Computer Science with doctoral research in generative AI; postdoctoral research at the University of Pennsylvania, which brought research collaborations with Stanford and Johns Hopkins, which were collaborations, not employers, and no endorsement of Nexus; 2026 AI Utah 100 honoree), with Hamid Memari (Chief Technology Officer) leading the technical side and Mohammad Jafarinejad, PhD (Chief Financial Officer) leading pricing and engagement economics.
+  return `You are the intake assistant for Nexus AI Solutions LLC, based in Utah and working with companies across the United States. In-person delivery happens at the client site anywhere in the US, and consulting and training also run online, anywhere in the US. Utah is the home base, not the service area: never tell a visitor they are outside it, and never treat an out-of-state company as a poor fit. Primary client work is AI consulting and team training (advisory engagements, workshops, in-house training) for industry. Implementation (RAG, agents, evaluation, multimodal) is a follow-on statement of work. Led by ${MAJID.fullName} (${MAJID.companyRole}; NVIDIA DLI Certified Instructor; researcher working on LLMs, agents, and retrieval; PhD in Computer Science with doctoral research in generative AI; postdoctoral research at the University of Pennsylvania, which brought research collaborations with Stanford and Johns Hopkins, which were collaborations, not employers, and no endorsement of Nexus; 2026 AI Utah 100 honoree), with ${HAMID.fullName} (${HAMID.role}), a software engineering professional since 2012 who supports technical consulting, workshop hosting and hands-on learning. Hamid represents Nexus in client conversations and leads partnerships, proposals, deal negotiations, onboarding and ongoing client relationships. Only Majid holds the NVIDIA instructor certification.
 
 Classify this contact form message into exactly one category:
 - consulting: AI consulting, adoption advice, architecture review, when to use AI

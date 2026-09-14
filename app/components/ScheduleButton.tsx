@@ -3,12 +3,12 @@
 import { openChat } from "@/lib/chat-events";
 
 /**
- * Reusable "Start a conversation" CTA. Opens the ChatWidget via the
+ * Reusable "Ask our AI" CTA. Opens the ChatWidget via the
  * open-chat event so it works from Server Components (hero, workshop page)
  * without prop-drilling the widget's open state.
  */
 export function ScheduleButton({
-  children = "Start a conversation",
+  children = "Ask our AI",
   variant = "primary",
   className = "",
 }: {

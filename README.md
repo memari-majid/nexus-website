@@ -53,8 +53,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `VOICE_WEBHOOK` | Public incoming Voice URL, e.g. `https://nexusaisolution.net/api/voice` |
 | `RESEND_API_KEY` | Optional. With `RESEND_FROM_EMAIL` also set, the contact form and the chat email tools send through [Resend](https://resend.com). Missing either one, every chat email tool reports "not sent" and the AI Consultant points the visitor to the contact form. |
 | `RESEND_FROM_EMAIL` | Verified sender on the Nexus domain in Resend (e.g. `Nexus AI Solutions <hello@nexusaisolution.net>`). Unset, Resend falls back to `onboarding@resend.dev`, which only delivers to the account owner, so the code treats email as not configured. |
-| `CONTACT_TO_EMAIL` | Inbox for contact-form inquiries (default: `info@nexusaisolution.net`) |
-| `WORKSHOP_TO_EMAIL` | Founder inbox for chat hand-offs, and the CC and reply-to on every visitor email (default: `memari.majid@hotmail.com`). `info@nexusaisolution.net` has no inbound mail, so never point replies there. |
+| `CONTACT_TO_EMAIL` | Inbox for contact-form inquiries (default: `SITE.email`, currently `memari.mj@gmail.com`) |
+| `WORKSHOP_TO_EMAIL` | Inbox for chat hand-offs and replies (default: `SITE.email`, currently `memari.mj@gmail.com`) |
+| `CONTACT_CC_EMAIL` | Comma-separated business team addresses copied on outgoing mail; production uses `hamid.mmr@gmail.com`. Duplicates in To/CC are removed. |
 | `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Optional. Upstash Redis REST from the Vercel Marketplace (no custom key prefix). Shares the chat rate limits and daily budgets across function instances. `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` are read as a fallback. Without either pair, limits are per warm instance. |
 | `CHAT_APPROVAL_SECRET` | Recommended before Resend. HMAC key for the chat's on-screen approvals: every approval request the AI Consultant streams is signed with it, and an approval that comes back unsigned or altered is refused before any budget is reserved (`lib/approval-signature.ts`). Unset, the key is derived from `RESEND_API_KEY` when that is set, else a random per-instance key with one warning at startup. |
 
@@ -76,7 +77,7 @@ fixed acknowledgment: the email is the product and it costs no model money, so t
 model call, not on delivery. The chat hand-off (`source: "chat-handoff"`) never reaches the classifier
 and is not metered here. There is no uncapped model call left on this site.
 
-**Phone:** the published `(801) 810-9152` number is **Google Voice**. GV cannot hit Vercel. The AI engine is Twilio TwiML at `/api/voice`. Keep the GV number public and forward it to a hidden Twilio number — checklist in [`docs/PLAN.md`](docs/PLAN.md).
+**Contact:** email only. `/contact` sends a team notification and a visitor confirmation through Resend, and offers a direct link to the business Gmail. The owner removed the public phone and street address on 2026-09-14. The legacy voice routes remain for existing integrations; they are not promoted on the website.
 
 **AI Gateway setup:** in Vercel Dashboard go to **Project → AI Gateway** and enable the gateway. For local dev, run `vercel link` then `vercel env pull .env.local` to provision a short-lived `VERCEL_OIDC_TOKEN` (auto-refreshed on Vercel; valid ~24h locally). No provider-specific API keys are required.
 
@@ -84,8 +85,8 @@ and is not metered here. There is no uncapped model call left on this site.
 
 Things only the owner can click. Numbered so code comments and plans can point at an item.
 
-1. **Resend:** set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` (a verified sender on `nexusaisolution.net`) in Vercel production. Both are empty today, so every chat email tool reports "not sent" until then.
-2. **Founder inbox:** keep `WORKSHOP_TO_EMAIL` on an inbox that receives mail (default `memari.majid@hotmail.com`). `info@nexusaisolution.net` has no inbound MX. Decide one of: set up inbound mail (MX records plus a mailbox) for `info@nexusaisolution.net`, or remove the `mailto:` links on `/contact` and in `ContactForm.tsx` so visitors are not sent to an address that bounces.
+1. **Resend configured:** production uses the verified `hello@mail.nexusaisolution.net` sender. Keep `RESEND_API_KEY` and `RESEND_FROM_EMAIL` configured; without both, the UI reports that the message was not sent.
+2. **Business inboxes:** `CONTACT_TO_EMAIL` and `WORKSHOP_TO_EMAIL` use `memari.mj@gmail.com`; `CONTACT_CC_EMAIL` copies `hamid.mmr@gmail.com`. No UVU email. The public direct-email link comes from `SITE.email`.
 3. **Fluid compute:** this project has it on in `vercel.json`. Enable it on the personal site project (`majidmemari`) too so its chat route's `maxDuration = 180` applies.
 4. **Upstash Redis:** add it from the Vercel Marketplace with **no custom prefix** so `KV_REST_API_URL` / `KV_REST_API_TOKEN` land in this project. Until then, limits and budgets are per warm instance.
 5. **WAF:** keep the `/api/chat` WAF rule at or above 30 requests per minute per IP (see `docs/PLAN.md`) so the app's own limit, and its friendlier message, is what visitors hit first.

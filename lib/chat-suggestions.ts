@@ -16,6 +16,7 @@ import {
   AFTER_HANDOFF_CHIPS,
   AFTER_SNAPSHOT_CHIPS,
   MAX_CHIPS,
+  canOfferChip,
 } from "@/lib/chat-chips";
 
 export { OPENING_CHIPS } from "@/lib/chat-chips";
@@ -66,7 +67,7 @@ export function sanitizeSuggestions(
   const seen = new Set<string>();
   for (const raw of chips) {
     const s = raw.replace(/\s+/g, " ").trim();
-    if (s.length < 2 || s.length > 42) continue;
+    if (s.length < 2 || s.length > 42 || s.split(/\s+/).length > 5) continue;
     if (isGeneric(s) || alreadyUsed(s, used)) continue;
     const key = norm(s);
     if (!key || seen.has(key)) continue;
@@ -75,10 +76,6 @@ export function sanitizeSuggestions(
     if (out.length === MAX_CHIPS) break;
   }
   return out;
-}
-
-function pick(pool: readonly string[], used: readonly string[]): string[] {
-  return sanitizeSuggestions(pool, used);
 }
 
 /**
@@ -92,9 +89,6 @@ export const BRIEF_DRAFTED_RE =
 /** The readiness snapshot card just appeared. */
 export const SNAPSHOT_SHOWN_RE =
   /\breadiness snapshot\b|\breadiness (?:comes out|lands|scores?|is) (?:at|around|about)?\s*\d|\b(?:scored|rated) (?:your|their|the) readiness\b/i;
-
-/** A chip that invites an email; hidden while outgoing email is off. */
-const EMAIL_CHIP_RE = /\bemail\b/i;
 
 export type SuggestionContext = {
   lastAssistant?: string;
@@ -115,6 +109,8 @@ export type SuggestionContext = {
  */
 export function fallbackSuggestions(opts: SuggestionContext): string[] {
   const used = opts.used ?? [];
+  const pick = (pool: readonly string[], usedChips: readonly string[]) =>
+    sanitizeSuggestions(pool.filter((chip) => canOfferChip(chip, opts.emailEnabled !== false)), usedChips);
   const assistant = opts.lastAssistant ?? "";
   const a = `${assistant} ${opts.lastUser ?? ""}`.toLowerCase();
   const afterBrief = opts.emailEnabled === false ? AFTER_BRIEF_CHIPS_NO_EMAIL : AFTER_BRIEF_CHIPS;
@@ -161,7 +157,7 @@ export function resolveSuggestions(
 ): string[] {
   const used = context.used ?? [];
   const candidates =
-    context.emailEnabled === false ? modelChips.filter((c) => !EMAIL_CHIP_RE.test(c)) : modelChips;
+    modelChips.filter((chip) => canOfferChip(chip, context.emailEnabled !== false));
   const fromModel = sanitizeSuggestions(candidates, used);
   if (fromModel.length >= MAX_CHIPS) return fromModel;
   const fallback = fallbackSuggestions({ ...context, used: [...used, ...fromModel] });

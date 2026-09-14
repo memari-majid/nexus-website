@@ -7,6 +7,7 @@ import {
   readPanelOpen,
   serverPanelOpen,
   setDemoInView,
+  setPanelOpen,
   subscribePanel,
 } from "@/app/components/chat/chatStore";
 import { InlineChat } from "@/app/components/chat/InlineChat";
@@ -28,8 +29,17 @@ import { InlineChat } from "@/app/components/chat/InlineChat";
  * frame's Send button and right-hand chips on a phone, and they step aside
  * below `sm` while the frame is in the viewport.
  */
-export function TryOurAi() {
+export function TryOurAi({ standalone = false }: { standalone?: boolean }) {
   const frameRef = useRef<HTMLDivElement>(null);
+  const frameHeight = standalone
+    ? "h-[37.5rem] min-h-[20rem] max-h-[calc(100dvh-20rem)]"
+    : INLINE_DEMO_HEIGHT;
+
+  // A full-page chat has no floating panel. Clear its shared state when
+  // arriving from another page so the visible conversation can announce replies.
+  useEffect(() => {
+    if (standalone) setPanelOpen(false);
+  }, [standalone]);
 
   // Any part of the frame in the viewport counts: while it is, the fixed
   // buttons yield below `sm`. Cleared on unmount so a navigation away never
@@ -59,7 +69,7 @@ export function TryOurAi() {
           here: two min-heights on one element tie on specificity. */}
       <div
         ref={frameRef}
-        className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950 ${INLINE_DEMO_HEIGHT}`}
+        className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950 ${frameHeight}`}
       >
         <div
           role="status"
