@@ -1,6 +1,11 @@
 /**
- * Per-reply stats the route streams to the widget as message metadata, plus
- * the token and cost math both sides share.
+ * The token and cost math the chat route bills with, plus the one piece of
+ * message metadata the route still streams to the widget.
+ *
+ * Nothing about cost, tokens, model, or latency reaches the client (owner
+ * decision, 2026-09-13): those numbers go to the server's `chat.usage` log
+ * line only. The widget receives `emailEnabled`, which it needs to pick chips
+ * that do not invite an email while outgoing email is off.
  *
  * Client-safe: type-only `ai` import, zod for the client-side schema.
  */
@@ -66,17 +71,6 @@ export function costUsd(model: ChatModel, t: TokenBreakdown): number {
   );
 }
 
-export function addTokens(a: TokenBreakdown, b: TokenBreakdown): TokenBreakdown {
-  return {
-    input: a.input + b.input,
-    cacheRead: a.cacheRead + b.cacheRead,
-    cacheWrite: a.cacheWrite + b.cacheWrite,
-    output: a.output + b.output,
-    reasoning: a.reasoning + b.reasoning,
-    total: a.total + b.total,
-  };
-}
-
 /**
  * What a request is billed against the budgets: the sum of each step's cost,
  * with any step that reported no usage charged at the precharge estimate.
@@ -109,39 +103,17 @@ export function abortedBilledUsd(
   return billedUsd(model, stepUsages, precharge) + precharge;
 }
 
-export const tokenBreakdownSchema = z.object({
-  input: z.number(),
-  cacheRead: z.number(),
-  cacheWrite: z.number(),
-  output: z.number(),
-  reasoning: z.number(),
-  total: z.number(),
-});
-
 /**
- * Streamed in pieces and merged on the client: `model`, `budgetFallback`, and
- * `emailEnabled` on start, `ttftMs` with the first text delta, the rest on
- * finish.
+ * Streamed on the `start` part and merged on the client. This is the whole of
+ * what a reply carries about the server: nothing about the model, the tokens,
+ * the cost, or the time it took.
  */
 export const chatMessageMetadataSchema = z.object({
-  model: z.string().optional(),
-  modelLabel: z.string().optional(),
-  /** True when the global soft budget routed this reply to the fallback model. */
-  budgetFallback: z.boolean().optional(),
   /**
    * False when outgoing email is not configured on the site, so the widget can
    * pick chips that do not invite an email (`AFTER_BRIEF_CHIPS_NO_EMAIL`).
    */
   emailEnabled: z.boolean().optional(),
-  /** Time to first visible text token, milliseconds from request start. */
-  ttftMs: z.number().optional(),
-  /** Request start to stream finish, milliseconds. */
-  totalMs: z.number().optional(),
-  tokens: tokenBreakdownSchema.optional(),
-  costUsd: z.number().optional(),
-  steps: z.number().optional(),
-  toolCalls: z.number().optional(),
-  finishReason: z.string().optional(),
 });
 
 export type ChatMessageMetadata = z.infer<typeof chatMessageMetadataSchema>;

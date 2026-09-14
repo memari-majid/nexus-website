@@ -32,14 +32,17 @@
 import { createHash } from "node:crypto";
 import { SITE } from "@/lib/site";
 import {
+  CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES,
   CONTACT_CLASSIFY_MESSAGE_CHARS,
   CONTACT_CLASSIFY_NAME_CHARS,
+  CONTACT_CLASSIFY_PAUSE_MS,
   UNPRICED_MODEL_RATES,
   contactClassifyCostUsd,
   contactClassifyFloorUsd,
   contactClassifyPrechargeUsd,
   contactClassifyRates,
   contactClassifyResolvedRates,
+  createFailureBreaker,
   parseClassifyRates,
 } from "@/lib/chat-limits";
 import { findModel } from "@/lib/chat-models";
@@ -59,13 +62,22 @@ import {
 } from "@/lib/email";
 import { getRateLimiter } from "@/lib/rate-limit";
 
-const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "anthropic/claude-haiku-4-5";
+/**
+ * Why this default, measured 2026-09-13: `openai/gpt-oss-20b` (the value
+ * `.env.local` pins) returned no schema-valid object on 99 of 99 submissions,
+ * and `anthropic/claude-haiku-4-5`, the default before this, is not a slug the
+ * gateway serves at all (its Haiku is `anthropic/claude-haiku-4.5`, checked
+ * against the gateway's model list). `openai/gpt-4.1-nano` answered first time
+ * through `parseInquiryClassification` at $0.1/$0.4 per 1M. Same default as
+ * the personal site.
+ */
+const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "openai/gpt-4.1-nano";
 
 /**
  * What that model costs, in USD per 1M tokens, `"input,output"`.
  *
- * The default classifier is not on the chat picker's allowlist, so nothing
- * published prices it. Without a figure here the settle would correct the real
+ * The default classifier is not on the chat allowlist, so nothing published
+ * prices it. Without a figure here the settle would correct the real
  * token counts at `UNPRICED_MODEL_RATES`, which are Opus rates and five times
  * too high for this model, and every anonymous form post would leave most of
  * its reservation standing against the daily caps.
@@ -75,8 +87,8 @@ const CLASSIFY_MODEL = process.env.CONTACT_CLASSIFY_MODEL ?? "anthropic/claude-h
  * change is an env edit, then the table in `lib/chat-limits.ts`, then nothing,
  * which prices the call pessimistically and warns.
  *
- * An explicit price here wins over the allowlist price even when the slug is a
- * picker model, because that is what setting the variable means.
+ * An explicit price here wins over the allowlist price even when the slug is
+ * the chat model, because that is what setting the variable means.
  */
 const CLASSIFY_RATES =
   parseClassifyRates(process.env.CONTACT_CLASSIFY_RATES) ?? contactClassifyRates(CLASSIFY_MODEL);
@@ -87,7 +99,21 @@ if (!findModel(CLASSIFY_MODEL) && !CLASSIFY_RATES) {
   );
 }
 
-/** Logs never carry a raw visitor IP. Same shape as the chat and eval routes. */
+/**
+ * Stops paying for a classifier that cannot succeed. After
+ * `CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES` failed calls in a row on this
+ * instance the model is skipped for `CONTACT_CLASSIFY_PAUSE_MS`; the form
+ * still delivers with the fixed acknowledgment and the pause is logged as its
+ * own outcome. One success resets it.
+ */
+let breaker = createFailureBreaker({});
+
+/** Test hook: a fresh breaker, so one test's failures never pause the next. */
+export function resetClassifierBreaker(): void {
+  breaker = createFailureBreaker({});
+}
+
+/** Logs never carry a raw visitor IP. Same shape as the chat route. */
 function ipHash(ip: string): string {
   return createHash("sha256").update(ip).digest("hex").slice(0, 12);
 }
@@ -124,15 +150,16 @@ export type InquiryFailure = {
   status: number;
 };
 
-/** How the one metered classification for this inquiry ended. */
 /**
  * How one classification ended, for the `contact.usage` line. `unmeasured`
  * is its own outcome rather than folded into `classified`: a run of them is a
  * provider that stopped reporting usage, not a cheap day, and since both settle
- * at the same floor the cost alone cannot tell them apart. The personal site
- * logs the same five.
+ * at the same floor the cost alone cannot tell them apart. `paused` is the
+ * breaker above: the model was not called and nothing was spent, and a run of
+ * those lines is a misconfigured `CONTACT_CLASSIFY_MODEL`, not a quiet day.
+ * The personal site logs the same six.
  */
-type ClassifyOutcome = "classified" | "unmeasured" | "failed" | "refused" | "rate-limited";
+type ClassifyOutcome = "classified" | "unmeasured" | "failed" | "refused" | "rate-limited" | "paused";
 
 /**
  * Runs the classifier inside the site's rate limiter and budget, and logs one
@@ -174,8 +201,13 @@ async function classifyMetered(args: {
   let outcome: ClassifyOutcome = "rate-limited";
   let refusedBy: "ip" | "global" | undefined;
 
-  const rate = await limiter.checkRequestRate(args.ip);
-  if (rate.allowed) {
+  // Paused: the last few calls on this instance all failed, so this one is
+  // not made. No rate check and no reservation either, since nothing runs.
+  const paused = breaker.paused();
+  const rate = paused ? { allowed: false } : await limiter.checkRequestRate(args.ip);
+  if (paused) {
+    outcome = "paused";
+  } else if (rate.allowed) {
     const budget = await limiter.reserveBudget(args.ip, estimateUsd);
     if (!budget.ok) {
       outcome = "refused";
@@ -183,6 +215,7 @@ async function classifyMetered(args: {
     } else {
       try {
         const classified = await classifyInquiry({ ...forModel, modelId: CLASSIFY_MODEL });
+        breaker.record(true);
         category = classified.category;
         autoReply = classified.autoReply;
         const measured = contactClassifyCostUsd({
@@ -211,6 +244,12 @@ async function classifyMetered(args: {
       } catch (err) {
         console.error("[inquiry] classifyInquiry:", err);
         outcome = "failed";
+        breaker.record(false);
+        if (breaker.paused()) {
+          console.warn(
+            `[inquiry] classifier paused for ${Math.round(CONTACT_CLASSIFY_PAUSE_MS / 60_000)} minutes after ${CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES} consecutive failures on "${CLASSIFY_MODEL}". The form still delivers with the fixed acknowledgment. Check CONTACT_CLASSIFY_MODEL: a model that never returns a usable object is paid for on every post.`,
+          );
+        }
         // The prompt may already have reached the gateway, so a failure is
         // charged, not refunded: every input token it sent plus the whole
         // output cap, at the same rates a success settles at. Settling at zero

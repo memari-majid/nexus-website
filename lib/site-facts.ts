@@ -3,11 +3,11 @@
  *
  * Every entry is derived from a typed data module that already ships on this
  * site (`lib/dli.ts`, `lib/majid.ts`, `lib/fde.ts`, `lib/training.ts`,
- * `lib/site.ts`, `lib/collaborations.ts`) or from the published evaluation
- * artifact. Nothing is written from memory here: if a claim is not in one of
- * those, it does not belong in this file. Each fact also carries the on-site
- * page a visitor can check it on, and the tool passes that citation through so
- * the assistant can name its source instead of asserting.
+ * `lib/site.ts`, `lib/collaborations.ts`). Nothing is written from memory
+ * here: if a claim is not in one of those, it does not belong in this file.
+ * Each fact also carries the on-site page a visitor can check it on, and the
+ * tool passes that citation through so the assistant can name its source
+ * instead of asserting.
  *
  * Two hard constraints:
  * - Facts are short. The tool's output is echoed back on every later turn and
@@ -19,9 +19,9 @@
  * Client-safe: pure data and string matching, no env, no `ai` import.
  */
 
+import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { UNIVERSITY_COLLABORATIONS } from "@/lib/collaborations";
 import { DLI } from "@/lib/dli";
-import { PUBLISHED_EVALS, hasPublishedScores } from "@/lib/evals";
 import { FDE } from "@/lib/fde";
 import { MAJID } from "@/lib/majid";
 import { plainPunctuation } from "@/lib/plain-punctuation";
@@ -29,13 +29,7 @@ import { SITE } from "@/lib/site";
 import { CUSTOM_TRAINING } from "@/lib/training";
 
 /** The indexable pages a fact may point a visitor at. Mirrors `INDEXABLE_PATHS`. */
-export const FACT_PATHS = [
-  "/",
-  "/about",
-  "/contact",
-  "/nvidia-dli-workshops",
-  "/how-it-works",
-] as const;
+export const FACT_PATHS = ["/", "/about", "/contact", "/nvidia-dli-workshops"] as const;
 
 export type FactPath = (typeof FACT_PATHS)[number];
 
@@ -60,20 +54,6 @@ const clean = (text: string): string => plainPunctuation(text).replace(/\s+/g, "
 function fact(entry: SiteFact): SiteFact {
   return { ...entry, topic: clean(entry.topic), text: clean(entry.text) };
 }
-
-const publishedModels = PUBLISHED_EVALS.rows
-  .filter((row) => row.costUsd !== null)
-  .map((row) => row.label)
-  .join(", ");
-
-/**
- * A score exists only if someone measured it, so this sentence follows the
- * artifact rather than the other way round. It names no winner: rows can and do
- * tie, and a fact the assistant cites must not turn a tie into a champion.
- */
-const scoreLine = hasPublishedScores()
-  ? "A judge model that was not in the run scored every reply against the five-part rubric, and the scores sit beside the cost."
-  : "No model has scored those replies against the rubric yet, so no score is published.";
 
 /**
  * The table. Order is the tie-break when two facts score the same, so the
@@ -154,7 +134,10 @@ export const SITE_FACTS: readonly SiteFact[] = [
   fact({
     id: "instructor",
     topic: "Instructor credential",
-    text: `${MAJID.name} is an ${DLI.instructorTitle}, listed in NVIDIA's Certified Instructor Directory. That is an individual credential: NVIDIA does not endorse, sponsor, or partner with Nexus.`,
+    // The chat name, not `MAJID.name`: this text renders inside the chat
+    // surface on the facts card, where the founder is "Dr. Memari" (AGENTS.md
+    // 9.1). The About page the fact cites still carries the site-wide form.
+    text: `${FOUNDER_CHAT_NAME} is an ${DLI.instructorTitle}, listed in NVIDIA's Certified Instructor Directory. That is an individual credential: NVIDIA does not endorse, sponsor, or partner with Nexus.`,
     source: { label: "About", path: "/about" },
     keywords: ["certified", "credential", "endorsement", "partner", "directory"],
   }),
@@ -188,17 +171,14 @@ export const SITE_FACTS: readonly SiteFact[] = [
   }),
   fact({
     id: "how-the-agent-works",
-    topic: "How this assistant works",
-    text: "A system prompt grounded in this site's data, ten tools that render as visible steps, on-screen approval before anything is sent, per-reply cost and token stats, a model picker, and daily budgets.",
-    source: { label: "How it works", path: "/how-it-works" },
-    keywords: ["agent", "tools", "prompt", "approval", "budget", "model picker", "how do you work"],
-  }),
-  fact({
-    id: "evaluations",
-    topic: "How the default model was chosen",
-    text: `A published bake-off measured on ${PUBLISHED_EVALS.measuredAt}: ${publishedModels} answered the same ${PUBLISHED_EVALS.shape.turns}-turn prospect conversation through the real system prompt, and the cost and the read of each answer are published. ${scoreLine}`,
-    source: { label: "How it works", path: "/how-it-works" },
-    keywords: ["eval", "evaluation", "benchmark", "bake-off", "which model", "compare", "judge"],
+    topic: "What this assistant is",
+    // Deliberately says nothing about the model, the prompt, the tools, the
+    // budgets or the cost (owner decision, 2026-09-13): the assistant is a
+    // custom build for this site, and anyone who wants one like it talks to
+    // the founder.
+    text: `A custom AI assistant built by Nexus for this site. It answers from the site's published facts, drafts a consulting brief, sizes the work, and hands off to ${FOUNDER_CHAT_NAME} with on-screen approval. Nexus builds assistants like it for clients.`,
+    source: { label: "Home", path: "/" },
+    keywords: ["agent", "assistant", "chatbot", "who built you", "how do you work", "build one for us"],
   }),
 ] as const;
 

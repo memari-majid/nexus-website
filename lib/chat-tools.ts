@@ -5,7 +5,7 @@
  *
  * Contract every tool keeps:
  * - Input schemas are plain strings, numbers, and enums: no `.email()`, no
- *   regex, no `format` keywords, so the JSON schema works on every picker
+ *   regex, no `format` keywords, so the JSON schema works on any gateway
  *   model. Addresses are validated by `EMAIL_RE` inside `execute`.
  * - `toModelOutput` returns compact text (`{ type: "text" as const }`) and
  *   reads `output` with optional chaining: echoed outputs come back from the
@@ -34,9 +34,16 @@
  *   (`isEmailConfigured()`); production has no Resend today, and a
  *   not-configured attempt must never burn the day's allowance.
  * - The model-facing not-sent hint is per tool and per reason. "Noted" is
- *   reserved for the not-configured hand-off, the one outcome that records
- *   the request on the server; everything else is plainly "not sent". No
- *   hint ever names an email address: info@ has no inbound mail.
+ *   reserved for the not-configured hand-off, the one outcome that writes
+ *   the request to the server log; everything else is plainly "not sent".
+ *   Noted means logged, not read: until email is connected nothing is
+ *   delivered to anyone, so that hint also says not to promise a review or
+ *   a follow-up. No hint ever names an email address: info@ has no inbound
+ *   mail.
+ * - The two draft tools sign their own input into their output (`signDraft`).
+ *   The sends re-read a draft from the echoed transcript, and the request
+ *   sanitizer keeps a draft part only when that signature verifies, so a
+ *   transcript cannot plant a brief or a note the model never wrote.
  *
  * Server-only (imports the `ai` runtime, Resend, and the rate limiter).
  * Client components may import its types with `import type` only.
@@ -50,14 +57,16 @@ import {
   type UIMessage,
 } from "ai";
 import { z } from "zod";
+import { approvalSecret, signDraft } from "@/lib/approval-signature";
 import { DLI } from "@/lib/dli";
 import { recommendWorkshop as pickWorkshop } from "@/lib/recommend";
-import { consultingBriefSchema, findBrief } from "@/lib/brief-schema";
+import { BRIEF_TOOL_NAME, consultingBriefSchema, findBrief } from "@/lib/brief-schema";
 import { pathLabel, renderBriefText } from "@/lib/brief-prompt";
 import { BRIEF_EMAIL_SUBJECT, briefEmail } from "@/lib/brief-email";
 import { ASSISTANT_NAME, FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { estimateInputSchema, estimateProject as planProject } from "@/lib/estimate";
 import {
+  OUTREACH_TOOL_NAME,
   audienceLabel,
   findOutreachNote,
   noteWordCount,
@@ -131,6 +140,12 @@ const CONTACT_FORM = "point them to the contact form at /contact";
 const FORM_ONLY_RECORDS =
   "which also only records messages on the server until email delivery is connected";
 const NEVER_CLAIM = "do not claim an email went out";
+/**
+ * A logged hand-off is not a read one. Until email is connected the request
+ * sits in a server log nobody is paged by, so the assistant must not turn
+ * "noted" into a promise that anyone will look at it or get in touch.
+ */
+const NO_FOLLOW_UP_PROMISE = `do not promise that ${FOUNDER_CHAT_NAME} will review it or reach out`;
 
 const WHAT: Record<SendKind, string> = {
   handoff: "Hand-off",
@@ -159,7 +174,7 @@ export function notSentHint(kind: SendKind, reason: unknown): string {
   switch (reason) {
     case "not-configured":
       return kind === "handoff"
-        ? `${what} NOT emailed but noted for ${FOUNDER_CHAT_NAME}: ${why}. Say it was noted but not sent, ${CONTACT_FORM} (${FORM_ONLY_RECORDS}), and ${NEVER_CLAIM}.`
+        ? `${what} NOT emailed but noted in the server log: ${why}, so it was logged here and not delivered to ${FOUNDER_CHAT_NAME}. Say it was noted but not sent, ${NO_FOLLOW_UP_PROMISE}, ${CONTACT_FORM} (${FORM_ONLY_RECORDS}), and ${NEVER_CLAIM}.`
         : `${what} NOT emailed: ${why}. Say so plainly; ${STAYS[kind]}. Do not say it was noted, and ${NEVER_CLAIM}.`;
     case "invalid-email":
       return `${what} NOT sent: ${why}. Ask them to check the address and offer to try again; ${NEVER_CLAIM}.`;
@@ -333,11 +348,19 @@ export const draftConsultingBrief = tool({
   description:
     "Draft the structured consulting brief for this visitor: who they are, the goal, where they are today, opportunities with effort, risks, what to keep with people, the recommended Nexus path, the first step, and open questions. Call it once you understand their organization and goal, or the moment they ask for a brief, a summary, or a write-up. It renders as a card the visitor can send to him or have emailed. Ground every field in what they said.",
   inputSchema: consultingBriefSchema,
-  execute: async (brief) => ({
+  execute: async (brief, options) => ({
     ok: true as const,
     path: brief.recommendedPath.path,
     opportunities: brief.opportunities.length,
     draftedAt: new Date().toISOString(),
+    // Proof this server saw the model write this brief. The sanitizer drops
+    // any echoed brief part whose output does not carry it.
+    signature: signDraft({
+      secret: approvalSecret(),
+      toolCallId: options.toolCallId,
+      toolName: BRIEF_TOOL_NAME,
+      input: brief,
+    }),
   }),
   toModelOutput: ({ output }) => {
     const path = str(output?.path);
@@ -406,11 +429,18 @@ export const draftOutreachNote = tool({
   description:
     "Draft a short note the visitor can actually send: to their leadership to make the case, to their team to line up the work, or to the founder as a message you will offer to email. Call it when they say they need to take this to someone, need a write-up to send, or ask you to put something in writing. Ground every line in what they told you. It renders as a card they can copy.",
   inputSchema: outreachNoteSchema,
-  execute: async (note) => ({
+  execute: async (note, options) => ({
     ok: true as const,
     audience: note.audience,
     words: noteWordCount(note),
     draftedAt: new Date().toISOString(),
+    // Same proof as the brief: the sanitizer keeps a note part only with it.
+    signature: signDraft({
+      secret: approvalSecret(),
+      toolCallId: options.toolCallId,
+      toolName: OUTREACH_TOOL_NAME,
+      input: note,
+    }),
   }),
   toModelOutput: ({ output }) => {
     const audience = str(output?.audience);
@@ -721,8 +751,8 @@ export const emailWorkshopInfo = tool({
 /**
  * The ten tools, in the order the prompt introduces them: understand, ground,
  * structure, then send. Order is not functional, but it is the order
- * `/how-it-works`, `TOOL_STEP_COPY`, and `evals/tool-smoke.ts` list them in,
- * so keeping it stable keeps the four lists readable side by side.
+ * `TOOL_STEP_COPY` lists them in, so keeping it stable keeps the two lists
+ * readable side by side.
  */
 export const chatTools = {
   lookupSiteFacts,

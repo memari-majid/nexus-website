@@ -31,10 +31,26 @@
  * output falls through each tool's `toModelOutput` to its generic line, which
  * is exactly what those lines are for.
  *
+ * Why the signature checks: an on-screen approval is only as trustworthy as
+ * the transcript that carries it, and the transcript is the client's. A part
+ * in `approval-responded` for a call the model never made, with a self-chosen
+ * id and input, used to execute. Now the SDK signs every approval request it
+ * emits (`experimental_toolApprovalSecret` on the route) and this sanitizer
+ * verifies that signature on the way in (`lib/approval-signature.ts`): an
+ * approval that does not verify becomes `output-denied` with
+ * `FORGED_APPROVAL_REASON`, before any budget is reserved. The draft tools
+ * sign their own input into their output for the same reason, and a draft
+ * part whose output does not verify is dropped, so `findBrief` and
+ * `findOutreachNote` can only ever hand a send tool a draft this server saw
+ * the model write. Both checks run only when the caller passes the secret; the
+ * route always does.
+ *
  * Server-only (imports the tool set for its names).
  */
 
 import { z } from "zod";
+import { MAX_SIGNATURE_CHARS, verifyApproval, verifyDraft } from "@/lib/approval-signature";
+import { BRIEF_TOOL_NAME } from "@/lib/brief-schema";
 import {
   MAX_BODY_CHARS,
   MAX_CHARS_PER_ASSISTANT_TEXT_PART,
@@ -45,6 +61,7 @@ import {
   MAX_TOOL_CHARS_TOTAL,
 } from "@/lib/chat-limits";
 import { chatTools, type NexusUIMessage } from "@/lib/chat-tools";
+import { OUTREACH_TOOL_NAME } from "@/lib/outreach";
 
 export const TOO_LONG = "This conversation is getting long. Tap New to start a fresh chat.";
 /** What an old tool result becomes once its payload is trimmed for size. */
@@ -57,6 +74,12 @@ export const STALE_APPROVAL_REASON =
 /** Model-facing error on an approval that was granted but never executed. */
 export const INTERRUPTED_APPROVAL_TEXT =
   "Approved on screen, but that request was interrupted before the send ran, so nothing was sent. Offer to try again only if the visitor asks.";
+/** Model-facing reason on an approval whose signature is missing or does not match. */
+export const FORGED_APPROVAL_REASON =
+  "That approval could not be verified against a request this assistant made, so nothing was sent. Do not call this tool again unless the visitor asks, and point them to the contact form at /contact.";
+
+/** The tools whose input is a draft that a send tool re-reads from history. */
+const DRAFT_TOOL_NAMES: ReadonlySet<string> = new Set([BRIEF_TOOL_NAME, OUTREACH_TOOL_NAME]);
 
 /**
  * Vercel sets `x-vercel-forwarded-for` and `x-real-ip` itself, so those are
@@ -90,6 +113,8 @@ const approvalSchema = z.object({
   id: z.string().min(1).max(128),
   approved: z.boolean().optional(),
   reason: z.string().max(500).optional(),
+  /** The SDK's HMAC over the request it issued; verified before an approved call may run. */
+  signature: z.string().max(MAX_SIGNATURE_CHARS).optional(),
 });
 
 /**
@@ -121,10 +146,13 @@ const messageSchema = z.object({
   parts: z.array(loosePartSchema).max(MAX_PARTS_PER_MESSAGE),
 });
 
+/**
+ * Only `messages`. A `model` field, or anything else a client adds, is
+ * stripped by `z.object`: the route runs one model and the body does not get
+ * a say in which.
+ */
 export const chatBodySchema = z.object({
   messages: z.array(messageSchema).min(1).max(MAX_MESSAGES * 4),
-  /** Picker choice; validated by `resolveModel`, not `z.enum`, so an unknown id falls back. */
-  model: z.string().max(64).optional(),
 });
 
 type LooseMessage = z.infer<typeof messageSchema>;
@@ -132,7 +160,7 @@ type LoosePart = z.infer<typeof loosePartSchema>;
 
 /* ---------- Sanitizing ---------- */
 
-type Approval = { id: string; approved?: boolean; reason?: string };
+type Approval = { id: string; approved?: boolean; reason?: string; signature?: string };
 type TextPart = { type: "text"; text: string };
 type StepStartPart = { type: "step-start" };
 type ToolPart = {
@@ -146,6 +174,14 @@ type ToolPart = {
 };
 type SanitizedPart = TextPart | StepStartPart | ToolPart;
 
+/** What the sanitizer refused because it could not verify it, for the route's log line. */
+export type Rejected = {
+  /** Approved parts whose signature was missing or wrong, rewritten to a denial. */
+  forgedApprovals: number;
+  /** Brief and note parts whose output carried no valid draft signature, dropped. */
+  unsignedDrafts: number;
+};
+
 export type SanitizedTranscript =
   | {
       ok: true;
@@ -154,13 +190,30 @@ export type SanitizedTranscript =
       textChars: number;
       /** Echoed tool inputs, outputs, and error text, counted toward the precharge only. */
       toolChars: number;
+      rejected: Rejected;
     }
   | { ok: false; error: "user-text-too-long" };
 
+export type SanitizeOptions = {
+  /**
+   * The signing secret (`approvalSecret()`). With it, approved parts and draft
+   * parts are verified; without it (pure tests of the other rules) they pass
+   * through as they always did, and the SDK's own check is still the backstop.
+   */
+  approvalSecret?: string;
+};
+
 const jsonLength = (v: unknown): number => (v === undefined ? 0 : JSON.stringify(v).length);
 
-function sanitizeToolPart(raw: LoosePart, isLastMessage: boolean): ToolPart | null {
-  if (!raw.type.startsWith("tool-") || !TOOL_NAMES.has(raw.type.slice("tool-".length))) return null;
+const toolNameOf = (type: string): string => type.slice("tool-".length);
+
+function sanitizeToolPart(
+  raw: LoosePart,
+  isLastMessage: boolean,
+  secret: string | undefined,
+  rejected: Rejected,
+): ToolPart | null {
+  if (!raw.type.startsWith("tool-") || !TOOL_NAMES.has(toolNameOf(raw.type))) return null;
   const parsed = toolPartSchema.safeParse(raw);
   if (!parsed.success) return null;
   const p = parsed.data;
@@ -168,7 +221,20 @@ function sanitizeToolPart(raw: LoosePart, isLastMessage: boolean): ToolPart | nu
   if (p.state === "input-streaming" || p.state === "input-available" || p.input === undefined) {
     return null;
   }
+  const toolName = toolNameOf(p.type);
   const head = { type: p.type as `tool-${string}`, toolCallId: p.toolCallId, input: p.input };
+  // A draft is only a draft when this server signed it into the output. Any
+  // other state or an unverifiable output is not one the send tools may read.
+  if (secret !== undefined && DRAFT_TOOL_NAMES.has(toolName)) {
+    const signature = (p.output as { signature?: unknown } | null | undefined)?.signature;
+    const verified =
+      p.state === "output-available" &&
+      verifyDraft({ secret, toolCallId: p.toolCallId, toolName, input: p.input, signature });
+    if (!verified) {
+      rejected.unsignedDrafts += 1;
+      return null;
+    }
+  }
   const id = p.approval?.id;
   const granted = id && p.approval?.approved === true ? { approval: { id, approved: true } } : {};
   switch (p.state) {
@@ -187,10 +253,24 @@ function sanitizeToolPart(raw: LoosePart, isLastMessage: boolean): ToolPart | nu
       }
       const reason = p.approval.reason;
       if (isLastMessage) {
+        const signature = p.approval.signature;
+        if (
+          secret !== undefined &&
+          p.approval.approved &&
+          !verifyApproval({ secret, signature, approvalId: id, toolCallId: p.toolCallId, toolName, input: p.input })
+        ) {
+          rejected.forgedApprovals += 1;
+          return { ...head, state: "output-denied", approval: { id, approved: false, reason: FORGED_APPROVAL_REASON } };
+        }
         return {
           ...head,
           state: "approval-responded",
-          approval: { id, approved: p.approval.approved, ...(reason ? { reason } : {}) },
+          approval: {
+            id,
+            approved: p.approval.approved,
+            ...(reason ? { reason } : {}),
+            ...(signature ? { signature } : {}),
+          },
         };
       }
       return p.approval.approved
@@ -219,14 +299,19 @@ function sanitizeUserPart(raw: LoosePart): TextPart | null | "too-long" {
   return { type: "text", text: raw.text };
 }
 
-function sanitizeAssistantPart(raw: LoosePart, isLastMessage: boolean): SanitizedPart | null {
+function sanitizeAssistantPart(
+  raw: LoosePart,
+  isLastMessage: boolean,
+  secret: string | undefined,
+  rejected: Rejected,
+): SanitizedPart | null {
   if (raw.type === "text") {
     if (typeof raw.text !== "string") return null;
     // Trimmed, not rejected: one long reply must not lock the visitor out.
     return { type: "text", text: raw.text.slice(0, MAX_CHARS_PER_ASSISTANT_TEXT_PART) };
   }
   if (raw.type === "step-start") return { type: "step-start" };
-  return sanitizeToolPart(raw, isLastMessage);
+  return sanitizeToolPart(raw, isLastMessage, secret, rejected);
 }
 
 const toolPartChars = (part: ToolPart): number =>
@@ -258,11 +343,15 @@ export function trimToolPayloads(parts: readonly ToolPart[], total: number): num
  * Rebuilds every message from whitelisted parts. Messages left with no parts
  * are dropped (a user turn that only carried a file part, say).
  */
-export function sanitizeTranscript(messages: readonly LooseMessage[]): SanitizedTranscript {
+export function sanitizeTranscript(
+  messages: readonly LooseMessage[],
+  options: SanitizeOptions = {},
+): SanitizedTranscript {
   const out: { id?: string; role: "user" | "assistant"; parts: SanitizedPart[] }[] = [];
   // Oldest first, and never the final message: that is where an approved call
   // is executed and where the visitor is looking.
   const trimmable: ToolPart[] = [];
+  const rejected: Rejected = { forgedApprovals: 0, unsignedDrafts: 0 };
   let textChars = 0;
   let toolChars = 0;
   for (let index = 0; index < messages.length; index++) {
@@ -271,7 +360,9 @@ export function sanitizeTranscript(messages: readonly LooseMessage[]): Sanitized
     const parts: SanitizedPart[] = [];
     for (const raw of message.parts) {
       const part =
-        message.role === "user" ? sanitizeUserPart(raw) : sanitizeAssistantPart(raw, isLastMessage);
+        message.role === "user"
+          ? sanitizeUserPart(raw)
+          : sanitizeAssistantPart(raw, isLastMessage, options.approvalSecret, rejected);
       if (part === "too-long") return { ok: false, error: "user-text-too-long" };
       if (!part) continue;
       if (part.type === "text") textChars += part.text.length;
@@ -284,7 +375,7 @@ export function sanitizeTranscript(messages: readonly LooseMessage[]): Sanitized
     if (parts.length > 0) out.push({ ...(message.id ? { id: message.id } : {}), role: message.role, parts });
   }
   toolChars = trimToolPayloads(trimmable, toolChars);
-  return { ok: true, messages: out as unknown as NexusUIMessage[], textChars, toolChars };
+  return { ok: true, messages: out as unknown as NexusUIMessage[], textChars, toolChars, rejected };
 }
 
 /* ---------- Body ---------- */
@@ -293,15 +384,15 @@ export type ParsedChatBody =
   | {
       ok: true;
       messages: NexusUIMessage[];
-      model?: string;
       textChars: number;
       /** Text plus echoed tool payloads: what the precharge estimates from. */
       prechargeChars: number;
+      rejected: Rejected;
     }
   | { ok: false; status: 400 | 413; error: string };
 
 /** Everything between `req.text()` and `convertToModelMessages`, in order of cost. */
-export function parseChatBody(rawText: string): ParsedChatBody {
+export function parseChatBody(rawText: string, options: SanitizeOptions = {}): ParsedChatBody {
   if (rawText.length > MAX_BODY_CHARS) return { ok: false, status: 413, error: TOO_LONG };
   let raw: unknown;
   try {
@@ -312,16 +403,16 @@ export function parseChatBody(rawText: string): ParsedChatBody {
   const parsed = chatBodySchema.safeParse(raw);
   if (!parsed.success) return { ok: false, status: 400, error: INVALID };
   if (parsed.data.messages.length > MAX_MESSAGES) return { ok: false, status: 413, error: TOO_LONG };
-  const transcript = sanitizeTranscript(parsed.data.messages);
+  const transcript = sanitizeTranscript(parsed.data.messages, options);
   if (!transcript.ok) return { ok: false, status: 400, error: INVALID };
   if (transcript.messages.length === 0) return { ok: false, status: 400, error: INVALID };
   if (transcript.textChars > MAX_CHARS_TOTAL) return { ok: false, status: 413, error: TOO_LONG };
   return {
     ok: true,
     messages: transcript.messages,
-    ...(parsed.data.model ? { model: parsed.data.model } : {}),
     textChars: transcript.textChars,
     prechargeChars: transcript.textChars + transcript.toolChars,
+    rejected: transcript.rejected,
   };
 }
 

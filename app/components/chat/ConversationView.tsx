@@ -9,7 +9,6 @@ import {
   useEffect,
   useRef,
   useState,
-  useSyncExternalStore,
   type RefObject,
 } from "react";
 import { OPENING_CHIPS } from "@/lib/chat-chips";
@@ -22,14 +21,12 @@ import {
 import { resolveSuggestions } from "@/lib/chat-suggestions";
 import {
   CHAT_HEADER_ROW,
-  CHAT_TOOLBAR_ROW,
   COMPOSER_ROW,
   NO_SIDEWAYS_OVERFLOW,
   TRANSCRIPT_SCROLLER,
   announcementFor,
   announcementText,
   betweenSteps,
-  chatModelId,
   chatTitleId,
   displayAssistantText,
   errorRole,
@@ -49,30 +46,19 @@ import {
   type ChatUIMessage,
 } from "@/lib/chat-ui";
 import { AssistantTurn, hasVisibleContent } from "./AssistantTurn";
-import {
-  chooseModel,
-  hydrateModel,
-  readModelId,
-  serverModelId,
-  sharedChat,
-  subscribeModel,
-} from "./chatStore";
-import { ModelPicker } from "./ModelPicker";
+import { sharedChat } from "./chatStore";
 import { ToolStep, ToolStepLive, type ToolPartContext } from "./primitives";
 
 /** Header line under the assistant name, per surface. */
 const SUBTITLE: Record<ChatSurface, string> = {
   floating: "Tell me what you're working on. I'll give you straight AI guidance.",
-  inline: "Live on this page, and the same agent the rest of the site runs.",
+  inline: "Tell me what your team does. I'll give you straight AI guidance.",
 };
 
 /** What the empty transcript says before the first message. */
-const INTRO: Record<ChatSurface, string> = {
-  floating: `Hey, I'm the ${ASSISTANT_NAME} for Nexus. Tell me what your team does and where you want to go with AI. I'll give you straight, useful guidance first, and when it helps I can draft a brief, size the work, score your readiness, and hand you off to ${FOUNDER_CHAT_NAME}. What are you working on?`,
-  inline: `Hey, I'm the ${ASSISTANT_NAME} for Nexus. This is the real agent, running here in the page. Tell me what your team does and where you want to go with AI. I can look up what this site publishes, draft a consulting brief, size the work in weeks, write the note you need to send internally, and hand the thread to ${FOUNDER_CHAT_NAME}. Every reply shows the model that wrote it, how fast it was, and what it cost.`,
-};
+const INTRO = `Hey, I'm the ${ASSISTANT_NAME} for Nexus. Tell me what your team does and where you want to go with AI. I'll give you straight, useful guidance first, and when it helps I can draft a brief, size the work, score your readiness, and hand you off to ${FOUNDER_CHAT_NAME}. What are you working on?`;
 
-/** Shown once, in the empty inline demo: what the agent can actually do here. */
+/** Shown once, in the empty inline frame: what the assistant can do for a visitor. */
 const CAPABILITIES: readonly string[] = [
   "Answers grounded in this site",
   "Consulting brief",
@@ -80,7 +66,6 @@ const CAPABILITIES: readonly string[] = [
   "AI readiness score",
   "A note you can send internally",
   `Hand-off to ${FOUNDER_CHAT_NAME}`,
-  "Model, speed and cost on every reply",
 ];
 
 /**
@@ -90,17 +75,15 @@ const CAPABILITIES: readonly string[] = [
 export type Announce = (announcement: Announcement | undefined) => void;
 
 /**
- * The live region is the frame's, not the conversation's. The inline demo
- * puts the chat in a tabpanel, and the inactive tabpanel is hidden with
- * `display: none`, which takes the whole subtree out of the accessibility
- * tree: a region rendered in here would be announced nowhere whenever the
- * visitor was reading the Evaluations tab. So the frame renders one region
- * outside its tabpanels and this view only hands it lines.
+ * The live region is the frame's, not the conversation's. Each shell renders
+ * one region as a sibling of this view, so the region is always in the
+ * accessibility tree whatever this view is doing, and this view only hands it
+ * lines.
  *
  * A shell that renders this view directly passes `onAnnounce`. The inline
  * frame is two components up, so it provides the same function through this
  * context instead of threading a prop through the shell in between. What the
- * view announces, and how often, is unchanged either way: `announcedRef` and
+ * view announces, and how often, is the same either way: `announcedRef` and
  * the `live` flag still decide, here, that a reply is spoken once.
  */
 export const AnnouncerContext = createContext<Announce | undefined>(undefined);
@@ -122,10 +105,10 @@ export type ConversationViewProps = {
 };
 
 /**
- * The conversation itself: header, toolbar, transcript, and composer. Both
- * shells render this, they share one `Chat` instance, and the only
- * differences between them are the copy above and the chrome around it. The
- * live region is the frame's, see `AnnouncerContext` above.
+ * The conversation itself: header, transcript, and composer. Both shells
+ * render this, they share one `Chat` instance, and the only differences
+ * between them are the copy above and the chrome around it. The live region
+ * is the frame's, see `AnnouncerContext` above.
  *
  * Sizing is the shell's job. This view assumes a flex column with a bounded
  * height: the transcript is the only part that scrolls, and the composer
@@ -148,8 +131,6 @@ export function ConversationView({
   const mountedRef = useRef(false);
   const focusInsideRef = useRef(false);
   const hadFocusRef = useRef(false);
-
-  const modelId = useSyncExternalStore(subscribeModel, readModelId, serverModelId);
 
   const [chat] = useState(sharedChat);
   const {
@@ -191,15 +172,9 @@ export function ConversationView({
     );
   }
 
-  // Hydration-safe: the default renders on the server and at first paint,
-  // then the saved pick is read once mounted.
-  useEffect(() => {
-    hydrateModel();
-  }, []);
-
   // Land at the bottom of whatever is already there, without touching the
   // page scroll. `scrollIntoView` would walk every scrollable ancestor and
-  // yank the page down to the inline demo on mount.
+  // yank the page down to the inline frame on mount.
   useEffect(() => {
     const el = scrollerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -324,7 +299,7 @@ export function ConversationView({
     .filter(Boolean);
   // The running row covers the gaps a multi-step turn leaves: before the
   // first part arrives, and after a tool step finishes while the model
-  // composes the next one (often several seconds on the larger models).
+  // composes the next one.
   const thinking =
     busy && (!last || last.role !== "assistant" || !hasVisibleContent(last) || betweenSteps(last.parts));
   const tools: ToolPartContext = {
@@ -340,19 +315,21 @@ export function ConversationView({
       : "Type a message…";
 
   // The route says on `start` whether outgoing email is configured; with it
-  // off, no chip may invite an email that would only end in "not sent".
+  // off, no chip may invite an email that would only end in "not sent". A
+  // reply that ends with the explicit `none` line gets no chips at all: the
+  // assistant asked the visitor something and wants them to answer it.
   const emailEnabled = lastAssistant ? readChatMetadata(lastAssistant.metadata)?.emailEnabled : undefined;
+  const modelChips = lastAssistant
+    ? splitSuggestions(stripControlTokens(messageText(lastAssistant)))
+    : undefined;
   const suggestions =
-    !locked && lastAssistant
-      ? resolveSuggestions(
-          splitSuggestions(stripControlTokens(messageText(lastAssistant))).suggestions,
-          {
-            lastAssistant: splitSuggestions(displayAssistantText(messageText(lastAssistant))).body,
-            lastUser: lastUser ? messageText(lastUser) : undefined,
-            used: usedChips,
-            emailEnabled,
-          },
-        )
+    !locked && lastAssistant && modelChips && !modelChips.none
+      ? resolveSuggestions(modelChips.suggestions, {
+          lastAssistant: splitSuggestions(displayAssistantText(messageText(lastAssistant))).body,
+          lastUser: lastUser ? messageText(lastUser) : undefined,
+          used: usedChips,
+          emailEnabled,
+        })
       : [];
 
   return (
@@ -372,7 +349,7 @@ export function ConversationView({
           </div>
           <p className="text-xs text-zinc-600 dark:text-zinc-400">{SUBTITLE[surface]}</p>
         </div>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {busy && (
             <button
               type="button"
@@ -382,6 +359,15 @@ export function ConversationView({
               Stop
             </button>
           )}
+          <button
+            type="button"
+            onClick={newChat}
+            disabled={messages.length === 0 && !error}
+            className="shrink-0 rounded-md border border-zinc-300 px-2 py-1 text-[11px] font-medium text-zinc-700 hover:border-zinc-400 hover:text-zinc-900 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+            aria-label="Start a new chat"
+          >
+            New
+          </button>
           {onClose && (
             <button
               type="button"
@@ -395,32 +381,6 @@ export function ConversationView({
             </button>
           )}
         </div>
-      </div>
-
-      <div className={CHAT_TOOLBAR_ROW}>
-        <ModelPicker
-          id={chatModelId(idPrefix)}
-          value={modelId}
-          onChange={chooseModel}
-          disabled={busy}
-        />
-        <Link
-          href="/how-it-works"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0 text-[11px] text-zinc-600 underline decoration-zinc-400 underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:decoration-zinc-600 dark:hover:text-zinc-200"
-        >
-          How this works
-        </Link>
-        <button
-          type="button"
-          onClick={newChat}
-          disabled={messages.length === 0 && !error}
-          className="shrink-0 rounded-md border border-zinc-300 px-2 py-1 text-[11px] font-medium text-zinc-700 hover:border-zinc-400 hover:text-zinc-900 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-          aria-label="Start a new chat"
-        >
-          New
-        </button>
       </div>
 
       {/* Mirrored from the personal site's ConversationView so the two files
@@ -447,7 +407,7 @@ export function ConversationView({
       >
         {messages.length === 0 && (
           <div className={`space-y-3 ${NO_SIDEWAYS_OVERFLOW}`}>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">{INTRO[surface]}</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">{INTRO}</p>
             {surface === "inline" && (
               <ul className="flex flex-wrap gap-1.5">
                 {CAPABILITIES.map((c) => (
@@ -532,7 +492,7 @@ export function ConversationView({
             in as one static string. */}
         <noscript
           dangerouslySetInnerHTML={{
-            __html: `<style>.chat-fine-print{display:none}</style><p class="rounded-lg border border-zinc-200 px-3 py-2 text-center text-xs text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">This demo needs JavaScript to reply. Use the <a class="underline" href="/contact">contact form</a> instead.</p>`,
+            __html: `<style>.chat-fine-print{display:none}</style><p class="rounded-lg border border-zinc-200 px-3 py-2 text-center text-xs text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">This chat needs JavaScript to reply. Use the <a class="underline" href="/contact">contact form</a> instead.</p>`,
           }}
         />
         <form onSubmit={onSubmit} action="/contact" className="flex gap-2">

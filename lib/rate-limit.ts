@@ -7,12 +7,7 @@
  * cannot be overshot by more than one request's estimate. `settleBudget`
  * (onFinish) refunds or tops up against actual usage; `topUpBudget` (onAbort)
  * only ever adds. Both are one-shot, because both measure against the original
- * estimate. `chargeAtLeast` is the repeatable form for work that lands after a
- * request has already settled: it raises the reservation to the highest total
- * ever reported and never lowers it, so a late leg is charged once and only
- * for itself. That holds whatever a settle did first, because a settle records
- * the total it wrote and the repeatable form charges the difference from
- * there, not from the estimate.
+ * estimate.
  *
  * Storage is Upstash Redis over REST when `KV_REST_API_*` (Vercel
  * Marketplace) or `UPSTASH_REDIS_REST_*` are set, else a per-instance memory
@@ -31,24 +26,12 @@
  * instead of sending twice. Both calls fail open: a store error never blocks
  * a send, it only loses the memory of it.
  *
- * The live evaluation run adds three more uses of the same store: a per-visitor
- * day counter that is the run cap (`reserveEvalRun`, `releaseEvalRun`, taken
- * before a model is called and given back only when the run never starts), a
- * day counter for its own spend sub-budget (`reserveEvalBudget`,
- * `settleEvalBudget`, `topUpEvalBudget`, which narrows the share of the soft
- * budget evals may take and never replaces `reserveBudget`), and a per-visitor
- * per-pair record of the finished run (`rememberRun`, `recallRun`) so asking
- * for the same comparison again in a day replays it instead of spending again.
- * A pair the visitor never ran misses that record and meets the run counter.
- *
  * Server-only: reads env lazily on first use. Never import from a client
  * component.
  */
 
 import {
-  EVAL_RUNS_PER_IP_PER_DAY,
   GLOBAL_EMAILS_PER_DAY,
-  GLOBAL_EVAL_USD_PER_DAY,
   GLOBAL_HANDOFFS_PER_DAY,
   GLOBAL_HARD_DAILY_USD,
   GLOBAL_SOFT_DAILY_USD,
@@ -81,8 +64,6 @@ const MINUTE_TTL_SECONDS = 120;
 const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
 /** How long a delivered approval-gated send is remembered per toolCallId. */
 export const SENT_TTL_SECONDS = 24 * 60 * 60;
-/** How long a finished evaluation run is replayed to the same visitor. */
-export const RUN_TTL_SECONDS = 24 * 60 * 60;
 const MICRO = 1_000_000;
 
 /** Dollars to integer micro-dollars, rounded up so a charge is never zero. */
@@ -199,81 +180,12 @@ export type BudgetDecision =
     }
   | { ok: false; reason: "ip" | "global"; ipSpentUsd: number; globalSpentUsd: number };
 
-/**
- * A reservation against the live-evaluation sub-budget. One key, not two: the
- * per-IP side of an eval run is counted in runs rather than in dollars, by
- * `reserveEvalRun` below.
- */
-export type EvalReservation = { key: string; estimateMicro: number };
-
-export type EvalBudgetDecision =
-  | { ok: true; reservation: EvalReservation; spentUsd: number }
-  | { ok: false; spentUsd: number };
-
-/** One live evaluation run, counted against a visitor's day. */
-export type EvalRunReservation = { key: string };
-
-export type EvalRunDecision =
-  | { ok: true; reservation: EvalRunReservation; runsToday: number }
-  | { ok: false; runsToday: number };
-
 export type RateLimiter = {
   readonly backend: "upstash" | "memory";
   checkRequestRate(ip: string): Promise<{ allowed: boolean; count: number }>;
   reserveBudget(ip: string, estimateUsd: number): Promise<BudgetDecision>;
   settleBudget(reservation: BudgetReservation, actualUsd: number): Promise<void>;
   topUpBudget(reservation: BudgetReservation, actualUsd: number): Promise<void>;
-  /**
-   * Raises a reservation to `actualUsd` and never lowers it, as many times as
-   * it is called.
-   *
-   * `settleBudget` and `topUpBudget` are one-shot: each compares the actual
-   * against the ORIGINAL estimate, so a second call would refund or
-   * double-charge. A run whose settle already fired (a cancelled eval run, say)
-   * can still have legs land afterwards, and that spend is real. This keeps
-   * the running total on the reservation and adds only the difference, so the
-   * counters end at the highest total ever reported. The one-shot pair writes
-   * that same running total when it moves the counters, so a settle that came
-   * first is the baseline here and its dollars are never charged twice.
-   */
-  chargeAtLeast(reservation: BudgetReservation, actualUsd: number): Promise<void>;
-  /**
-   * Reserves against the day's live-evaluation sub-budget, which sits INSIDE
-   * the global soft budget. Refuses without spending when the day's eval share
-   * is gone. This narrows what evals may cost; it never replaces
-   * `reserveBudget`, which is the only global hard cap there is.
-   */
-  reserveEvalBudget(estimateUsd: number): Promise<EvalBudgetDecision>;
-  /** Settles an eval reservation against actual spend. Refunds or tops up. */
-  settleEvalBudget(reservation: EvalReservation, actualUsd: number): Promise<void>;
-  /**
-   * Settles an eval reservation upwards only, for a run that failed or was
-   * abandoned: its prompts were consumed, so the estimate is the floor and the
-   * sub-budget is never handed money back for work that happened.
-   */
-  topUpEvalBudget(reservation: EvalReservation, actualUsd: number): Promise<void>;
-  /** `chargeAtLeast` for the eval sub-budget: repeatable, and only ever up. */
-  chargeEvalAtLeast(reservation: EvalReservation, actualUsd: number): Promise<void>;
-  /**
-   * Takes one of this visitor's live evaluation runs for the UTC day. The
-   * counter goes up FIRST and is given back on refusal, so parallel taps at the
-   * edge of the allowance cannot all slip through, and a run that fails or is
-   * abandoned still counts: it spent real money. `releaseEvalRun` is for the
-   * paths where nothing ran at all.
-   */
-  reserveEvalRun(ip: string): Promise<EvalRunDecision>;
-  /** Gives a reserved run back. Only ever called before a model is asked for anything. */
-  releaseEvalRun(reservation: EvalRunReservation): Promise<void>;
-  /**
-   * Remembers a finished evaluation run for `RUN_TTL_SECONDS`, keyed by the
-   * caller's bucket (an IP hash, the UTC day, and the challenger that was run).
-   * A repeat of the SAME pair that day replays this instead of spending again;
-   * a pair the visitor never ran has no record here, which is what keeps the
-   * replay from answering a comparison nobody asked for. Never throws.
-   */
-  rememberRun(bucket: string, run: unknown): Promise<void>;
-  /** The run remembered by `rememberRun`, or null when there is none. */
-  recallRun(bucket: string): Promise<unknown>;
   /** One email of the given kind; false when the IP or the site is over its daily cap for that kind. */
   reserveEmail(ip: string, kind?: EmailKind): Promise<boolean>;
   /**
@@ -304,8 +216,6 @@ export type RateLimiterOptions = {
     globalEmailsPerDay: number;
     perIpHandoffsPerDay: number;
     globalHandoffsPerDay: number;
-    evalDailyUsd: number;
-    evalRunsPerIpPerDay: number;
   }>;
 };
 
@@ -340,8 +250,6 @@ export function createRateLimiter(store: CounterStore, options: RateLimiterOptio
     globalEmailsPerDay: GLOBAL_EMAILS_PER_DAY,
     perIpHandoffsPerDay: PER_IP_HANDOFFS_PER_DAY,
     globalHandoffsPerDay: GLOBAL_HANDOFFS_PER_DAY,
-    evalDailyUsd: GLOBAL_EVAL_USD_PER_DAY,
-    evalRunsPerIpPerDay: EVAL_RUNS_PER_IP_PER_DAY,
     ...options.limits,
   };
   let lastErrorLog = 0;
@@ -369,56 +277,6 @@ export function createRateLimiter(store: CounterStore, options: RateLimiterOptio
 
   const sentKey = (tool: string, toolCallId: string) =>
     `${prefix}:sent:${safeSegment(tool)}:${idSegment(toolCallId)}`;
-
-  /**
-   * The caller's bucket carries the visitor, the UTC day, and the pair that was
-   * run, so a replay is only ever the comparison that was actually asked for.
-   * `safeSegment` bounds it at 64 characters, which those three fit inside.
-   */
-  const runKey = (bucket: string) => `${prefix}:run:${safeSegment(bucket)}`;
-
-  /**
-   * Micro-dollars a reservation's counters currently hold, for the repeatable
-   * `chargeAtLeast` pair. Keyed on the reservation object itself, so nothing
-   * outside this module has to carry the running total, and it disappears with
-   * the request that made it.
-   *
-   * Every one-shot settle records what it wrote here, which is what keeps the
-   * two families on one baseline. Without that, `chargeUpTo` measured from the
-   * original estimate even after a settle had moved the counters, and the gap
-   * was charged twice: on a $0.05 estimate, `topUpBudget` to $0.08 followed by
-   * `chargeAtLeast` $0.12 ended at $0.15 for a run that cost $0.12. It erred
-   * toward over-charging our own budget, and the promise in this file's header
-   * is the highest total ever reported, not more than it.
-   */
-  const chargedMicro = new WeakMap<object, number>();
-
-  /**
-   * Raises `keys` so the reservation has been charged `actualUsd` in total.
-   * Safe to call repeatedly and in any order: the highest total wins, and a
-   * call that asks for less than has already been charged does nothing.
-   */
-  async function chargeUpTo(
-    reservation: object,
-    keys: readonly string[],
-    estimateMicro: number,
-    actualUsd: number,
-  ): Promise<void> {
-    const target = toMicroUsd(actualUsd);
-    const already = chargedMicro.get(reservation) ?? estimateMicro;
-    if (target <= already) return;
-    // Recorded before the await, so two legs landing together cannot both read
-    // the old total and charge the same dollars twice.
-    chargedMicro.set(reservation, target);
-    const delta = target - already;
-    await incr(
-      keys.map((key) => ({ key, by: delta })),
-      DAY_TTL_SECONDS,
-    );
-  }
-
-  /** Per-visitor live-evaluation runs for one UTC day. Same IP segment as every other per-IP key. */
-  const evalRunKey = (ip: string, day: string) => `${prefix}:evals:runs:${safeSegment(ip)}:${day}`;
 
   return {
     backend: options.backend ?? "memory",
@@ -468,10 +326,8 @@ export function createRateLimiter(store: CounterStore, options: RateLimiterOptio
     },
 
     async settleBudget(reservation, actualUsd) {
-      const target = toMicroUsd(actualUsd);
-      const delta = target - reservation.estimateMicro;
+      const delta = toMicroUsd(actualUsd) - reservation.estimateMicro;
       if (delta === 0) return;
-      chargedMicro.set(reservation, target);
       await incr(
         [
           { key: reservation.ipKey, by: delta },
@@ -482,11 +338,9 @@ export function createRateLimiter(store: CounterStore, options: RateLimiterOptio
     },
 
     async topUpBudget(reservation, actualUsd) {
-      const target = toMicroUsd(actualUsd);
-      const delta = target - reservation.estimateMicro;
+      const delta = toMicroUsd(actualUsd) - reservation.estimateMicro;
       // Below the estimate nothing moves, so the estimate is still the total.
       if (delta <= 0) return;
-      chargedMicro.set(reservation, target);
       await incr(
         [
           { key: reservation.ipKey, by: delta },
@@ -494,81 +348,6 @@ export function createRateLimiter(store: CounterStore, options: RateLimiterOptio
         ],
         DAY_TTL_SECONDS,
       );
-    },
-
-    async chargeAtLeast(reservation, actualUsd) {
-      await chargeUpTo(
-        reservation,
-        [reservation.ipKey, reservation.globalKey],
-        reservation.estimateMicro,
-        actualUsd,
-      );
-    },
-
-    async reserveEvalBudget(estimateUsd) {
-      const key = `${prefix}:usd:evals:${dayBucket(now())}`;
-      const estimateMicro = toMicroUsd(estimateUsd);
-      const [total] = await incr([{ key, by: estimateMicro }], DAY_TTL_SECONDS);
-      if (total > toMicroUsd(limits.evalDailyUsd)) {
-        await incr([{ key, by: -estimateMicro }], DAY_TTL_SECONDS);
-        return { ok: false, spentUsd: fromMicroUsd(total - estimateMicro) };
-      }
-      return { ok: true, reservation: { key, estimateMicro }, spentUsd: fromMicroUsd(total) };
-    },
-
-    async settleEvalBudget(reservation, actualUsd) {
-      const target = toMicroUsd(actualUsd);
-      const delta = target - reservation.estimateMicro;
-      if (delta === 0) return;
-      chargedMicro.set(reservation, target);
-      await incr([{ key: reservation.key, by: delta }], DAY_TTL_SECONDS);
-    },
-
-    async topUpEvalBudget(reservation, actualUsd) {
-      const target = toMicroUsd(actualUsd);
-      const delta = target - reservation.estimateMicro;
-      // Below the estimate nothing moves, so the estimate is still the total.
-      if (delta <= 0) return;
-      chargedMicro.set(reservation, target);
-      await incr([{ key: reservation.key, by: delta }], DAY_TTL_SECONDS);
-    },
-
-    async chargeEvalAtLeast(reservation, actualUsd) {
-      await chargeUpTo(reservation, [reservation.key], reservation.estimateMicro, actualUsd);
-    },
-
-    async reserveEvalRun(ip) {
-      const key = evalRunKey(ip, dayBucket(now()));
-      const [count] = await incr([{ key, by: 1 }], DAY_TTL_SECONDS);
-      if (count > limits.evalRunsPerIpPerDay) {
-        await incr([{ key, by: -1 }], DAY_TTL_SECONDS);
-        return { ok: false, runsToday: count - 1 };
-      }
-      return { ok: true, reservation: { key }, runsToday: count };
-    },
-
-    async releaseEvalRun(reservation) {
-      await incr([{ key: reservation.key, by: -1 }], DAY_TTL_SECONDS);
-    },
-
-    async rememberRun(bucket, run) {
-      if (!bucket) return;
-      try {
-        await withFallback((s) => s.set(runKey(bucket), JSON.stringify(run), RUN_TTL_SECONDS));
-      } catch (err) {
-        logStoreError("a finished eval run was not remembered", err);
-      }
-    },
-
-    async recallRun(bucket) {
-      if (!bucket) return null;
-      try {
-        const raw = await withFallback((s) => s.get(runKey(bucket)));
-        return raw === null ? null : (JSON.parse(raw) as unknown);
-      } catch (err) {
-        logStoreError("treating the eval run as not yet made", err);
-        return null;
-      }
     },
 
     async reserveEmail(ip, kind = "visitor") {
@@ -621,6 +400,13 @@ export function createRateLimiter(store: CounterStore, options: RateLimiterOptio
 
 let shared: RateLimiter | null = null;
 
+/** The Upstash REST pair from the environment, or null when either half is missing. */
+function sharedStoreEnv(): { url: string; token: string } | null {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  return url && token ? { url, token } : null;
+}
+
 /**
  * Process-wide limiter. Env is read here, on first call, never at import, so
  * the module stays importable in tests and the in-memory fallback is the
@@ -628,10 +414,9 @@ let shared: RateLimiter | null = null;
  */
 export function getRateLimiter(): RateLimiter {
   if (shared) return shared;
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (url && token) {
-    shared = createRateLimiter(createUpstashStore(url, token), { backend: "upstash" });
+  const env = sharedStoreEnv();
+  if (env) {
+    shared = createRateLimiter(createUpstashStore(env.url, env.token), { backend: "upstash" });
     console.info("[rate-limit] Upstash REST counters enabled");
   } else {
     shared = createRateLimiter(createMemoryStore(), { backend: "memory" });

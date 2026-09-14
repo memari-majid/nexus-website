@@ -5,7 +5,11 @@ import {
   AFTER_BRIEF_CHIPS_NO_EMAIL,
   AFTER_HANDOFF_CHIPS,
   AFTER_SNAPSHOT_CHIPS,
+  DISCOVERY_CHIPS,
+  MAX_CHIPS,
   OPENING_CHIPS,
+  READY_CHIPS,
+  chipLine,
 } from "@/lib/chat-chips";
 import {
   BRIEF_DRAFTED_RE,
@@ -29,7 +33,16 @@ describe("resolveSuggestions", () => {
       lastAssistant: "Consulting first: scope the SOP problem before building.",
       used: [],
     });
-    expect(chips).toEqual([...AFTER_ADVICE_CHIPS]);
+    expect(chips).toEqual(AFTER_ADVICE_CHIPS.slice(0, MAX_CHIPS));
+  });
+
+  it("never hands the widget more than the cap, whatever the model emits", () => {
+    const chips = resolveSuggestions(
+      ["Which training fits us?", "What's covered?", "Would an FDE help?", "When should we skip AI?"],
+      { used: [] },
+    );
+    expect(chips).toHaveLength(MAX_CHIPS);
+    expect(MAX_CHIPS).toBe(2);
   });
 
   it("drops chips that invite an email while outgoing email is off", () => {
@@ -48,6 +61,14 @@ describe("resolveSuggestions", () => {
 describe("shared chips", () => {
   it("re-exports the opening chips from lib/chat-chips so the widget import keeps working", () => {
     expect(REEXPORTED_OPENING_CHIPS).toBe(OPENING_CHIPS);
+  });
+
+  it("renders the prompt's example lines at the cap, five words or fewer each", () => {
+    for (const list of [DISCOVERY_CHIPS, AFTER_ADVICE_CHIPS, READY_CHIPS, AFTER_BRIEF_CHIPS, AFTER_BRIEF_CHIPS_NO_EMAIL, AFTER_SNAPSHOT_CHIPS, AFTER_HANDOFF_CHIPS]) {
+      const line = chipLine(list);
+      expect(line.split(" | ")).toHaveLength(MAX_CHIPS);
+      for (const chip of list) expect(chip.split(/\s+/).length, chip).toBeLessThanOrEqual(5);
+    }
   });
 
   it("keeps the no-email after-brief list free of email chips", () => {
@@ -102,27 +123,27 @@ describe("after-brief detection (spec 4.3)", () => {
 
   it("offers the after-brief chips only once the brief exists", () => {
     const after = fallbackSuggestions({ lastAssistant: "Here's your brief." });
-    expect(after).toEqual([...AFTER_BRIEF_CHIPS]);
+    expect(after).toEqual(AFTER_BRIEF_CHIPS.slice(0, MAX_CHIPS));
     const offer = fallbackSuggestions({
       lastAssistant: "Want me to draft the brief?",
       lastUser: "Draft a consulting brief",
     });
-    expect(offer).not.toEqual([...AFTER_BRIEF_CHIPS]);
+    expect(offer).not.toEqual(AFTER_BRIEF_CHIPS.slice(0, MAX_CHIPS));
   });
 
   it("swaps to the no-email after-brief chips when outgoing email is off", () => {
     const after = fallbackSuggestions({ lastAssistant: "Here's your brief.", emailEnabled: false });
-    expect(after).toEqual([...AFTER_BRIEF_CHIPS_NO_EMAIL]);
+    expect(after).toEqual(AFTER_BRIEF_CHIPS_NO_EMAIL.slice(0, MAX_CHIPS));
   });
 
   it("offers the after-snapshot and after-hand-off chips in their moments", () => {
     expect(SNAPSHOT_SHOWN_RE.test("Here is your readiness snapshot.")).toBe(true);
     expect(SNAPSHOT_SHOWN_RE.test("Want a readiness check?")).toBe(false);
-    expect(fallbackSuggestions({ lastAssistant: "Your readiness snapshot is above." })).toEqual([
-      ...AFTER_SNAPSHOT_CHIPS,
-    ]);
+    expect(fallbackSuggestions({ lastAssistant: "Your readiness snapshot is above." })).toEqual(
+      AFTER_SNAPSHOT_CHIPS.slice(0, MAX_CHIPS),
+    );
     expect(
       fallbackSuggestions({ lastAssistant: "Noted but not sent: email is not set up yet." }),
-    ).toEqual([...AFTER_HANDOFF_CHIPS]);
+    ).toEqual(AFTER_HANDOFF_CHIPS.slice(0, MAX_CHIPS));
   });
 });

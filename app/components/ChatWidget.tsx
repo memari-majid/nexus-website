@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { OPEN_CHAT_EVENT } from "@/lib/chat-events";
 import { ASSISTANT_THE } from "@/lib/chat-persona";
 import {
@@ -14,7 +14,12 @@ import {
   type Announcement,
 } from "@/lib/chat-ui";
 import { ConversationView } from "@/app/components/chat/ConversationView";
-import { setPanelOpen } from "@/app/components/chat/chatStore";
+import {
+  readDemoInView,
+  serverDemoInView,
+  setPanelOpen,
+  subscribeDemoInView,
+} from "@/app/components/chat/chatStore";
 
 /**
  * The floating shell: a launcher, and a panel that holds the shared
@@ -46,6 +51,11 @@ export function ChatWidget() {
   // Focus goes back there on close, or to the launcher when it is gone.
   const openerRef = useRef<HTMLElement | null>(null);
   const wasOpenRef = useRef(false);
+  // Below `sm` the launcher sits exactly where the inline demo's Send button
+  // lands (measured: 30% of Send under it at 390x844, the same at 360x640),
+  // so it steps aside while that frame is on screen. The frame is the same
+  // conversation, and the CTAs still open this panel through the event.
+  const demoInView = useSyncExternalStore(subscribeDemoInView, readDemoInView, serverDemoInView);
 
   const openDialog = useCallback(() => {
     const active = document.activeElement;
@@ -169,7 +179,7 @@ export function ChatWidget() {
         ref={launcherRef}
         type="button"
         onClick={openDialog}
-        className={`fixed z-[60] flex h-14 w-14 min-h-[56px] min-w-[56px] items-center justify-center rounded-full bg-brand-500 text-zinc-950 shadow-lg shadow-brand-900/30 transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-zinc-50 motion-reduce:transition-none dark:focus:ring-offset-zinc-950 ${open ? "hidden" : ""} bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))]`}
+        className={`fixed z-[60] flex h-14 w-14 min-h-[56px] min-w-[56px] items-center justify-center rounded-full bg-brand-500 text-zinc-950 shadow-lg shadow-brand-900/30 transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-zinc-50 motion-reduce:transition-none dark:focus:ring-offset-zinc-950 ${open ? "hidden" : ""} ${demoInView ? "max-sm:hidden" : ""} bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))]`}
         aria-label={`Open ${ASSISTANT_THE}`}
         aria-haspopup="dialog"
       >

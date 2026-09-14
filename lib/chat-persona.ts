@@ -3,10 +3,10 @@
  *
  * Owner override, 2026-09-13 (AGENTS.md 9.1): the assistant is the "AI
  * Consultant". Inside the chat surface only (the chat system prompt, tool
- * descriptions and hints, card copy, the emails the agent sends, and
- * `/how-it-works` when it quotes the agent) the founder is called
- * "Dr. Memari". Everywhere else on the site, in metadata, in JSON-LD, in alt
- * text, and in the phone voice prompt, he stays "Majid Memari, PhD".
+ * descriptions and hints, card copy, and the emails the agent sends) the
+ * founder is called "Dr. Memari". Everywhere else on the site, in metadata,
+ * in JSON-LD, in alt text, and in the phone voice prompt, he stays
+ * "Majid Memari, PhD".
  *
  * Nothing may hardcode these strings in a component, a prompt, a test, or a
  * doc. Never rename by blanket substitution either: the tool keys

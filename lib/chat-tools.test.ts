@@ -1,6 +1,7 @@
 import type { ModelMessage } from "ai";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
+import { approvalSecret, verifyDraft } from "@/lib/approval-signature";
 import { BRIEF_TOOL_NAME } from "@/lib/brief-schema";
 import { SAMPLE_BRIEF } from "@/lib/brief-schema.test";
 import { APPROVAL_TOOLS, chatTools, isFailureReason, notSentHint, toolContext } from "@/lib/chat-tools";
@@ -327,6 +328,11 @@ describe("toModelOutput", () => {
     expect(noted).toMatch(/noted but not sent/);
     expect(noted).toContain("/contact");
     expect(noted).toMatch(/only records messages/);
+    // Noted means logged, not read. Nothing is delivered until email is
+    // connected, so the hint must not let "noted" grow into a follow-up.
+    expect(noted).toMatch(/logged here and not delivered/);
+    expect(noted).toContain(`do not promise that ${FOUNDER_CHAT_NAME} will review it or reach out`);
+    expect(noted).not.toMatch(/noted for/);
     for (const reason of ["invalid-email", "rate-limited", "send-failed", "invalid-input", "bogus", undefined]) {
       expect(notSentHint("handoff", reason), String(reason)).not.toMatch(/noted/i);
       expect(notSentHint("handoff", reason), String(reason)).toMatch(/NOT sent/);
@@ -644,7 +650,24 @@ describe("pure tools", () => {
     const out = (await tools.draftConsultingBrief.execute!(SAMPLE_BRIEF, options())) as Record<string, unknown>;
     expect(out.ok).toBe(true);
     expect(out.path).toBe("consulting");
-    expect(JSON.stringify(out).length).toBeLessThan(200);
+    expect(JSON.stringify(out).length).toBeLessThan(220);
+  });
+
+  it("the draft tools sign their input into the output, bound to the call id", async () => {
+    const brief = (await tools.draftConsultingBrief.execute!(SAMPLE_BRIEF, options())) as { signature: string };
+    expect(
+      verifyDraft({ secret: approvalSecret(), toolCallId: "call_1", toolName: BRIEF_TOOL_NAME, input: SAMPLE_BRIEF, signature: brief.signature }),
+    ).toBe(true);
+    expect(
+      verifyDraft({ secret: approvalSecret(), toolCallId: "call_2", toolName: BRIEF_TOOL_NAME, input: SAMPLE_BRIEF, signature: brief.signature }),
+    ).toBe(false);
+    const note = (await tools.draftOutreachNote.execute!(SAMPLE_NOTE, options())) as { signature: string };
+    expect(
+      verifyDraft({ secret: approvalSecret(), toolCallId: "call_1", toolName: OUTREACH_TOOL_NAME, input: SAMPLE_NOTE, signature: note.signature }),
+    ).toBe(true);
+    // The signature is proof for the sanitizer, not something the model reads.
+    const spoken = (await tools.draftConsultingBrief.toModelOutput!({ toolCallId: "c", input: {}, output: brief })) as { value: string };
+    expect(spoken.value).not.toContain(brief.signature);
   });
 
   it("assessReadiness returns the clamped snapshot", async () => {

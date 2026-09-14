@@ -15,6 +15,7 @@ import {
   AFTER_BRIEF_CHIPS_NO_EMAIL,
   AFTER_HANDOFF_CHIPS,
   AFTER_SNAPSHOT_CHIPS,
+  MAX_CHIPS,
 } from "@/lib/chat-chips";
 
 export { OPENING_CHIPS } from "@/lib/chat-chips";
@@ -56,7 +57,7 @@ function alreadyUsed(s: string, used: readonly string[]): boolean {
   });
 }
 
-/** Keep three short, unused, non-fluff chips. */
+/** Keep at most `MAX_CHIPS` short, unused, non-fluff chips. */
 export function sanitizeSuggestions(
   chips: readonly string[],
   used: readonly string[] = [],
@@ -71,7 +72,7 @@ export function sanitizeSuggestions(
     if (!key || seen.has(key)) continue;
     seen.add(key);
     out.push(s);
-    if (out.length === 3) break;
+    if (out.length === MAX_CHIPS) break;
   }
   return out;
 }
@@ -162,7 +163,7 @@ export function resolveSuggestions(
   const candidates =
     context.emailEnabled === false ? modelChips.filter((c) => !EMAIL_CHIP_RE.test(c)) : modelChips;
   const fromModel = sanitizeSuggestions(candidates, used);
-  if (fromModel.length >= 2) return fromModel;
+  if (fromModel.length >= MAX_CHIPS) return fromModel;
   const fallback = fallbackSuggestions({ ...context, used: [...used, ...fromModel] });
   return sanitizeSuggestions([...fromModel, ...fallback], used);
 }

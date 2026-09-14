@@ -8,7 +8,7 @@ import { z } from "zod";
  * email re-read it from the message history (`findBrief`) instead of asking
  * the model to emit it twice.
  *
- * Schema rules that matter on every picker model: no regex patterns, no
+ * Schema rules that matter on any gateway model: no regex patterns, no
  * `format` keywords, plain strings and enums only. Caps are twice the display
  * target and the targets sit in `.describe()`, so a slightly long field is
  * accepted instead of rejecting a 1,500-token brief and burning a retry step.

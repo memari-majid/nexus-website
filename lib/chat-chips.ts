@@ -6,8 +6,11 @@
  * A chip is visitor-facing chat copy, so the founder is `FOUNDER_CHAT_NAME`
  * here (AGENTS.md 9.1), read from `lib/chat-persona.ts` and never spelled out.
  *
- * Every chip is under seven words and reads as something a visitor would tap.
- * Client-safe, dependency-free.
+ * The model may emit at most `MAX_CHIPS` per reply, each five words or fewer
+ * and each naming something concrete from the reply or the visitor's last
+ * message, or the `NO_CHIPS` line when the reply ends by asking the visitor
+ * about their situation. The lists below are the prompt's worked examples and
+ * the fallback's pool; every entry fits that rule. Client-safe.
  *
  * Nexus is based in Utah and works with companies across the United States, so
  * no chip may name a state, a region, or a travel radius, or invite a visitor
@@ -15,6 +18,12 @@
  */
 
 import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
+
+/** Most chips one reply may carry. The prompt, the parser and the fallback all read this. */
+export const MAX_CHIPS = 2;
+
+/** What the model writes after the marker when the reply should carry no chips. */
+export const NO_CHIPS = "none";
 
 /** Shown before the first message. */
 export const OPENING_CHIPS = [
@@ -76,7 +85,7 @@ export const AFTER_HANDOFF_CHIPS = [
   "What's covered?",
 ] as const;
 
-/** Renders a list the way the prompt asks the model to emit it. */
+/** Renders a list the way the prompt asks the model to emit it: the first `MAX_CHIPS` only. */
 export function chipLine(chips: readonly string[]): string {
-  return chips.join(" | ");
+  return chips.slice(0, MAX_CHIPS).join(" | ");
 }

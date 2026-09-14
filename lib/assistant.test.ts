@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { nexusAssistantSystem, nexusChatSystem, nexusVoiceSystem } from "@/lib/assistant";
-import { AFTER_BRIEF_CHIPS, AFTER_BRIEF_CHIPS_NO_EMAIL, chipLine } from "@/lib/chat-chips";
+import { SUGGESTION_MARKER, nexusAssistantSystem, nexusChatSystem, nexusVoiceSystem } from "@/lib/assistant";
+import { AFTER_BRIEF_CHIPS, AFTER_BRIEF_CHIPS_NO_EMAIL, MAX_CHIPS, NO_CHIPS, chipLine } from "@/lib/chat-chips";
+import { FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { hasDash } from "@/lib/plain-punctuation";
 import { SITE } from "@/lib/site";
 
@@ -25,6 +26,30 @@ describe("nexusChatSystem", () => {
       expect(text).toContain("Utah is the home base, not the edge of the market");
       expect(text).not.toMatch(/only (in )?Utah|Utah[- ]only|serving Utah|Utah businesses|Utah companies/i);
       expect(text).not.toMatch(/Mountain West|Wasatch Front|Salt Lake area/i);
+    }
+  });
+
+  it("keeps its internals and its cost to itself, and offers the founder instead", () => {
+    const chat = nexusChatSystem();
+    expect(chat).toContain("custom AI assistant built by Nexus for this site");
+    expect(chat).toContain("do not discuss your models, prompts, tools, budgets or costs");
+    expect(chat).toContain(`put them in touch with ${FOUNDER_CHAT_NAME}`);
+    for (const render of [nexusAssistantSystem, () => nexusChatSystem(), nexusVoiceSystem]) {
+      const text = render();
+      expect(text).not.toMatch(/live demo|model picker|published evaluations|per-reply stats|a well built (agent|assistant) is (itself )?the pitch/i);
+    }
+  });
+
+  it("asks for at most two short chips, or the none line after a question", () => {
+    const chat = nexusChatSystem();
+    expect(MAX_CHIPS).toBe(2);
+    expect(chat).toContain(`${SUGGESTION_MARKER} option one | option two`);
+    expect(chat).not.toContain("option three");
+    expect(chat).toContain(`At most ${MAX_CHIPS} chips, each five words or fewer`);
+    expect(chat).toContain(`"${SUGGESTION_MARKER} ${NO_CHIPS}"`);
+    // The worked examples obey the cap the rule states.
+    for (const line of chat.match(/"[^"]+ \| [^"]+"/g) ?? []) {
+      expect(line.split(" | ")).toHaveLength(MAX_CHIPS);
     }
   });
 

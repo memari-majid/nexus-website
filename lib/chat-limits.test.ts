@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   CHARS_PER_TOKEN,
+  CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES,
   CONTACT_CLASSIFY_MESSAGE_CHARS,
   CONTACT_CLASSIFY_NAME_CHARS,
   CONTACT_CLASSIFY_OUTPUT_TOKENS,
+  CONTACT_CLASSIFY_PAUSE_MS,
   CONTACT_CLASSIFY_TIMEOUT_MS,
   GLOBAL_HARD_DAILY_USD,
   GLOBAL_SOFT_DAILY_USD,
@@ -18,6 +20,7 @@ import {
   PER_IP_DAILY_USD,
   PER_IP_REQUESTS_PER_MINUTE,
   PRECHARGE_OUTPUT_TOKENS,
+  PROMPT_TOKENS_ESTIMATE,
   STORE_TIMEOUT_MS,
   STREAM_TIMEOUT_MS,
   UNPRICED_MODEL_RATES,
@@ -26,16 +29,20 @@ import {
   contactClassifyPrechargeUsd,
   contactClassifyRates,
   contactClassifyResolvedRates,
+  createFailureBreaker,
   parseClassifyRates,
   prechargeUsd,
 } from "@/lib/chat-limits";
-import { defaultModel, findModel } from "@/lib/chat-models";
+import { defaultModel, findModel, type ChatModel } from "@/lib/chat-models";
 
 describe("budget constants", () => {
-  it("map the token targets to dollars at the Opus input price", () => {
-    const opusInput = defaultModel().inputPerM; // $5 per 1M
-    expect(GLOBAL_SOFT_DAILY_USD).toBeCloseTo((600_000 * opusInput) / 1e6, 6); // $3.00
-    expect(GLOBAL_HARD_DAILY_USD).toBeCloseTo((2_000_000 * opusInput) / 1e6, 6); // $10.00
+  it("keep the dollar budgets as they were set, soft under hard", () => {
+    // Unchanged when the chat moved to Haiku 4.5 (2026-09-13): the same
+    // dollars now buy several times the conversations, and the hard budget is
+    // still the ceiling.
+    expect(GLOBAL_SOFT_DAILY_USD).toBe(3.0);
+    expect(GLOBAL_HARD_DAILY_USD).toBe(10.0);
+    expect(GLOBAL_SOFT_DAILY_USD).toBeLessThan(GLOBAL_HARD_DAILY_USD);
     expect(PER_IP_DAILY_USD).toBe(1.0);
     expect(PER_IP_REQUESTS_PER_MINUTE).toBe(20);
   });
@@ -71,24 +78,71 @@ describe("budget constants", () => {
 });
 
 describe("prechargeUsd", () => {
-  const opus = defaultModel();
-  const gemini = findModel("google/gemini-3.8-flash")!;
+  const haiku = defaultModel();
+  /** A model priced five times Haiku, to show the estimate follows the price list. */
+  const dearer: ChatModel = { ...haiku, id: "test/dearer", inputPerM: 5, outputPerM: 25 };
 
   it("is never zero and grows with conversation length", () => {
-    const empty = prechargeUsd(opus, 0);
-    const long = prechargeUsd(opus, 12_000);
+    const empty = prechargeUsd(haiku, 0);
+    const long = prechargeUsd(haiku, 12_000);
     expect(empty).toBeGreaterThan(0);
     expect(long).toBeGreaterThan(empty);
   });
 
-  it("is cheaper on a cheaper model", () => {
-    expect(prechargeUsd(gemini, 2_000)).toBeLessThan(prechargeUsd(opus, 2_000));
+  it("follows the model's list price", () => {
+    expect(prechargeUsd(haiku, 2_000)).toBeLessThan(prechargeUsd(dearer, 2_000));
   });
 
-  it("sits in the cents range for one Opus request", () => {
-    const usd = prechargeUsd(opus, 2_000);
+  it("sits in the cents range for one Haiku request", () => {
+    const usd = prechargeUsd(haiku, 2_000);
     expect(usd).toBeGreaterThan(0.01);
-    expect(usd).toBeLessThan(0.2);
+    expect(usd).toBeLessThan(0.05);
+  });
+
+  it("reserves the whole prompt at the uncached price, which is where the per-IP cap has to refuse", () => {
+    // Measured 2026-09-13 on the first turn after a deploy: the prompt plus
+    // the ten tool schemas wrote 13,460 to 13,528 tokens to the cache. At the
+    // old 6,000 estimate a cold turn was under-reserved, so a parallel burst
+    // from one address was admitted past $1 before anything settled.
+    expect(PROMPT_TOKENS_ESTIMATE).toBeGreaterThanOrEqual(13_528);
+    const coldPrompt = (PROMPT_TOKENS_ESTIMATE * haiku.inputPerM) / 1e6;
+    expect(prechargeUsd(haiku, 0)).toBeGreaterThan(coldPrompt);
+  });
+});
+
+describe("createFailureBreaker", () => {
+  it("pauses after the configured run of failures, for the configured time, and a success resets it", () => {
+    let t = 0;
+    const breaker = createFailureBreaker({ trips: 3, pauseMs: 1_000, now: () => t });
+    expect(breaker.paused()).toBe(false);
+    breaker.record(false);
+    breaker.record(false);
+    expect(breaker.paused()).toBe(false);
+    // A success in between clears the run.
+    breaker.record(true);
+    breaker.record(false);
+    breaker.record(false);
+    expect(breaker.paused()).toBe(false);
+    breaker.record(false);
+    expect(breaker.paused()).toBe(true);
+    t = 999;
+    expect(breaker.paused()).toBe(true);
+    t = 1_000;
+    expect(breaker.paused()).toBe(false);
+    // Tripped again only after another full run, not on the next failure.
+    breaker.record(false);
+    expect(breaker.paused()).toBe(false);
+  });
+
+  it("ships with the documented defaults", () => {
+    expect(CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES).toBe(5);
+    expect(CONTACT_CLASSIFY_PAUSE_MS).toBe(60 * 60 * 1000);
+    let t = 0;
+    const breaker = createFailureBreaker({ now: () => t });
+    for (let i = 0; i < CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES; i++) breaker.record(false);
+    expect(breaker.paused()).toBe(true);
+    t = CONTACT_CLASSIFY_PAUSE_MS;
+    expect(breaker.paused()).toBe(false);
   });
 });
 
@@ -97,25 +151,26 @@ describe("contact classifier rates", () => {
     // The override is the operator writing a price in the environment. A
     // resolver that read the allowlist first would make that variable silently
     // unreachable for exactly the slugs an operator is most likely to reprice.
-    const opus = findModel("anthropic/claude-opus-5");
-    expect(opus).toBeDefined();
+    const haiku = findModel("anthropic/claude-haiku-4.5");
+    expect(haiku).toBeDefined();
     const override = { inputPerM: 0.04, outputPerM: 0.16 };
-    expect(contactClassifyResolvedRates({ model: opus, rates: override })).toEqual(override);
-    const fromModel = contactClassifyResolvedRates({ model: opus });
-    expect(fromModel.inputPerM).toBe(opus?.inputPerM);
-    expect(fromModel.outputPerM).toBe(opus?.outputPerM);
+    expect(contactClassifyResolvedRates({ model: haiku, rates: override })).toEqual(override);
+    const fromModel = contactClassifyResolvedRates({ model: haiku });
+    expect(fromModel.inputPerM).toBe(haiku?.inputPerM);
+    expect(fromModel.outputPerM).toBe(haiku?.outputPerM);
     expect(contactClassifyResolvedRates({ model: undefined })).toEqual(UNPRICED_MODEL_RATES);
   });
 
-  it("prices the default classifier from the table, because it is not a picker model here", () => {
-    // Worth asserting rather than assuming: `anthropic/claude-haiku-4-5` is the
+  it("prices the default classifier from the table, because it is not the chat model here", () => {
+    // Worth asserting rather than assuming: `openai/gpt-4.1-nano` is the
     // default CONTACT_CLASSIFY_MODEL and is NOT on this site's chat allowlist,
     // so the published-price branch never fires for it. Drop the table row and
-    // every classification would be priced at Opus rates.
-    expect(findModel("anthropic/claude-haiku-4-5")).toBeUndefined();
-    const tabled = contactClassifyRates("anthropic/claude-haiku-4-5");
-    expect(tabled).toEqual({ inputPerM: 1, outputPerM: 5 });
+    // every classification would be priced at the pessimistic rates.
+    expect(findModel("openai/gpt-4.1-nano")).toBeUndefined();
+    const tabled = contactClassifyRates("openai/gpt-4.1-nano");
+    expect(tabled).toEqual({ inputPerM: 0.1, outputPerM: 0.4 });
     expect(contactClassifyResolvedRates({ model: undefined, rates: tabled })).toEqual(tabled);
+    expect(contactClassifyRates("anthropic/claude-haiku-4-5")).toEqual({ inputPerM: 1, outputPerM: 5 });
     expect(contactClassifyRates("openai/gpt-oss-20b")).toEqual({
       inputPerM: 0.04,
       outputPerM: 0.16,

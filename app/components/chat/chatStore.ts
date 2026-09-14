@@ -2,14 +2,13 @@
 
 import { Chat } from "@ai-sdk/react";
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from "ai";
-import { FALLBACK_MODEL_ID } from "@/lib/chat-models";
-import { MODEL_STORAGE_KEY, isChatModelId, type ChatUIMessage } from "@/lib/chat-ui";
+import type { ChatUIMessage } from "@/lib/chat-ui";
 
 /**
- * One conversation, two shells. The inline demo on the homepage and the
+ * One conversation, two shells. The inline section on the homepage and the
  * floating panel render the same transcript from this module, so a visitor
- * who starts in the page and then opens the panel keeps their conversation,
- * their model pick, and their approval cards.
+ * who starts in the page and then opens the panel keeps their conversation
+ * and their approval cards.
  *
  * Everything the SDK needs goes on the `Chat` instance, never on the
  * `useChat` call: `@ai-sdk/react` builds its own options only when no `chat`
@@ -46,52 +45,10 @@ function createStore<T>(initial: T): Store<T> {
   };
 }
 
-/* ---------- Model ---------- */
-
-/**
- * The page opens on the cheaper model. The picker still offers all four, and
- * a visitor's pick is remembered, but the default a homepage visitor spends
- * is the fallback one (AGENTS.md 9.3: do not change this without changing the
- * rest of the cost posture).
- */
-const modelStore = createStore<string>(FALLBACK_MODEL_ID);
-
-export const subscribeModel = modelStore.subscribe;
-
-export function readModelId(): string {
-  return modelStore.get();
-}
-
-/** Server and first-paint snapshot. Constant, so hydration cannot mismatch. */
-export function serverModelId(): string {
-  return FALLBACK_MODEL_ID;
-}
-
-/** Only ids in the allowlist land, so a stale stored value cannot leak through. */
-export function chooseModel(id: string): void {
-  if (!isChatModelId(id)) return;
-  modelStore.set(id);
-  try {
-    window.localStorage.setItem(MODEL_STORAGE_KEY, id);
-  } catch {
-    /* storage unavailable */
-  }
-}
-
-/** Reads the saved pick once mounted. Storage can be blocked, so never throws. */
-export function hydrateModel(): void {
-  try {
-    const stored = window.localStorage.getItem(MODEL_STORAGE_KEY);
-    if (isChatModelId(stored)) modelStore.set(stored);
-  } catch {
-    /* storage unavailable */
-  }
-}
-
 /* ---------- Floating panel ---------- */
 
 /**
- * Whether the floating panel is open. The inline demo watches this: both
+ * Whether the floating panel is open. The inline section watches this: both
  * shells render the same transcript, so only one of them may hold a live
  * region that talks.
  */
@@ -109,6 +66,31 @@ export function serverPanelOpen(): boolean {
 
 export function setPanelOpen(open: boolean): void {
   panelStore.set(open);
+}
+
+/* ---------- Inline section visibility ---------- */
+
+/**
+ * Whether the inline chat frame is in the viewport. The fixed launcher and
+ * the scroll-to-top button watch this: on a phone both sit exactly where the
+ * frame's Send button and its right-hand chips land, so a thumb on Send opened
+ * the panel instead. While the frame is on screen they step out of the way
+ * below `sm`; the frame is the same conversation the launcher would open.
+ */
+const demoInViewStore = createStore(false);
+
+export const subscribeDemoInView = demoInViewStore.subscribe;
+
+export function readDemoInView(): boolean {
+  return demoInViewStore.get();
+}
+
+export function serverDemoInView(): boolean {
+  return false;
+}
+
+export function setDemoInView(inView: boolean): void {
+  demoInViewStore.set(inView);
 }
 
 /* ---------- Transport ---------- */
@@ -135,12 +117,11 @@ async function chatFetch(input: RequestInfo | URL, init?: RequestInit): Promise<
 
 function createChat(): Chat<ChatUIMessage> {
   return new Chat<ChatUIMessage>({
-    // The body is read on every send, so the automatic re-send after an
-    // approval carries whatever the picker holds at that moment.
+    // The body carries the messages and nothing else: the route runs one
+    // model and the client does not get to name it.
     transport: new DefaultChatTransport<ChatUIMessage>({
       api: "/api/chat",
       fetch: chatFetch,
-      body: () => ({ model: modelStore.get() }),
     }),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
   });

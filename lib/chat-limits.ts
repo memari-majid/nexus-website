@@ -2,12 +2,12 @@
  * Every knob that costs money, in one owner-tunable file.
  *
  * Budgets are in dollars, not tokens, so cached prompt reads (a tenth of the
- * input price on Anthropic) and cheaper picker models are charged for what
- * they cost. At the Opus input price ($5 per 1M) the daily budgets map to
- * the original token targets: 600k tokens = $3.00 soft, 2M tokens = $10.00
- * hard. The per-IP allowance is $1.00 rather than the 60k-token equivalent
- * ($0.30) because cached reads count at a tenth and a whole company behind
- * one NAT shares the bucket.
+ * input price on Anthropic) are charged for what they cost. The dollar
+ * figures were set when the chat ran a dearer model and are kept as they
+ * were: on Claude Haiku 4.5 they buy several times the conversations they
+ * did, and the hard budget is still the ceiling. The per-IP allowance is
+ * $1.00 because cached reads count at a tenth and a whole company behind one
+ * NAT shares the bucket.
  *
  * Client-safe: constants and pure functions only.
  */
@@ -65,8 +65,15 @@ export const MAX_CHARS_PER_TEXT_PART = 4_000;
 export const MAX_MESSAGES = 40;
 export const MAX_PARTS_PER_MESSAGE = 50;
 
-/** Rendered system prompt (about 4.7k tokens) plus tool schemas (about 1.4k), measured 2026-09-12. */
-export const PROMPT_TOKENS_ESTIMATE = 6_000;
+/**
+ * Rendered system prompt plus the ten tool schemas, as the gateway counts
+ * them on a cold cache: 13,460 to 13,528 tokens written to the cache on
+ * Anthropic models, measured 2026-09-13 on the first turn after a deploy.
+ * Rounded up, because this is the number the per-IP cap refuses on: at the
+ * old 6,000 a cold turn reserved well under what it billed, so a parallel
+ * burst from one address walked past $1 before any request settled.
+ */
+export const PROMPT_TOKENS_ESTIMATE = 14_000;
 /** Typical reply plus one tool call. */
 export const PRECHARGE_OUTPUT_TOKENS = 1_200;
 export const CHARS_PER_TOKEN = 4;
@@ -130,12 +137,66 @@ export const CONTACT_CLASSIFY_NAME_CHARS = 120;
 /** One classification is a single short call: it never needs longer than this. */
 export const CONTACT_CLASSIFY_TIMEOUT_MS = 20_000;
 
+/**
+ * Consecutive failed classifications on one instance before the classifier
+ * is paused, and for how long. A model that never returns a usable object
+ * (measured 2026-09-13: `openai/gpt-oss-20b` answered 99 of 99 submissions
+ * with text that fit no schema) would otherwise be paid for on every form
+ * post while every visitor got the fixed acknowledgment anyway. While paused
+ * the form still delivers with that acknowledgment and spends nothing, and the
+ * pause is logged as its own `paused` outcome so a run of them reads as a
+ * misconfigured model, not a quiet day. Per instance: a fresh instance tries
+ * again, which is the retry.
+ */
+export const CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES = 5;
+export const CONTACT_CLASSIFY_PAUSE_MS = 60 * 60 * 1000;
+
+export type FailureBreaker = {
+  /** True while the pause is in force: skip the call. */
+  paused(): boolean;
+  /** Records how a call ended. A success clears the count; a failure counts toward the trip. */
+  record(ok: boolean): void;
+};
+
+/**
+ * The pause above, as a pure object the metering wraps around the model call.
+ * Trips after `trips` consecutive failures, stays tripped for `pauseMs`, and a
+ * success at any point resets it. `now` is injectable so the tests need no
+ * clock.
+ */
+export function createFailureBreaker(args: {
+  trips?: number;
+  pauseMs?: number;
+  now?: () => number;
+}): FailureBreaker {
+  const trips = args.trips ?? CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES;
+  const pauseMs = args.pauseMs ?? CONTACT_CLASSIFY_PAUSE_MS;
+  const now = args.now ?? Date.now;
+  let failures = 0;
+  let pausedUntil = 0;
+  return {
+    paused: () => now() < pausedUntil,
+    record: (ok) => {
+      if (ok) {
+        failures = 0;
+        pausedUntil = 0;
+        return;
+      }
+      failures += 1;
+      if (failures >= trips) {
+        pausedUntil = now() + pauseMs;
+        failures = 0;
+      }
+    },
+  };
+}
+
 export type Rates = { inputPerM: number; outputPerM: number };
 
 /**
  * Rates assumed when nothing prices the slug in `CONTACT_CLASSIFY_MODEL`: it is
  * not on the chat allowlist, not in the table below, and no env override names
- * a price. They match the most expensive model on the allowlist (Opus 5), so an
+ * a price. They are Opus-class rates, the dearest tier the gateway lists, so an
  * unknown model over-reserves rather than under-reserving.
  *
  * The last resort, for both halves of the accounting. Using them for a slug
@@ -152,21 +213,22 @@ export const UNPRICED_MODEL_RATES = { inputPerM: 5, outputPerM: 25 } as const;
 /**
  * USD per 1M tokens for the classifier models, keyed by gateway slug.
  *
- * They need their own table because `CHAT_MODELS` is the picker's allowlist,
- * not a price list: the classifier is deliberately a model no visitor can
- * select, so `findModel` returns nothing for it and there is no published price
- * to settle against.
+ * They need their own table because `CHAT_MODELS` is the chat's allowlist,
+ * not a price list: the classifier is deliberately not the chat model, so
+ * `findModel` returns nothing for it and there is no published price to settle
+ * against.
  *
- * Both sites carry the same two rows so the tables diff by eye, and each site's
- * own default is one of them. Recorded on 2026-09-13 from the gateway's
- * published list prices. Recheck them when the gateway reprices; the env
- * override exists so that is not a deploy.
+ * Both sites carry the same three rows so the tables diff by eye, and the
+ * default on both, `openai/gpt-4.1-nano`, is the first of them. Recorded on
+ * 2026-09-13 from the gateway's published list prices. Recheck them when the
+ * gateway reprices; the env override exists so that is not a deploy.
  *
- * A slug that neither this table nor the picker prices is both reserved and
+ * A slug that neither this table nor the chat allowlist prices is both reserved and
  * settled at `UNPRICED_MODEL_RATES`. Correct it with `CONTACT_CLASSIFY_RATES`
  * in the environment rather than leaving it to that fallback.
  */
 export const CONTACT_CLASSIFY_RATES: Readonly<Record<string, Rates | undefined>> = {
+  "openai/gpt-4.1-nano": { inputPerM: 0.1, outputPerM: 0.4 },
   "openai/gpt-oss-20b": { inputPerM: 0.04, outputPerM: 0.16 },
   "anthropic/claude-haiku-4-5": { inputPerM: 1, outputPerM: 5 },
 };
@@ -217,21 +279,22 @@ export function parseClassifyRates(raw: string | undefined): Rates | undefined {
  *
  * 1. `rates`, which only an explicit `CONTACT_CLASSIFY_RATES` env override or
  *    the `CONTACT_CLASSIFY_RATES` table above ever sets. An operator who writes
- *    a price in the environment means that price, even for a slug the picker
- *    also prices, so this wins rather than being silently ignored.
+ *    a price in the environment means that price, even for a slug the chat
+ *    allowlist also prices, so this wins rather than being silently ignored.
  * 2. The allowlisted model's own published price, when the classifier happens
- *    to be a model the picker offers.
+ *    to be the chat model.
  * 3. `UNPRICED_MODEL_RATES`, the answer for a slug nothing prices.
  *
- * Which branch each site's default takes, because the two differ and it is easy
- * to assume otherwise: the personal site's default (`openai/gpt-oss-20b`) and
- * this site's default (`anthropic/claude-haiku-4-5`) BOTH take branch 1, from
- * the table above. Neither slug is on its site's picker allowlist. This site's
- * `CHAT_MODELS` is Opus 5, Sonnet 5, GPT-5.6 Sol and Gemini 3.8 Flash, with no
- * Haiku row, so `findModel("anthropic/claude-haiku-4-5")` is undefined here and
+ * Which branch the default takes, because it is easy to assume otherwise: both
+ * sites default to `openai/gpt-4.1-nano` (since 2026-09-13; before that this
+ * site named `anthropic/claude-haiku-4-5`, a slug the gateway does not serve,
+ * and the personal site `openai/gpt-oss-20b`, which never returned a usable
+ * object), and it takes branch 1, from the table above. The slug is on neither
+ * site's chat allowlist. This site's `CHAT_MODELS` is Claude Haiku 4.5 alone,
+ * with no nano row, so `findModel("openai/gpt-4.1-nano")` is undefined here and
  * branch 2 never fires for the default. Branch 2 exists for the operator who
- * points `CONTACT_CLASSIFY_MODEL` at a picker model; delete the table row for
- * the default and it falls to branch 3, which prices Haiku at five times its
+ * points `CONTACT_CLASSIFY_MODEL` at the chat model; delete the table row for
+ * the default and it falls to branch 3, which prices nano at fifty times its
  * real rate rather than at nothing.
  */
 export function contactClassifyResolvedRates(args: {
@@ -303,94 +366,4 @@ export function contactClassifyCostUsd(args: {
   const usd =
     (args.inputTokens * rates.inputPerM + args.outputTokens * rates.outputPerM) / 1_000_000;
   return Math.max(Math.round(usd * 1_000_000) / 1_000_000, 0);
-}
-
-/* ---------- Live evaluation run (`app/api/evals/run/route.ts`) ---------- */
-
-/**
- * The evaluations panel can run a real, scored comparison on demand. It is the
- * most expensive thing a visitor can trigger, so it is fenced four ways: a
- * counted cap of one run per visitor per UTC day, its own sub-budget inside
- * the global soft budget, the same `reserveBudget` call every chat request
- * makes (that one call is the only global hard cap there is), and two bounded
- * legs that cannot add up to the function ceiling.
- */
-
-/**
- * Live runs one client IP may start per UTC day. Enforced by a counter in the
- * limiter (`reserveEvalRun`), taken before any model is called: a run that
- * fails, times out, or is abandoned still counts, because it still spent. The
- * run cache (`rememberRun` / `recallRun`) sits in front of the counter and
- * gives a repeat of the SAME pair that day its own earlier result instead of a
- * refusal. It is keyed on the challenger as well as the visitor and the day, so
- * it never answers a pair that was not run; the counter is the cap. Raising
- * this number raises the most expensive thing a visitor can trigger:
- * `GLOBAL_EVAL_USD_PER_DAY` divided by
- * `evalPrechargeUsd` is the number of runs the day can afford in total.
- */
-export const EVAL_RUNS_PER_IP_PER_DAY = 1;
-/**
- * Model spend live evaluation runs may cause per UTC day, across all visitors.
- * Sits INSIDE `GLOBAL_SOFT_DAILY_USD`: every run also reserves against the
- * ordinary day counters, so this only narrows the share evals may take.
- */
-export const GLOBAL_EVAL_USD_PER_DAY = 1.0;
-/** One turn, not the two the published bake-off used. Keeps a run near a cent. */
-export const EVAL_MAX_OUTPUT_TOKENS = 600;
-/**
- * The judge writes five scores and one line of rationale, which is about 120
- * tokens of text. The cap is far above that because a reasoning model spends
- * this same budget thinking first: measured on `google/gemini-3.8-flash`, the
- * default judge, one verdict took 619 reasoning tokens and left 66 for the
- * answer, so the object came back truncated and the score was lost. That is
- * how the published table came back unscored and how a visitor's live run
- * would have reported "the judge did not return a score this time" nearly
- * every time, since both read this constant. Raise it before lowering it, and
- * remember it also sets the judge's share of `evalPrechargeUsd`.
- */
-export const EVAL_JUDGE_MAX_OUTPUT_TOKENS = 1_500;
-/** Both contestants run in parallel inside this leg. */
-export const EVAL_CONTESTANT_TIMEOUT_MS = 40_000;
-/** The judge leg. 40 + 30 leaves headroom under `EVAL_MAX_DURATION_SECONDS`. */
-export const EVAL_JUDGE_TIMEOUT_MS = 30_000;
-/** Vercel function ceiling for the eval route (also set in `vercel.json`). */
-export const EVAL_MAX_DURATION_SECONDS = 120;
-/** Raw request text for the eval route: a model id and nothing else. */
-export const EVAL_MAX_BODY_CHARS = 2_000;
-/** Rendered eval prompt plus the one scenario turn, measured the same way as the chat estimate. */
-export const EVAL_PROMPT_TOKENS_ESTIMATE = 6_000;
-/** The judge reads both replies, so its prompt is the scenario plus two answers. */
-export const EVAL_JUDGE_PROMPT_TOKENS_ESTIMATE = 8_000;
-
-/**
- * Default judge: the cheapest seat at the table, and the one model that is
- * never the production default, so scoring a run costs a fraction of running
- * it. A model must not judge itself, so when a visitor picks the judge as a
- * contestant the route swaps to `EVAL_JUDGE_ALT_MODEL_ID`.
- */
-export const EVAL_JUDGE_MODEL_ID = "google/gemini-3.8-flash";
-export const EVAL_JUDGE_ALT_MODEL_ID = "anthropic/claude-sonnet-5";
-
-/**
- * What one live run is charged before it starts: both contestants at one turn
- * each, plus the judge reading both replies. Settled against actual usage when
- * the run finishes, exactly like a chat request.
- */
-export function evalPrechargeUsd(
-  contestants: readonly ChatModel[],
-  judge: ChatModel,
-): number {
-  const perContestant = contestants.reduce(
-    (sum, model) =>
-      sum +
-      (EVAL_PROMPT_TOKENS_ESTIMATE * model.inputPerM +
-        EVAL_MAX_OUTPUT_TOKENS * model.outputPerM) /
-        1_000_000,
-    0,
-  );
-  const judged =
-    (EVAL_JUDGE_PROMPT_TOKENS_ESTIMATE * judge.inputPerM +
-      EVAL_JUDGE_MAX_OUTPUT_TOKENS * judge.outputPerM) /
-    1_000_000;
-  return Math.max(perContestant + judged, 0.0001);
 }

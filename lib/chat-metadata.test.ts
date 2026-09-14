@@ -9,7 +9,7 @@ import {
 } from "@/lib/chat-metadata";
 import { defaultModel } from "@/lib/chat-models";
 
-const opus = defaultModel();
+const haiku = defaultModel();
 
 describe("tokenBreakdown", () => {
   it("reconstructs uncached input from the details when noCacheTokens is present", () => {
@@ -47,14 +47,18 @@ describe("tokenBreakdown", () => {
 
 describe("costUsd", () => {
   it("bills cached reads at a tenth of the input price", () => {
-    const cached = costUsd(opus, { ...EMPTY_TOKENS, cacheRead: 1_000_000, total: 1_000_000 });
-    const fresh = costUsd(opus, { ...EMPTY_TOKENS, input: 1_000_000, total: 1_000_000 });
-    expect(fresh).toBeCloseTo(5, 6);
-    expect(cached).toBeCloseTo(0.5, 6);
+    const cached = costUsd(haiku, { ...EMPTY_TOKENS, cacheRead: 1_000_000, total: 1_000_000 });
+    const fresh = costUsd(haiku, { ...EMPTY_TOKENS, input: 1_000_000, total: 1_000_000 });
+    expect(fresh).toBeCloseTo(1, 6);
+    expect(cached).toBeCloseTo(0.1, 6);
+  });
+
+  it("bills cache writes at a quarter over the input price", () => {
+    expect(costUsd(haiku, { ...EMPTY_TOKENS, cacheWrite: 1_000_000, total: 1_000_000 })).toBeCloseTo(1.25, 6);
   });
 
   it("bills output at the output price", () => {
-    expect(costUsd(opus, { ...EMPTY_TOKENS, output: 100_000, total: 100_000 })).toBeCloseTo(2.5, 6);
+    expect(costUsd(haiku, { ...EMPTY_TOKENS, output: 100_000, total: 100_000 })).toBeCloseTo(0.5, 6);
   });
 });
 
@@ -62,24 +66,24 @@ describe("billedUsd", () => {
   const precharge = 0.05;
 
   it("charges a step with no reported usage at the precharge estimate, never free", () => {
-    const billed = billedUsd(opus, [{ inputTokens: 0, outputTokens: 0, totalTokens: 0 }], precharge);
+    const billed = billedUsd(haiku, [{ inputTokens: 0, outputTokens: 0, totalTokens: 0 }], precharge);
     expect(billed).toBeCloseTo(precharge, 6);
   });
 
   it("charges the estimate when no step ran at all", () => {
-    expect(billedUsd(opus, [], precharge)).toBeCloseTo(precharge, 6);
+    expect(billedUsd(haiku, [], precharge)).toBeCloseTo(precharge, 6);
   });
 
   it("sums real usage per step and only substitutes the estimate for empty steps", () => {
     const billed = billedUsd(
-      opus,
+      haiku,
       [
         { inputTokens: 1_000, outputTokens: 100, totalTokens: 1_100 },
         { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
       ],
       precharge,
     );
-    const real = (1_000 * opus.inputPerM + 100 * opus.outputPerM) / 1e6;
+    const real = (1_000 * haiku.inputPerM + 100 * haiku.outputPerM) / 1e6;
     expect(billed).toBeCloseTo(real + precharge, 6);
   });
 });
@@ -88,25 +92,38 @@ describe("abortedBilledUsd", () => {
   const precharge = 0.05;
 
   it("charges the estimate when the abort hit before any step completed", () => {
-    expect(abortedBilledUsd(opus, [], precharge)).toBeCloseTo(precharge, 6);
+    expect(abortedBilledUsd(haiku, [], precharge)).toBeCloseTo(precharge, 6);
   });
 
   it("adds the interrupted step at the estimate on top of the completed steps", () => {
     const completed = [{ inputTokens: 1_000, outputTokens: 100, totalTokens: 1_100 }];
-    const real = (1_000 * opus.inputPerM + 100 * opus.outputPerM) / 1e6;
-    expect(abortedBilledUsd(opus, completed, precharge)).toBeCloseTo(real + precharge, 6);
-    expect(abortedBilledUsd(opus, completed, precharge)).toBeGreaterThan(
-      billedUsd(opus, completed, precharge),
+    const real = (1_000 * haiku.inputPerM + 100 * haiku.outputPerM) / 1e6;
+    expect(abortedBilledUsd(haiku, completed, precharge)).toBeCloseTo(real + precharge, 6);
+    expect(abortedBilledUsd(haiku, completed, precharge)).toBeGreaterThan(
+      billedUsd(haiku, completed, precharge),
     );
   });
 });
 
 describe("chatMessageMetadataSchema", () => {
-  it("accepts the partial pieces the route streams and merges", () => {
-    expect(chatMessageMetadataSchema.safeParse({ model: "anthropic/claude-opus-5" }).success).toBe(true);
-    expect(chatMessageMetadataSchema.safeParse({ ttftMs: 812 }).success).toBe(true);
-    expect(chatMessageMetadataSchema.safeParse({ tokens: EMPTY_TOKENS, costUsd: 0.01 }).success).toBe(true);
+  it("accepts the email flag the route streams on start", () => {
     expect(chatMessageMetadataSchema.safeParse({ emailEnabled: false }).success).toBe(true);
-    expect(chatMessageMetadataSchema.safeParse({ ttftMs: "fast" }).success).toBe(false);
+    expect(chatMessageMetadataSchema.safeParse({}).success).toBe(true);
+    expect(chatMessageMetadataSchema.safeParse({ emailEnabled: "no" }).success).toBe(false);
+  });
+
+  it("carries nothing about cost, tokens, model, or latency to the client", () => {
+    // Unknown keys are stripped rather than rejected, so nothing can be read
+    // back out of the parsed metadata even if a stray field were streamed.
+    const parsed = chatMessageMetadataSchema.safeParse({
+      emailEnabled: true,
+      model: "anthropic/claude-haiku-4.5",
+      costUsd: 0.01,
+      tokens: EMPTY_TOKENS,
+      ttftMs: 100,
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(Object.keys(parsed.data)).toEqual(["emailEnabled"]);
   });
 });

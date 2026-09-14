@@ -5,7 +5,6 @@ import {
   APPROVAL_VALUE_CELL_UNBROKEN,
   APPROVAL_WAITING,
   CHAT_HEADER_ROW,
-  CHAT_TOOLBAR_ROW,
   CHAT_TOOL_NAMES,
   COMPOSER_ROW,
   FLOATING_PANEL_HEIGHT,
@@ -14,7 +13,6 @@ import {
   NOT_SENT_COPY,
   NO_SIDEWAYS_OVERFLOW,
   SHEET_PANEL_QUERY,
-  SIDEWAYS_SCROLL_REGION,
   TOOL_STEP_COPY,
   TRANSCRIPT_SCROLLER,
   announcementFor,
@@ -29,7 +27,6 @@ import {
   lockedBodyStyle,
   nextAnnouncement,
   notSentCopy,
-  chatModelId,
   chatTitleId,
   displayAssistantText,
   friendlyError,
@@ -40,7 +37,6 @@ import {
   readChatMetadata,
   scrollBehavior,
   splitSuggestions,
-  statSummary,
   stepRole,
   stripControlTokens,
   trapTabTarget,
@@ -133,23 +129,15 @@ describe("hasDraftedBrief", () => {
   });
 });
 
-describe("readChatMetadata and statSummary", () => {
-  it("renders the compact line from merged start and finish metadata", () => {
-    const meta = readChatMetadata({
-      model: "anthropic/claude-opus-5",
-      modelLabel: "Claude Opus 5",
-      budgetFallback: false,
-      ttftMs: 900,
-      totalMs: 6200,
-      tokens: { input: 400, cacheRead: 5000, cacheWrite: 0, output: 300, reasoning: 0, total: 5700 },
-      costUsd: 0.012,
-    });
-    expect(meta).toBeDefined();
-    expect(statSummary(meta!)).toBe("Claude Opus 5 · first token 900ms · 6.2s · 5.7k tokens · $0.0120");
+describe("readChatMetadata", () => {
+  it("reads the email flag the route streams on start and nothing else", () => {
+    expect(readChatMetadata({ emailEnabled: false })).toEqual({ emailEnabled: false });
+    // Anything about cost or the model is dropped, so no card can render it.
+    expect(readChatMetadata({ emailEnabled: true, costUsd: 0.01, model: "x" })).toEqual({ emailEnabled: true });
   });
 
   it("rejects metadata of the wrong shape instead of throwing", () => {
-    expect(readChatMetadata({ totalMs: "fast" })).toBeUndefined();
+    expect(readChatMetadata({ emailEnabled: "yes" })).toBeUndefined();
     expect(readChatMetadata(null)).toBeUndefined();
   });
 });
@@ -360,9 +348,7 @@ describe("assistant naming", () => {
 describe("dom ids", () => {
   it("prefixes every id, so two mounted shells never collide", () => {
     expect(chatTitleId(":r1:")).toBe(":r1:-title");
-    expect(chatModelId(":r1:")).toBe(":r1:-model");
     expect(chatTitleId(":r1:")).not.toBe(chatTitleId(":r2:"));
-    expect(chatModelId(":r1:")).not.toBe(chatTitleId(":r1:"));
   });
 });
 
@@ -387,10 +373,11 @@ describe("fit", () => {
   it("floors the inline demo above the rows that cannot shrink", () => {
     // The floor must exceed the sum of the fixed rows. The frame is
     // overflow-hidden and the transcript is the only child that gives space
-    // back, so once the dvh cap drops under tab strip + header + toolbar +
-    // composer the surplus is clipped: about 250 px of those at 640 px wide,
-    // about 290 px once the header subtitle and the composer fine print wrap
-    // on a 360 px phone. A 640x360 frame without the floor measured 216 px
+    // back, so once the dvh cap drops under header + composer the surplus is
+    // clipped. Measured with the tab strip and toolbar that used to sit with
+    // them: about 250 px at 640 px wide, about 290 px once the header subtitle
+    // and the composer fine print wrap on a 360 px phone, so the floor is
+    // conservative now. A 640x360 frame without the floor measured 216 px
     // against 274 px of content, which put the input 19 px past the edge and
     // hid the contact-form fallback link with no way to scroll to it.
     const floor = /min-h-\[([\d.]+)rem\]/.exec(INLINE_DEMO_HEIGHT);
@@ -419,7 +406,6 @@ describe("fit", () => {
     // `shrink-0` absorbs the lot and the composer is clipped: a 640x360 phone
     // in landscape leaves the inline frame about 216 px.
     expect(CHAT_HEADER_ROW).toContain("shrink-0");
-    expect(CHAT_TOOLBAR_ROW).toContain("shrink-0");
     expect(COMPOSER_ROW).toContain("shrink-0");
   });
 
@@ -437,20 +423,6 @@ describe("fit", () => {
     expect(NO_SIDEWAYS_OVERFLOW).toContain("min-w-0");
     expect(NO_SIDEWAYS_OVERFLOW).toContain("max-w-full");
     expect(NO_SIDEWAYS_OVERFLOW).toContain("break-words");
-  });
-
-  it("gives a sideways scroller a focus stop and a visible ring", () => {
-    // A scroll container is operable by mouse and by touch for free and by
-    // nobody else, so the element carrying this also carries tabIndex={0},
-    // role="region" and an aria-label naming what scrolls. The table that
-    // needs it is the published bake-off in `EvalPanel`: 368 px of content in
-    // a 278 px box inside the inline demo frame at 360, and in 248 px at 280,
-    // so Cost, First token and Read are off the right edge with no way in
-    // from the keyboard. The model-price table on /how-it-works is not a user
-    // of this: it measures the same width as its box from 360 up.
-    expect(SIDEWAYS_SCROLL_REGION).toContain("overflow-x-auto");
-    expect(SIDEWAYS_SCROLL_REGION).toContain("min-w-0");
-    expect(SIDEWAYS_SCROLL_REGION).toContain("focus-visible:ring-2");
   });
 });
 
@@ -515,16 +487,26 @@ describe("messageText", () => {
 });
 
 describe("splitSuggestions", () => {
-  it("keeps the marker out of the transcript and turns the rest into chips", () => {
-    const { body, suggestions } = splitSuggestions(
+  it("keeps the marker out of the transcript and turns the rest into at most two chips", () => {
+    const { body, suggestions, none } = splitSuggestions(
       "Start with a two week pilot.\n\nSUGGESTIONS: Draft a brief | Rate our readiness | What should we fix first?",
     );
     expect(body).toBe("Start with a two week pilot.");
-    expect(suggestions).toEqual(["Draft a brief", "Rate our readiness", "What should we fix first?"]);
+    expect(suggestions).toEqual(["Draft a brief", "Rate our readiness"]);
+    expect(none).toBe(false);
+  });
+
+  it("reports the explicit none line, so a question to the visitor gets no chips", () => {
+    for (const line of ["SUGGESTIONS: none", "SUGGESTIONS: None.", "SUGGESTIONS:none "]) {
+      const { body, suggestions, none } = splitSuggestions(`What does your team build?\n\n${line}`);
+      expect(body).toBe("What does your team build?");
+      expect(suggestions).toEqual([]);
+      expect(none).toBe(true);
+    }
   });
 
   it("leaves a reply without the marker alone", () => {
-    expect(splitSuggestions("No chips here.")).toEqual({ body: "No chips here.", suggestions: [] });
+    expect(splitSuggestions("No chips here.")).toEqual({ body: "No chips here.", suggestions: [], none: false });
   });
 
   it("drops an empty or absurdly long option while the line is still streaming", () => {

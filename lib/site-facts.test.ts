@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { INDEXABLE_PATHS } from "@/lib/seo";
-import { hasPublishedScores } from "@/lib/evals";
 import { MAX_FACTS, SITE_FACTS, citationLine, lookupFacts } from "@/lib/site-facts";
 import { hasDash } from "@/lib/plain-punctuation";
 
@@ -43,28 +42,22 @@ describe("lookupFacts", () => {
     expect(ids).toContain("coverage");
   });
 
-  it("finds how the agent works, which is the fact about itself", () => {
-    const ids = lookupFacts("how do you work, what tools do you have?").map((f) => f.id);
+  it("finds the fact about itself, and that fact keeps the internals out", () => {
+    const ids = lookupFacts("how do you work, who built you?").map((f) => f.id);
     expect(ids).toContain("how-the-agent-works");
+    const self = SITE_FACTS.find((f) => f.id === "how-the-agent-works");
+    expect(self).toBeDefined();
+    if (!self) return;
+    expect(self.text).toContain("custom AI assistant built by Nexus");
+    expect(self.text).not.toMatch(/model|prompt|token|budget|cost|picker|evaluation/i);
+    expect(self.source.path).toBe("/");
   });
 
-  it("reports the published scores the artifact has, and crowns no winner", () => {
-    // The fact exists so the model can cite rather than assert, so it must say
-    // what the artifact says: scored when a judge scored it, unscored when not.
-    // It names no model as the best one either: published rows tie, and a tie
-    // reported as a single winner is a claim nobody measured.
-    const evaluations = SITE_FACTS.find((f) => f.id === "evaluations");
-    expect(evaluations).toBeDefined();
-    if (!evaluations) return;
-    expect(evaluations.text).toContain(
-      hasPublishedScores() ? "scored every reply" : "No model has scored those replies",
+  it("publishes no evaluation or model-choice fact any more", () => {
+    expect(SITE_FACTS.find((f) => f.id === "evaluations")).toBeUndefined();
+    expect(lookupFacts("which model is this, and how did you compare them?").map((f) => f.id)).not.toContain(
+      "evaluations",
     );
-    expect(evaluations.text).not.toMatch(/\b(winner|won|highest|best|beat)\b/i);
-  });
-
-  it("surfaces the evaluations fact when asked which model answers", () => {
-    const ids = lookupFacts("which model is this, and how did you compare them?").map((f) => f.id);
-    expect(ids).toContain("evaluations");
   });
 
   it("returns nothing rather than something irrelevant", () => {

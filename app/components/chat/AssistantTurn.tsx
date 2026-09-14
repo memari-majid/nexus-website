@@ -10,7 +10,6 @@ import {
   type ChatUIMessage,
 } from "@/lib/chat-ui";
 import type { ToolPartContext } from "./primitives";
-import { StatLine } from "./StatLine";
 import { ToolPartView } from "./ToolPartView";
 
 const ASSISTANT_BUBBLE = `mr-4 rounded-xl border border-zinc-200 bg-zinc-100 px-3 py-2 text-sm text-zinc-800 dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:text-zinc-300 ${NO_SIDEWAYS_OVERFLOW}`;
@@ -68,10 +67,5 @@ export function AssistantTurn({ m, tools }: { m: ChatUIMessage; tools: ToolPartC
   });
 
   if (nodes.length === 0) return null;
-  return (
-    <div className={`space-y-2 ${NO_SIDEWAYS_OVERFLOW}`}>
-      {nodes}
-      <StatLine metadata={m.metadata} />
-    </div>
-  );
+  return <div className={`space-y-2 ${NO_SIDEWAYS_OVERFLOW}`}>{nodes}</div>;
 }

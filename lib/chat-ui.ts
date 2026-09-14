@@ -1,8 +1,8 @@
 /**
  * Client-side view of the chat tools: the typed UI message and tool parts
  * (derived from the route's tool set), the step labels for each tool, and the
- * small presentation helpers the widget needs (picker storage, stat
- * formatting, defensive readers for echoed data).
+ * small presentation helpers the widget needs (defensive readers for echoed
+ * data, the chip parser, the fit rules).
  *
  * Client-safe: type-only `ai` and `chat-tools` imports, no React, no
  * `process.env`. Never import a value from `lib/chat-tools.ts` here.
@@ -11,9 +11,9 @@
 import type { DeepPartial, ToolUIPart } from "ai";
 import { SUGGESTION_MARKER } from "@/lib/assistant";
 import type { ConsultingBrief } from "@/lib/brief-schema";
+import { MAX_CHIPS, NO_CHIPS } from "@/lib/chat-chips";
 import { ASSISTANT_NAME, FOUNDER_CHAT_NAME } from "@/lib/chat-persona";
 import { chatMessageMetadataSchema, type ChatMessageMetadata } from "@/lib/chat-metadata";
-import { findModel, formatUsd } from "@/lib/chat-models";
 import type { ChatUITools, NexusUIMessage, NotSentReason } from "@/lib/chat-tools";
 
 /** The `reason` union of the three sending tools, re-exported so cards never import the server module. */
@@ -223,54 +223,20 @@ export function hasDraftedBrief(
   );
 }
 
-/* ---------- Model picker ---------- */
-
-/** localStorage key for the visitor's picker choice. */
-export const MODEL_STORAGE_KEY = "nexus:chat-model";
-
-/** True only for ids in the allowlist, so a stale stored value cannot leak through. */
-export function isChatModelId(id: unknown): id is string {
-  return findModel(id) !== undefined;
-}
-
-/** Display name for a gateway id, or the raw id when it is not in the list. */
-export function modelLabel(id: string | undefined): string {
-  if (!id) return "";
-  return findModel(id)?.label ?? id;
-}
-
-/* ---------- Per-reply stats ---------- */
+/* ---------- Route metadata ---------- */
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" ? (v as Record<string, unknown>) : {};
 }
 
-/** Metadata is whatever the stream carried; validate before rendering. */
+/**
+ * Metadata is whatever the stream carried; validate before reading. The route
+ * streams one flag, `emailEnabled`, and nothing about the reply's cost, tokens,
+ * model, or timing: those go to the server log only.
+ */
 export function readChatMetadata(raw: unknown): ChatMessageMetadata | undefined {
   const parsed = chatMessageMetadataSchema.safeParse(raw);
   return parsed.success ? parsed.data : undefined;
-}
-
-export function formatMs(ms: number): string {
-  if (ms < 1000) return `${Math.round(ms)}ms`;
-  return `${(ms / 1000).toFixed(ms < 10_000 ? 1 : 0)}s`;
-}
-
-export function formatTokens(n: number): string {
-  if (n < 1000) return String(Math.round(n));
-  return `${(n / 1000).toFixed(n < 10_000 ? 1 : 0)}k`;
-}
-
-/** Compact one-liner: "Claude Opus 5 · first token 0.9s · 6.2s · 3.4k tokens · $0.0210" */
-export function statSummary(meta: ChatMessageMetadata): string {
-  const bits: string[] = [];
-  const label = meta.modelLabel || modelLabel(meta.model);
-  if (label) bits.push(label);
-  if (meta.ttftMs != null) bits.push(`first token ${formatMs(meta.ttftMs)}`);
-  if (meta.totalMs != null) bits.push(formatMs(meta.totalMs));
-  if (meta.tokens) bits.push(`${formatTokens(meta.tokens.total)} tokens`);
-  if (meta.costUsd != null) bits.push(formatUsd(meta.costUsd));
-  return bits.join(" · ");
 }
 
 /* ---------- Readiness ---------- */
@@ -437,15 +403,11 @@ export type ChatSurface = "floating" | "inline";
 
 /**
  * Both shells can be mounted at once, so every id is prefixed with the
- * shell's own `useId()` value. Hardcoded ids would give the model picker two
- * labels and leave `aria-labelledby` pointing at the wrong heading.
+ * shell's own `useId()` value. A hardcoded id would leave one dialog's
+ * `aria-labelledby` pointing at the other shell's heading.
  */
 export function chatTitleId(prefix: string): string {
   return `${prefix}-title`;
-}
-
-export function chatModelId(prefix: string): string {
-  return `${prefix}-model`;
 }
 
 /**
@@ -465,9 +427,11 @@ export const FLOATING_PANEL_HEIGHT =
  * stops the cap from shrinking it into nothing.
  *
  * The floor is the load bearing half. The frame is `overflow-hidden` and its
- * rows are fixed: tab strip, header, toolbar and composer measure about
- * 250 px at 640 px wide, and about 290 px once the header subtitle and the
- * composer's fine print wrap on a 360 px phone. Only the transcript can give
+ * rows are fixed: header and composer. Measured with the tab strip and the
+ * toolbar that used to sit with them, the fixed rows came to about 250 px at
+ * 640 px wide, and about 290 px once the header subtitle and the composer's
+ * fine print wrapped on a 360 px phone, so the floor below is conservative
+ * now that those two rows are gone. Only the transcript can give
  * space back, so under a viewport of roughly 420 px the cap alone took the
  * rest out of the composer: the input sat past the frame edge and the fine
  * print, with its contact-form fallback link, was clipped out of reach with
@@ -490,23 +454,6 @@ export const INLINE_DEMO_HEIGHT =
   "h-[32rem] sm:h-[37.5rem] min-h-[20rem] max-h-[calc(100dvh-9rem)]";
 
 /**
- * A box whose content really is wider than the column it sits in and scrolls
- * sideways, such as the published evaluations table. Measure before reaching
- * for it: a table that fits its box wants a plain wrapper, because this one
- * announces a region called "scroll sideways" and takes a tab stop, and both
- * are a lie when nothing scrolls. A scroll container is operable by mouse and
- * by touch for free, and by nobody else unless it can take focus, so the
- * element that carries this must also carry
- * `tabIndex={0}`, `role="region"` and an `aria-label` naming what scrolls.
- * Without them a keyboard-only visitor on a phone never reaches the columns
- * past the right edge. The ring is `focus-visible` so a mouse click inside
- * the box does not light it up, and it sits on the box edge rather than an
- * offset, so it reads the same on white and on the page's tinted background.
- */
-export const SIDEWAYS_SCROLL_REGION =
-  "min-w-0 overflow-x-auto rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500";
-
-/**
  * The transcript scroller. `min-h-0` is what keeps the composer pinned: a
  * flex child defaults to `min-height: auto` and would otherwise grow with its
  * content and push the composer past the bottom edge.
@@ -524,10 +471,6 @@ export const TRANSCRIPT_SCROLLER = "min-h-0 flex-1 overflow-y-auto overscroll-co
  */
 export const CHAT_HEADER_ROW =
   "flex shrink-0 min-w-0 items-start justify-between gap-2 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800";
-
-/** The toolbar row, under the header. Fixed height for the same reason. */
-export const CHAT_TOOLBAR_ROW =
-  "flex shrink-0 items-center gap-2 border-b border-zinc-200 px-3 py-2 dark:border-zinc-800";
 
 /** The composer row: never scrolls away, and clears the home indicator on iOS. */
 export const COMPOSER_ROW =
@@ -613,20 +556,25 @@ export function messageText(message: { parts: readonly { type: string; text?: st
 }
 
 /**
- * The assistant ends replies with `SUGGESTIONS: a | b | c`. Split that off so
- * the chips render as buttons and the marker never reaches the visitor,
- * including mid-stream, while the line is still being typed out.
+ * The assistant ends replies with `SUGGESTIONS: a | b`, or `SUGGESTIONS: none`
+ * when the reply ends by asking the visitor about their situation. Split that
+ * off so the chips render as buttons and the marker never reaches the visitor,
+ * including mid-stream, while the line is still being typed out. At most
+ * `MAX_CHIPS` survive, whatever the model wrote. `none` is reported as its own
+ * flag so the widget can honour it instead of filling in fallback chips.
  */
-export function splitSuggestions(raw: string): { body: string; suggestions: string[] } {
+export function splitSuggestions(raw: string): { body: string; suggestions: string[]; none: boolean } {
   const i = raw.lastIndexOf(SUGGESTION_MARKER);
-  if (i === -1) return { body: raw, suggestions: [] };
+  if (i === -1) return { body: raw, suggestions: [], none: false };
   const body = raw.slice(0, i).trimEnd();
-  const suggestions = raw
-    .slice(i + SUGGESTION_MARKER.length)
+  const rest = raw.slice(i + SUGGESTION_MARKER.length).trim();
+  if (rest.replace(/[.\s]+$/, "").toLowerCase() === NO_CHIPS) return { body, suggestions: [], none: true };
+  const suggestions = rest
     .split("|")
     .map((s) => s.trim())
-    .filter((s) => s.length > 1 && s.length < 60);
-  return { body, suggestions };
+    .filter((s) => s.length > 1 && s.length < 60)
+    .slice(0, MAX_CHIPS);
+  return { body, suggestions, none: false };
 }
 
 const HARMONY_FINAL = "<|channel|>final<|message|>";

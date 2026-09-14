@@ -4,7 +4,8 @@ import {
   contactClassifyFloorUsd,
   contactClassifyRates,
 } from "@/lib/chat-limits";
-import { submitInquiry } from "@/lib/inquiry";
+import { CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES } from "@/lib/chat-limits";
+import { resetClassifierBreaker, submitInquiry } from "@/lib/inquiry";
 import { inquiryPromptChars } from "@/lib/inquiry-ai";
 
 // The classifier is a model call; stub it so the shared-inbox path runs offline.
@@ -39,7 +40,7 @@ vi.mock("@/lib/rate-limit", async (importOriginal) => {
   };
 });
 
-const CLASSIFY_MODEL = "anthropic/claude-haiku-4-5";
+const CLASSIFY_MODEL = "openai/gpt-4.1-nano";
 
 /** The one `contact.usage` line a metered submission writes. */
 function usageLine(log: { mock: { calls: unknown[][] } }): Record<string, unknown> {
@@ -67,6 +68,7 @@ beforeEach(() => {
     delete process.env[k];
   }
   classify.mockReset();
+  resetClassifierBreaker();
   // Every metered submission writes one `contact.usage` line; keep it out of
   // the test output. Tests that read it spy on the same instance.
   vi.spyOn(console, "log").mockImplementation(() => {});
@@ -179,6 +181,44 @@ describe("submitInquiry with every other source", () => {
     if (!result.ok) return;
     expect(result.category).toBe("general");
     expect(error).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops calling a classifier that keeps failing, still delivers, and logs the pause as its own outcome", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    classify.mockRejectedValue(new Error("classifier returned no usable object"));
+    for (let i = 0; i < CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES; i++) {
+      const result = await submitInquiry({ name: "Ada", email: "ada@acme.com", message: `Hello ${i}` });
+      expect(result.ok).toBe(true);
+    }
+    expect(classify).toHaveBeenCalledTimes(CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES);
+    // The trip is announced once, naming what to check.
+    expect(warn.mock.calls.filter((c) => String(c[0]).includes("classifier paused"))).toHaveLength(1);
+    expect(String(warn.mock.calls[0][0])).toContain("CONTACT_CLASSIFY_MODEL");
+
+    // The next post is not paid for: no rate check, no reservation, no model.
+    limiter.checkRequestRate.mockClear();
+    limiter.reserveBudget.mockClear();
+    classify.mockClear();
+    log.mockClear();
+    const paused = await submitInquiry({ name: "Ada", email: "ada@acme.com", message: "Still here" });
+    expect(paused.ok).toBe(true);
+    if (!paused.ok) return;
+    expect(paused.category).toBe("general");
+    expect(classify).not.toHaveBeenCalled();
+    expect(limiter.checkRequestRate).not.toHaveBeenCalled();
+    expect(limiter.reserveBudget).not.toHaveBeenCalled();
+    const line = usageLine(log);
+    expect(line.outcome).toBe("paused");
+    expect(line.costUsd).toBe(0);
+
+    // A fresh breaker (a fresh instance) tries the model again.
+    resetClassifierBreaker();
+    classify.mockResolvedValueOnce({ category: "workshop", autoReply: "Thanks, Ada.", inputTokens: 10, outputTokens: 5 });
+    const again = await submitInquiry({ name: "Ada", email: "ada@acme.com", message: "Back" });
+    expect(again.ok && again.category).toBe("workshop");
   });
 });
 

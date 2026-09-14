@@ -3,19 +3,15 @@ import type { Person } from "@/lib/people";
 import { DLI } from "@/lib/dli";
 import { FAQS } from "@/lib/faq";
 import { HAMID } from "@/lib/hamid";
-import { ASSISTANT_NAME } from "@/lib/chat-persona";
 import { MAJID } from "@/lib/majid";
 import { MOHAMMAD } from "@/lib/mohammad";
 import { SITE, SITE_URL } from "@/lib/site";
 
-/** Append only: sitemap priority is derived from index position. */
-export const INDEXABLE_PATHS = [
-  "/",
-  "/about",
-  "/contact",
-  "/nvidia-dli-workshops",
-  "/how-it-works",
-] as const;
+/**
+ * Append only: sitemap priority is derived from index position. `/how-it-works`
+ * was removed on 2026-09-13 and redirects to `/` in `next.config.ts`.
+ */
+export const INDEXABLE_PATHS = ["/", "/about", "/contact", "/nvidia-dli-workshops"] as const;
 
 export function absoluteUrl(path = "/"): string {
   if (path === "/") return SITE_URL;
@@ -53,17 +49,7 @@ export const PAGE_COPY = {
     description:
       "Official NVIDIA Deep Learning Institute workshops for industry teams across the United States, hosted by a Certified Instructor on site or online. Building Agentic AI Applications With LLMs: eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
   },
-  howItWorks: {
-    title: `How the ${ASSISTANT_NAME} Works: Inside the Nexus AI Agent`,
-    description: `A teardown of the ${ASSISTANT_NAME}, the AI consulting agent on nexusaisolution.net: the loop it runs, the ten tools it calls, the approval step before any email, the model picker with public list prices, per-reply cost, and the published evaluations behind the default model.`,
-  },
 } as const;
-
-/** Breadcrumb trail for /how-it-works. The page inlines its own JSON-LD graph. */
-export const HOW_IT_WORKS_BREADCRUMBS = [
-  { name: "Home", path: "/" },
-  { name: `How the ${ASSISTANT_NAME} works`, path: "/how-it-works" },
-];
 
 /**
  * Shared 1200x630 social preview card. Relative so `metadataBase` in
