@@ -25,6 +25,16 @@ function useReveal() {
   return { ref, visible };
 }
 
+/**
+ * Fades a block in the first time it is scrolled into view.
+ *
+ * The resting state is visible. The state the fade starts from lives in
+ * `app/globals.css` behind `html.js`, a class the one-line script in
+ * `app/layout.tsx` sets before the page paints, so the copy inside a Reveal is
+ * readable when scripting is off and when the bundle never arrives, with no
+ * flash for everyone else. Reduced motion drops the hidden state in the same
+ * stylesheet, so nothing waits on an observer that only fires on scroll.
+ */
 export function Reveal({
   children,
   className = "",
@@ -38,9 +48,7 @@ export function Reveal({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      } ${className}`}
+      className={`reveal ${visible ? "reveal-in" : ""} ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}

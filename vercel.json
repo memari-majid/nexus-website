@@ -1,5 +1,27 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "fluid": true,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "app/api/chat/route.ts": { "maxDuration": 180 },
+    "app/api/contact/route.ts": { "maxDuration": 30 },
+    "app/api/voice/route.ts": { "maxDuration": 15 },
+    "app/api/voice/gather/route.ts": { "maxDuration": 15 },
+    "app/api/voice/message/route.ts": { "maxDuration": 15 }
+  }
 }

@@ -62,7 +62,7 @@ export async function assertTwilioSignature(
     if (process.env.NODE_ENV === "production" && process.env.VOICE_ALLOW_INSECURE !== "1") {
       return false;
     }
-    console.warn("[voice] TWILIO_AUTH_TOKEN missing — skipping signature check (dev only)");
+    console.warn("[voice] TWILIO_AUTH_TOKEN missing, skipping signature check (dev only)");
     return true;
   }
   const signature = request.headers.get("x-twilio-signature") ?? "";

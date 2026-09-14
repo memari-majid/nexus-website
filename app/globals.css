@@ -2,6 +2,26 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * NVIDIA-inspired brand green scale. #76b900 is the signature green; it only
+ * clears ~2.4:1 on white, so light mode uses darker shades (brand-600/700) for
+ * text/links and brand green is reserved for dark surfaces and large elements.
+ * White text on brand green is never used — green buttons take near-black text.
+ */
+@theme {
+  --color-brand-50: #f2f9e6;
+  --color-brand-100: #e2f0c8;
+  --color-brand-200: #c7e293;
+  --color-brand-300: #a9d157;
+  --color-brand-400: #8ed000;
+  --color-brand-500: #76b900;
+  --color-brand-600: #5b8c00;
+  --color-brand-700: #4f7a00;
+  --color-brand-800: #3f6200;
+  --color-brand-900: #2f4a00;
+  --color-brand-950: #1a2900;
+}
+
 /* Responsive text: long words/URLs wrap instead of overflowing the viewport */
 @layer base {
   html {
@@ -20,6 +40,24 @@
   }
 }
 
+/*
+ * Scroll reveal (`app/components/Reveal.tsx`). The resting state is visible;
+ * the state the fade starts from is gated on `html.js`, which the inline
+ * script in `app/layout.tsx` sets before the page paints. Copy inside a Reveal
+ * is therefore readable with scripting off, and when a bundle fails to load,
+ * without costing anyone else a flash.
+ */
+.reveal {
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+}
+
+:where(html.js) .reveal:not(.reveal-in) {
+  opacity: 0;
+  transform: translateY(2rem);
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -31,52 +69,45 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 0.15;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-
 .gradient-text {
-  background: linear-gradient(135deg, #0284c7 0%, #6366f1 50%, #0284c7 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 6s linear infinite;
+  color: #4f7a00;
 }
 
 .dark .gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #38bdf8 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 6s linear infinite;
+  color: #8ed000;
 }
 
-/* Solid, minimal card — Apple-style restraint */
+/*
+ * NVIDIA green as a *secondary* accent, reserved for NVIDIA-related elements
+ * (the credential badge, workshop links). Nexus keeps its own sky-blue accent
+ * everywhere else — recolouring the site green would read as an NVIDIA product.
+ * NVIDIA's #76b900 only clears 2.4:1 on white, so light mode darkens the shade:
+ * the mark lands at 3.9:1 and link text at 4.7:1, and dark mode uses the brand
+ * green at ~8.7:1 on zinc-950.
+ */
+.nvidia-mark {
+  color: #5b8c00;
+}
+
+.dark .nvidia-mark {
+  color: #76b900;
+}
+
+.link-nvidia {
+  color: #4f7a00;
+  text-decoration: underline;
+}
+
+.dark .link-nvidia {
+  color: #8ed000;
+}
+
+/* Solid, quiet card — no lift, no glow */
 .card {
   background: rgb(255 255 255);
   border: 1px solid rgb(228 228 231);
   border-radius: 1rem;
-  transition:
-    box-shadow 0.25s ease,
-    transform 0.25s ease,
-    border-color 0.25s ease;
+  transition: border-color 0.2s ease;
 }
 
 .dark .card {
@@ -86,11 +117,120 @@
 
 .card:hover {
   border-color: rgb(161 161 170);
-  box-shadow: 0 10px 40px -12px rgb(0 0 0 / 0.12);
-  transform: translateY(-2px);
 }
 
 .dark .card:hover {
-  border-color: rgb(82 82 91);
-  box-shadow: 0 12px 40px -8px rgb(0 0 0 / 0.45);
+  border-color: rgb(113 113 122);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #76b900;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #09090b; /* zinc-950 — ~8:1 on brand green; white-on-green is prohibited */
+  transition: background 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #8ed000;
+}
+
+.dark .btn-primary {
+  background: #76b900;
+  color: #09090b;
+}
+
+.dark .btn-primary:hover {
+  background: #8ed000;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(212 212 216);
+  background: rgb(255 255 255 / 0.7);
+  padding: 0.75rem 1.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(39 39 42);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: rgb(161 161 170);
+  background: rgb(255 255 255);
+}
+
+.dark .btn-secondary {
+  border-color: rgb(63 63 70);
+  background: rgb(24 24 27 / 0.6);
+  color: rgb(244 244 245);
+}
+
+.dark .btn-secondary:hover {
+  border-color: rgb(113 113 122);
+}
+
+.btn-compact {
+  padding: 0.55rem 1.1rem;
+}
+
+.text-link {
+  color: rgb(24 24 27);
+  text-decoration: underline;
+  text-decoration-color: rgb(212 212 216);
+  text-underline-offset: 4px;
+}
+
+.text-link:hover {
+  text-decoration-color: #5b8c00;
+}
+
+.dark .text-link {
+  color: rgb(244 244 245);
+  text-decoration-color: rgb(82 82 91);
+}
+
+.dark .text-link:hover {
+  text-decoration-color: #8ed000;
+}
+
+/*
+ * One global honour of `prefers-reduced-motion`. Nothing that moves on this
+ * site carries meaning: the reveal, the hover transitions, the pulsing step
+ * dot in the chat and smooth scrolling are all decoration, so the whole lot
+ * collapses to instant here instead of being opted out one utility at a time.
+ * Last in the file on purpose: the reveal override below shares its
+ * specificity with the rule it has to beat.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* A reveal that cannot fade must not sit at opacity 0 waiting for an
+     observer that only fires on scroll. */
+  :where(html.js) .reveal:not(.reveal-in) {
+    opacity: 1;
+    transform: none;
+  }
 }

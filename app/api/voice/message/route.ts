@@ -1,3 +1,4 @@
+import { clientIp } from "@/lib/chat-request";
 import { submitInquiry } from "@/lib/inquiry";
 import { assertTwilioSignature, readTwilioForm } from "@/lib/twilio-signature";
 import { gather, hangup, MESSAGE_PROMPT, twiml, voiceUrl } from "@/lib/voice";
@@ -24,8 +25,14 @@ export async function POST(request: Request) {
   const result = await submitInquiry({
     name: "Phone caller",
     phone: from || undefined,
-    message: `Voice assistant message for Dr. Majid Memari (do not transfer; he will call back if he wants).\nCaller ID: ${from || "unknown"}\nTranscript:\n${speech}`,
+    message: `Voice assistant message for Majid Memari (do not transfer; he will call back if he wants).\nCaller ID: ${from || "unknown"}\nTranscript:\n${speech}`,
     source: "voice-assistant",
+    // Same derivation as every other route, so the classifier this reaches is
+    // metered the same way. Twilio is the peer here, not the caller, so every
+    // voice message shares one bucket: that is the point, since the phone line
+    // is one funnel into the same model call and the caller's own network is
+    // never visible to us.
+    clientIp: clientIp(request.headers),
   });
 
   if (!result.ok) {
@@ -39,7 +46,7 @@ export async function POST(request: Request) {
 
   return twiml(
     hangup(
-      "Thank you. I have sent your message to Dr. Memari. He will call you back if he wants to continue. Goodbye.",
+      "Thank you. I have sent your message to Majid Memari. He will call you back if he wants to continue. Goodbye.",
     ),
   );
 }

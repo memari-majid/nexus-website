@@ -3,14 +3,14 @@ import { SITE } from "@/lib/site";
 
 export const MAX_VOICE_TURNS = 3;
 export const VOICE_FALLBACK =
-  "I am having trouble answering right now. Please say your name, a callback number, and a short message, and I will send that to Dr. Memari.";
+  "I am having trouble answering right now. Please say your name, a callback number, and a short message, and I will send that to Majid Memari.";
 export const MESSAGE_PROMPT =
-  "I will take a message for Dr. Memari. Please say your name, the best number to reach you, and your message. He will call you back if he wants to continue.";
+  "I will take a message for Majid Memari. Please say your name, the best number to reach you, and your message. He will call you back if he wants to continue.";
 
 type HistoryTurn = { role: "user" | "assistant"; content: string };
 
 export function openingGreeting(): string {
-  return `Hello, you've reached Dr. Majid Memari. This is his A I personal assistant at ${SITE.name}. He is not on this line. I can answer a brief question about who he is or A I consulting and team training, or I can take a message and email it to him. How can I help?`;
+  return `Hello, you've reached Majid Memari. This is his A I personal assistant at ${SITE.name}. He is not on this line. I can answer a brief question about who he is or A I consulting and team training, or I can take a message and email it to him. How can I help?`;
 }
 
 export function wantsMessage(text: string): boolean {

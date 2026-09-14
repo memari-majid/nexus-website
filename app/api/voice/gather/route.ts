@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     return twiml(
       gather(
         voiceUrl("/api/voice/gather", { turn, misses: misses + 1, hist: url.searchParams.get("hist") ?? undefined }),
-        "Sorry, I did not catch that. I can answer a brief question, or you can leave a message for Dr. Memari.",
+        "Sorry, I did not catch that. I can answer a brief question, or you can leave a message for Majid Memari.",
       ) + hangup("Thank you for calling Nexus A I Solutions. Goodbye."),
     );
   }
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
   return twiml(
     gather(
       voiceUrl("/api/voice/gather", { turn: turn + 1, misses: 0, hist: nextHist }),
-      `${reply} I can take a message for Dr. Memari whenever you are ready. Name, callback number, and a short note.`,
+      `${reply} I can take a message for Majid Memari whenever you are ready. Name, callback number, and a short note.`,
     ) + say("Thank you for calling Nexus A I Solutions. Goodbye."),
   );
 }

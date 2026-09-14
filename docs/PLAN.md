@@ -1,18 +1,26 @@
 # Plan — nexusaisolution.net
 
-**Last updated:** 2026-08-26  
+**Last updated:** 2026-09-13  
 **Repo:** https://github.com/memari-majid/nexus-website  
 **This is the only living *site-ops* plan in this repo.** Positioning and channel strategy stay in [`../contract/docs/reference/PLAN.md`](../../contract/docs/reference/PLAN.md) (§11 / §11.1). Do not duplicate that strategy here.
+
+**AI assistants:** standing editorial rules, edit map, and hard policies live in [`../AGENTS.md`](../AGENTS.md). Keep status and deploy notes here; keep “how to update” there.
 
 Restore the company site after the Vercel project was removed.
 
 | Track | Status | Notes |
 |---|---|---|
-| **Vercel project** | Recreated | `nexus-website` on `memari-majids-projects`, GitHub `memari-majid/nexus-website`, production branch `main` |
+| **Vercel project** | Tuned 2026-09-12 | `nexus-website` on `memari-majids-projects`, GitHub `memari-majid/nexus-website`, production branch `main`, Node **24.x**, region **iad1**. Skew protection 12h; Git fork protection on. WAF rate limits: `/api/chat` 30/min/IP, `/api/contact` 10/min/IP. `vercel.json` enables Fluid Compute + security headers. Preview now has the same public/config env as production (OIDC covers AI Gateway). **Majid must confirm in a terminal** (paid): `vercel project update nexus-website --fluid-compute on --function-cpu standard` and enable Web Analytics + Speed Insights if he wants those dashboards. |
 | **Domain** | Attached | `nexusaisolution.net` + `www` — DNS is still on Cloudflare (`sreeni` / `valentin.ns.cloudflare.com`), not Vercel nameservers |
 | **Env** | Production + development | Site URL, AI CPA URL, models, contact inbox, AI Gateway key. Preview-all-branches add is blocked by CLI in this environment |
-| **Copy** | Synced 2026-08-26 | Public site is **AI solutions only**. **Hamid Memari is not listed**. Homepage leads with **active projects and named collaborators** — not publication counts (those stay on the personal `/publications` page). Hero stats: active AI delivery streams, courses & DLI workshops, student researchers, Fall 2026 UVU courses. Partners strip (`#partners`): State (Herbert Institute, Utah Office of Data Privacy, DHHS) · Universities (UVU; One-U RAI public/policy; GridEye U of Utah / UVU ECE / PacifiCorp collaboration, USHE proposal in development) · Silicon Slopes (community, not a client) · Industry (**Clarion AI Partners** — applied AI consulting on LLM and agent workflows, including when to use AI). No invented client counts or extra law-firm roster. **Selected for the 2026 AI Utah 100**. |
-| **SEO** | Live 2026-08-25 | Title includes “Majid Memari”; crawlable `/about` founder page; Person JSON-LD `sameAs` personal site + Scholar/ORCID |
+| **Pages** | Live 2026-09-13 | `/` · `/about` (team index) · `/about/<slug>` ×3 (per-person, one shared template from `lib/people.ts`) · `/nvidia-dli-workshops` · `/contact`. All in `sitemap.xml`. `/how-it-works` (the public teardown of the AI Consultant) was removed on 2026-09-13 and 308s to `/` from `next.config.ts`. Nav is exactly four links in this order: **Consulting · Training · About · Contact**, plus the persistent **"Start a conversation"** CTA (desktop and mobile) that opens the chat. |
+| **Design** | Sleek pass 2026-09-12 · demo section 2026-09-13 | Apple-like: one idea per section, generous space, short declarative copy, **no trailing periods in headlines**. Homepage = hero + Consulting + **Try our AI** + Training + Team + footer. "Try our AI" (added 2026-09-13) holds the inline AI Consultant chat, with its heading and one line inviting the visitor to ask about their team, and is the one sanctioned addition to the homepage inventory: rule and cost posture in [`AGENTS.md`](../AGENTS.md) §9.3. Depth (workshop outline, NVIDIA verification links, collaborations) lives on inner pages, not the homepage. Removed: stats grid, partners strip, AI-now, portfolio, careers, FAQ accordion, market widgets, `/api/news`, `/api/market`. |
+| **Inline AI chat** | Live 2026-09-13 · trimmed to chat only the same evening | The homepage "Try our AI" section embeds a working AI Consultant chat in the normal page flow, with the floating launcher still covering the rest of the site. Fixed height on desktop (about 560 to 640 px), fills the section column, scrolls internally, never grows the page. Both shells share one conversation through `app/components/chat/chatStore.ts`, so a visitor who opens the floating panel keeps the transcript. One model, Claude Haiku 4.5, and no model picker, no per-reply stats line, no explainer cards. Every turn goes through the same limiter, budgets, and `chat.usage` log line as the widget; that log line is the only place cost, tokens, and timing are reported. |
+| **Evaluations** | Removed 2026-09-13 | The Evaluations tab, the live run route (`app/api/evals/run`), the `evals/` scripts and their checked-in results, and the eval-only limiter counters are gone, not hidden. The owner judged the demo and evaluation work too complicated and expensive for what it bought; the record is [`AGENTS.md`](../AGENTS.md) §9.4. Nothing on the site quotes a score or a model comparison any more. |
+| **People** | Live 2026-09-12 | `lib/people.ts` is the one registry (homepage row, `/about`, per-person pages, JSON-LD). **Majid Memari, PhD — Founder & CEO**; **Hamid Memari — CTO**; **Mohammad JN, PhD — CFO** (display name shortened; legal name `Mohammad Jafarinejad` stays in structured data). Portraits are cropped from **one studio group shot** (master outside the repo at `~/Downloads/team-headshots-source.png`) into square `public/team-*.jpg` (640×640, head-and-shoulders, q88) — reuse that recipe; never copy a photo from LinkedIn. |
+| **Naming & affiliations** | Policy 2026-09-12 · chat override 2026-09-13 | Full rules in [`AGENTS.md`](../AGENTS.md). Name style: postnominal **"Majid Memari, PhD"**: never a `Dr.` prefix, never `Ph.D.` with periods. **One scoped override (2026-09-13, do not revert):** the assistant is named **the AI Consultant** and inside the chat surface only it calls him **Dr. Memari**; website copy, metadata, and the phone voice prompt keep "Majid Memari, PhD". Names live in `lib/chat-persona.ts`. Rule: [`AGENTS.md`](../AGENTS.md) §9.1. **Omit current UVU faculty title** on this commercial site (conflict of interest). **Prior research may be named**: Penn (postdoc); Stanford / Johns Hopkins as collaborations through that appointment (not employers); U of Utah One-U RAI; SIU for PhD. Degree = PhD in CS with doctoral research in generative AI, not “PhD in LLMs.” Experience as **start year** ("since 2015"); **no** citation totals. Verifiable credentials (NVIDIA, AI Utah 100) stay. |
+| **NVIDIA DLI** | Live 2026-09-12 | `lib/dli.ts` is the single source; rendered in homepage `#training`, `/nvidia-dli-workshops` (full who-provides-what), FAQ, chat/voice (`lib/assistant.ts`, `lib/chat-tools.ts`), the consulting-brief prompt, and the intake classifier. **Industry only:** **DLI Certified Instructor** hosts workshops for company teams (NVIDIA sells seats). **Do not publish** University Ambassador, free workshops, campus delivery, or academia as an audience. Never "NVIDIA partner" / "NVIDIA-sponsored" or any implied NVIDIA endorsement of Nexus. **Never publish** the Ambassador program cost or projected profit. **Only list workshops he is certified to teach** — today that is exactly one: *Building Agentic AI Applications With LLMs* (8h, NIM / LangChain / LangGraph / retrieval / multi-agent / deployment; DLI certificate). Private cohorts **in person or online**, subject to NVIDIA requirements, **six weeks** lead time. Audience is **industry**. **Delivery-model rule (lock this)**: **NVIDIA takes care of everything** — cloud GPU VMs (customer needs **no** GPUs / local compute / special infra), pricing & purchase, content & curriculum, assessment, and certificate; **Nexus only hosts and teaches** and helps participants pass. Explicit boundary in `DLI.boundary`: Nexus has **no control** over pricing, content, curriculum, assessment, or the certificate — seats purchased through NVIDIA at NVIDIA's rate. Never quote a workshop dollar price. Chat must never invent that Nexus sells seats, sets prices, or requires client GPUs. A quiet **Resources** link list points to official NVIDIA pages (course outline, instructor directory, CIP, DLI, instructor-led workshops, catalog PDF, NIM docs, build.nvidia.com, agentic AI) — all checked HTTP 200 on 2026-09-12; **re-verify before editing** (sibling NVIDIA paths 404 easily). **Custom training** (`lib/training.ts`) is **Nexus curriculum** — never call it an NVIDIA workshop and never imply a DLI certificate. The NVIDIA eye mark (`app/components/NvidiaLogo.tsx`) is monochrome `currentColor` in NVIDIA green. **Do not** publish the long NVIDIA legal trademark disclaimer; the short credential line (`TRADEMARK_SHORT`) may stay in the footer / training page. |
+| **SEO** | NVIDIA pass 2026-09-12 · market pass 2026-09-13 | **Market is the United States, not Utah** (2026-09-13): home/about/contact/DLI titles and descriptions, layout keywords, the hero, and `areaServed` now read nationwide; em dashes removed from every `PAGE_COPY` title and description. Sandy UT `PostalAddress` and the factual Utah credentials stay (see the Market framing note below). Realistic target is **intent**, not the bare word "NVIDIA" (nvidia.com owns that). `/nvidia-dli-workshops` is the ranking asset: focused title, module outline, `Course` JSON-LD with **NVIDIA DLI as provider/seller**, breadcrumbs, and internal links from nav/footer/homepage. Also live: ProfessionalService + Person ×3 + WebSite + ProfilePage schema (FAQPage dropped from `/` on 2026-09-13 because the homepage does not render the FAQ; `faqJsonLd()` stays for any page that does). The DLI page graph now includes the founder Person node so `Course.instructor` resolves. Every page ships a 1200×630 `og:image` (`public/og-image.png`), `og:site_name`, `og:locale`, and a `summary_large_image` Twitter card via `pageMetadata()` / the per-person template. Canonical **apex**; `www` 308s. **No keyword stuffing** — it hurts. **Majid must still** verify Search Console, submit the sitemap, and request indexing for the new pages. |
 | **Phone / voice AI** | Personal assistant; **AI cannot pick up yet** | 2026-08-25 test: 801 went to **GV voicemail** because Web + 618 forwarding are OFF and no Twilio number is linked. Webhook live. Twilio SID/token still empty. |
 
 ---
@@ -32,15 +40,38 @@ Or push `main` — GitHub integration deploys automatically.
 
 Apex and `www` are on the Vercel project. Current nameservers are Cloudflare. Keep Cloudflare and point records at Vercel (`CNAME` to `cname.vercel-dns.com`, proxied or DNS-only per Vercel docs), **or** switch nameservers to `ns1.vercel-dns.com` / `ns2.vercel-dns.com`.
 
-## Google name search
+## SEO (organic search)
 
-This site will show for “Majid Memari” only as a *supporting* result. The personal site is the name-query target. Link both ways (already on `/about`) and add `https://nexusaisolution.net` on LinkedIn as a second website if desired.
+**Intent this site owns:** **Nexus AI Solutions**; AI consulting across the United States / team training / workshops; Applied AI, Gen AI, RAG, agents; AI Solution Architect. **AI Entrepreneurship** is training direction, not a launched SKU (no catalog numbers). Branded “Majid Memari” is a *supporting* result — the personal site is the name-query target.
+
+**SEO keywords (on-page + metadata, no stuffing):** Nexus AI Solutions · AI consulting United States · nationwide AI team training · AI Solution Architect · Applied AI · Gen AI · RAG · agents · workshops · Majid Memari (supporting founder mention).
+
+**Market framing (2026-09-13):** Utah is the **home base, not the market boundary**. Positioning copy says the **United States**: the hero, page titles and descriptions, keywords, and `areaServed` (now a single `Country: United States`) all read nationwide, with delivery **in person at the client offices or online**. The Sandy UT `PostalAddress` and the factual Utah references (AI Utah 100 honoree, University of Utah One-U RAI, Utah public-sector work, Silicon Slopes) stay: they are credentials, not market limits. Standing rule in [`AGENTS.md`](../AGENTS.md) §10.
+
+**Shipped (2026-08-27)**
+
+- Unique title/description for `/`, `/about`, `/contact`
+- ProfessionalService + Person + WebSite + FAQPage JSON-LD. No SearchAction (no on-site search). Course schema stays on majidmemari.com so Nexus is not framed as selling the UVU class
+- `sitemap.xml` + `robots.txt` (allow `/`, disallow `/api/`, host = apex)
+- Middleware 308: `www.nexusaisolution.net` → `https://nexusaisolution.net` (both previously 200)
+- Honest contact copy: `(801) 810-9152` is Google Voice, not a live AI receptionist
+- Headings mention AI consulting, team training, and AI Entrepreneurship (UVU course the founder teaches; training direction, not a launched SKU)
+
+**Planned — Majid must click**
+
+1. [Google Search Console](https://search.google.com/search-console) → add `https://nexusaisolution.net` (and optionally a Domain property covering www) → verify → submit `https://nexusaisolution.net/sitemap.xml` → Request indexing for `/`, `/about`, `/contact`
+2. **LinkedIn** → add `https://nexusaisolution.net` as a second website (personal site stays first)
+3. Optional: company LinkedIn Page (only if a real page exists) — do not invent one
+4. **Google Business Profile** — only if he wants a real local listing for Sandy, UT consulting. Do **not** create a fake GBP or reviews
+5. Same profile backlinks as the personal PLAN (Scholar / ORCID / ResearchGate / UVU) should list **majidmemari.com**; Nexus is optional second URL
+
+Do **not** buy links, spam directories, or fabricate reviews. Do not claim a $1M USHE award or a launched entrepreneurship product.
 
 ---
 
 ## Phone: personal assistant (Google Voice + hidden Twilio + Vercel)
 
-**Product:** callers dial **(801) 810-9152**. An AI **personal assistant** answers, can briefly say who Dr. Memari is / consulting & training, then takes **name + callback + message** and **emails that message** (`CONTACT_TO_EMAIL` / Resend, else server log). He calls back if he wants. **No live transfer. No “please hold.” 618 does not ring.**
+**Product:** callers dial **(801) 810-9152**. An AI **personal assistant** answers, can briefly say who Majid Memari is / consulting & training, then takes **name + callback + message** and **emails that message** (`CONTACT_TO_EMAIL` / Resend, else server log). He calls back if he wants. **No live transfer. No “please hold.” 618 does not ring.**
 
 **Why the 2026-08-25 test hit Google Voice voicemail:** Settings → Calls has **Forward calls to Web = OFF**, **Forward calls to (618) 412-1041 = OFF**, and **no other linked number**. GV has nowhere to send the call, so it plays its own voicemail. There is no “rings before voicemail” control that can send the call to Vercel. Vercel has no Twilio SID/token/number.
 
@@ -97,9 +128,32 @@ Until a hidden Twilio number is linked **and** its forwarding is ON, incoming 80
 
 ---
 
+## Follow-ups (in-repo, no owner click needed)
+
+1. **Shared usage-log helper.** `/api/chat` writes its `chat.usage` JSON line and
+   `lib/inquiry.ts` writes `contact.usage` in the same shape. Extracting one helper was
+   deferred while the callers settled; do it when a third caller appears, and keep the field
+   names stable so existing Vercel log filters keep working.
+2. **Budget review on Haiku.** The dollar budgets in `lib/chat-limits.ts` were set for a dearer
+   model and kept as they were when the chat moved to Claude Haiku 4.5 (2026-09-13). They now
+   buy several times the conversations. Revisit them against a week of `chat.usage` lines and
+   the gateway spend page; lowering them is the likely move, not raising them.
+3. **Assistant naming is a prompt parameter now.** `nexusAssistantSystem("chat" | "site")`
+   renders one founder naming rule per surface. If a third surface appears, give it a value;
+   do not append a paragraph that overrides an earlier rule (`AGENTS.md` §9.1).
+4. **Persona parity.** `lib/chat-persona.ts` and `../majidmemari/lib/chat-persona.ts` export the
+   same SHARED NAMES block, same order. The personal site still renders its badge twice (widget
+   header and inline chat) where this repo renders it once inside `ConversationView`; folding
+   that into its `ConversationView` is the remaining parity edit, and it is cosmetic.
+
 ## Next
 
-1. Confirm Cloudflare records so [nexusaisolution.net](https://nexusaisolution.net) resolves to this project.
-2. Enable **AI Gateway** on the new project if chat / contact classifier / voice 503s.
-3. Add Resend keys if voice messages should email (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`).
-4. Add a hidden Twilio answering number and link it in GV (checklist above) so the personal assistant can pick up 801. A new test call will **not** reach the AI until that exists.
+Owner clicks only (agents cannot finish these):
+
+1. **Search Console** — verify the property, submit `sitemap.xml`, and request indexing for `/nvidia-dli-workshops` and the three `/about/<slug>` pages.
+2. Confirm the NVIDIA logo usage against the terms of the Certified Instructor agreement.
+3. Decide whether the street address should stay public — it is in the footer, `/contact`, and `PostalAddress` schema.
+4. Enable **AI Gateway** if chat / contact classifier / voice 503s; add Resend keys if voice messages should email.
+5. Add a hidden Twilio answering number and link it in GV (checklist above) so the assistant can pick up 801.
+
+Done in-repo (2026-09-12): missing modules committed so GitHub/Vercel builds resolve; Contact restored in nav and footer; Node engine pinned to `22.x`.

@@ -1,22 +1,36 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
+import { PAGE_COPY } from "@/lib/seo";
 import { SITE, SITE_URL } from "@/lib/site";
+
+/** One title for the default, Open Graph, and Twitter cards. */
+const DEFAULT_TITLE = PAGE_COPY.home.title;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Nexus AI Solutions — Founded by Majid Memari, Ph.D.",
+    default: DEFAULT_TITLE,
     template: "%s | Nexus AI Solutions",
   },
   description: SITE.description,
   authors: [{ name: "Majid Memari", url: "https://www.majidmemari.com" }],
   keywords: [
-    "Majid Memari",
     "Nexus AI Solutions",
-    "Utah AI consulting",
-    "Principal AI Architect",
-    "Utah Valley University",
+    "NVIDIA DLI workshop",
+    "NVIDIA Deep Learning Institute training",
+    "NVIDIA Certified Instructor",
+    "generative AI workshop for teams",
+    "agentic AI training",
+    "AI consulting United States",
+    "nationwide AI team training",
+    "AI Solution Architect",
+    "Gen AI",
+    "RAG",
+    "AI agents",
+    "Majid Memari",
   ],
   alternates: {
     canonical: "/",
@@ -30,7 +44,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Nexus AI Solutions — Majid Memari, Ph.D.",
+    title: DEFAULT_TITLE,
     description: SITE.description,
     url: SITE_URL,
     siteName: SITE.name,
@@ -47,7 +61,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nexus AI Solutions — Founded by Majid Memari, Ph.D.",
+    title: DEFAULT_TITLE,
     description: SITE.description,
     images: ["/og-image.png"],
   },
@@ -58,11 +72,31 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * `interactiveWidget` is deliberately left at the browser default
+ * (`resizes-visual`). `resizes-content` would shrink the layout viewport when
+ * the on-screen keyboard opens, and every `dvh` length on the site resolves
+ * against it: the chat sheet, the inline demo cap, and the `scroll-padding-top`
+ * on `html`. Focusing the contact form would then re-lay-out the whole page
+ * behind the keyboard, which is a worse trade than the pan the default does.
+ * The chat sheet already clears the keyboard by other means: it is a flex
+ * column with one scroller, so the composer is pinned inside whatever height
+ * it is given.
+ */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
+
+/**
+ * Marks the document as scripted, before the first paint. Anything that hides
+ * content until JavaScript moves it, which today is the scroll reveal, is
+ * gated on this class in `app/globals.css`, so a visitor with scripting off,
+ * or one whose bundle never arrives, reads the copy instead of a blank
+ * section.
+ */
+const SCRIPTING_FLAG = "document.documentElement.classList.add('js')";
 
 export default function RootLayout({
   children,
@@ -72,7 +106,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-w-0 overflow-x-hidden antialiased">
+        <script dangerouslySetInnerHTML={{ __html: SCRIPTING_FLAG }} />
         <ThemeProvider>{children}</ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
