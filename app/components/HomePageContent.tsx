@@ -99,8 +99,7 @@ export function HomePageContent() {
           </Reveal>
           <Reveal delay={80}>
             <h1 className="mt-8 text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-7xl sm:leading-[1.05]">
-              AI consulting and training,{" "}
-              <span className="gradient-text">across the United States</span>
+              AI consulting <span className="gradient-text">and training</span>
             </h1>
           </Reveal>
           <Reveal delay={160}>
