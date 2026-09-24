@@ -1,0 +1,9 @@
+[     428ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://kit.fontawesome.com/6b0af4bcb3.js:0
+[    1426ms] [WARNING] [WORKAROUND] Page URL should not be URL-encoded. Navigating. @ https://static.profile.api.courses.nvidia.com/workarounds.js:11
+[    1536ms] [LOG] Error, missing Report Suite ID in AppMeasurement initialization @ https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/2e4b72e2a7ff/EX4d80f697727445fe8fe2b2f430536f43-libraryCode_source.min.js:1
+[    1624ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://kit.fontawesome.com/6b0af4bcb3.js:0
+[    1766ms] [LOG] Error, missing Report Suite ID in AppMeasurement initialization @ https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/2e4b72e2a7ff/EX4d80f697727445fe8fe2b2f430536f43-libraryCode_source.min.js:1
+[    1941ms] Uncaught (in promise) TypeError: Cannot read properties of null (reading 'split')
+    at <anonymous> (https://static.profile.api.courses.nvidia.com/workarounds.js:57:82)
+[    2090ms] [LOG] page slug  courses/course-detail @ :89
+[    2578ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://learn.learn.nvidia.com/api/ibl/enrollment/enroll_status?course_id=course-v1%3ADLI%2BC-FX-25%2BV1:0

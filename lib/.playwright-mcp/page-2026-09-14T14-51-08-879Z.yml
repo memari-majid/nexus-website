@@ -1,0 +1,176 @@
+- generic [active] [ref=f4e1]:
+  - banner:
+    - navigation [ref=f4e2] [cursor=pointer]:
+      - generic [ref=f4e3]:
+        - link "Skip to main content" [ref=f4e4]:
+          - /url: "#page-content"
+        - generic [ref=f4e5]:
+          - link "NVIDIA Home" [ref=f4e7]:
+            - /url: https://www.nvidia.com/en-eu/
+            - img "Artificial Intelligence Computing Leadership from NVIDIA" [ref=f4e8]
+          - generic [ref=f4e11]:
+            - menu "menu" [ref=f4e12]:
+              - menuitem "Products" [ref=f4e13]
+              - menuitem "Solutions" [ref=f4e15]
+              - menuitem "Industries" [ref=f4e17]
+            - menu "menu" [ref=f4e19]:
+              - menuitem "Shop" [ref=f4e20]
+              - menuitem "Drivers" [ref=f4e21]
+              - menuitem "Support" [ref=f4e22]
+          - list "Menu Tools" [ref=f4e24]:
+            - listitem [ref=f4e25]:
+              - link "Search NVIDIA" [ref=f4e26]:
+                - /url: "#"
+                - img "Search icon" [ref=f4e27]
+            - link "Country Selector" [ref=f4e29]:
+              - /url: "#"
+              - generic [ref=f4e32]: US
+            - text: 
+      - text:                                                                                                                                                                                                                                                                                                   
+      - generic [ref=f4e35]:
+        - link "Deep Learning Institute" [ref=f4e37]:
+          - /url: https://www.nvidia.com/en-eu/training/
+        - link "Find Training" [ref=f4e40]:
+          - /url: https://www.nvidia.com/en-eu/training/find-training/
+        - link "Self-Paced Courses" [ref=f4e42]:
+          - /url: https://www.nvidia.com/en-eu/training/self-paced-courses/
+        - link "Workshops" [ref=f4e44]:
+          - /url: https://www.nvidia.com/en-eu/training/instructor-led-workshops/
+        - link "Certification" [ref=f4e46]:
+          - /url: https://www.nvidia.com/en-eu/learn/certification/
+        - link "Educator Programs" [ref=f4e48]:
+          - /url: https://www.nvidia.com/en-eu/training/educator-programs/
+  - heading "Instructor Data Not Available" [level=1] [ref=f4e61]
+  - generic [ref=f4e62]:
+    - generic [ref=f4e64]:
+      - generic [ref=f4e65]:
+        - generic [ref=f4e66]:
+          - generic [ref=f4e67]: Courses and Credentials
+          - list [ref=f4e68]:
+            - listitem [ref=f4e69]:
+              - link "Learning Paths" [ref=f4e70] [cursor=pointer]:
+                - /url: https://dam-cdn.nvd.orangelogic.com/AssetLink/e3d6dnl072557c05146bwe4gfu2ykw7o.pdf
+            - listitem [ref=f4e71]:
+              - link "Course Catalog" [ref=f4e72] [cursor=pointer]:
+                - /url: https://dam-cdn.nvd.orangelogic.com/AssetLink/f14exk056qm0g3x3550ibl0xi88880r6.pdf
+            - listitem [ref=f4e73]:
+              - link "Instructor-Led Workshops" [ref=f4e74] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/instructor-led-workshops/
+            - listitem [ref=f4e75]:
+              - link "Private Workshop Request" [ref=f4e76] [cursor=pointer]:
+                - /url: https://enterprise-support.nvidia.com/s/training/request-training
+            - listitem [ref=f4e77]:
+              - link "Free Self-Paced Courses" [ref=f4e78] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/find-training/
+            - listitem [ref=f4e79]:
+              - link "Certification Exams" [ref=f4e80] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/learn/certification/
+        - generic [ref=f4e81]:
+          - generic [ref=f4e82]: Training by Topic
+          - list [ref=f4e83]:
+            - listitem [ref=f4e84]:
+              - link "Accelerated Computing" [ref=f4e85] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/find-training/
+            - listitem [ref=f4e86]:
+              - link "AI Infrastructure" [ref=f4e87] [cursor=pointer]:
+                - /url: https://academy.nvidia.com/en/
+            - listitem [ref=f4e88]:
+              - link "Data Science" [ref=f4e89] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/find-training/
+            - listitem [ref=f4e90]:
+              - link "Deep Learning" [ref=f4e91] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/find-training/
+            - listitem [ref=f4e92]:
+              - link "Generative AI / LLMs" [ref=f4e93] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/find-training/
+            - listitem [ref=f4e94]:
+              - link "Graphics and Simulation" [ref=f4e95] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/find-training/
+        - generic [ref=f4e96]:
+          - generic [ref=f4e97]: Get Involved
+          - list [ref=f4e98]:
+            - listitem [ref=f4e99]:
+              - link "Attend GTC" [ref=f4e100] [cursor=pointer]:
+                - /url: https://www.nvidia.com/gtc/training/
+            - listitem [ref=f4e101]:
+              - link "Become an Ambassador" [ref=f4e102] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/educator-programs/university-ambassador-program/
+            - listitem [ref=f4e103]:
+              - link "Become a Certified Instructor" [ref=f4e104] [cursor=pointer]:
+                - /url: https://developer.nvidia.com/dli/cip/application-amb
+            - listitem [ref=f4e105]:
+              - link "Join Forums" [ref=f4e106] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/forums/
+            - listitem [ref=f4e107]:
+              - link "Join Inception Program for Start-ups" [ref=f4e108] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/startups/
+            - listitem [ref=f4e109]:
+              - link "Join Connect Program for ISVs" [ref=f4e110] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/programs/isv/
+            - listitem [ref=f4e111]:
+              - link "Join NVIDIA Developer Program" [ref=f4e112] [cursor=pointer]:
+                - /url: https://developer.nvidia.com/developer-program
+        - generic [ref=f4e113]:
+          - generic [ref=f4e114]: About Us
+          - list [ref=f4e115]:
+            - listitem [ref=f4e116]:
+              - link "Contact Us" [ref=f4e117] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/learn/training/support/
+            - listitem [ref=f4e118]:
+              - link "Training Newsletter" [ref=f4e119] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/newsletter/
+            - listitem [ref=f4e120]:
+              - link "Training FAQ" [ref=f4e121] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/learn/training/support/
+            - listitem [ref=f4e122]:
+              - link "Certification FAQ" [ref=f4e123] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/learn/certification/
+            - listitem [ref=f4e124]:
+              - link "Instructor Directory" [ref=f4e125] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/training/instructor-directory/
+            - listitem [ref=f4e126]:
+              - link "NVIDIA Research" [ref=f4e127] [cursor=pointer]:
+                - /url: https://www.nvidia.com/en-eu/research/
+      - generic [ref=f4e129]:
+        - generic [ref=f4e130]: Follow NVIDIA
+        - link "Facebook" [ref=f4e131] [cursor=pointer]:
+          - /url: https://www.facebook.com/NVIDIA
+          - img "Facebook" [ref=f4e132]
+        - link "Instagram" [ref=f4e134] [cursor=pointer]:
+          - /url: https://www.instagram.com/nvidia/?hl=en
+          - img "Instagram" [ref=f4e135]
+        - link "LinkedIn" [ref=f4e137] [cursor=pointer]:
+          - /url: https://www.linkedin.com/company/nvidia/
+          - img "LinkedIn" [ref=f4e138]
+        - link "Twitter" [ref=f4e140] [cursor=pointer]:
+          - /url: https://twitter.com/nvidia
+          - img "Twitter" [ref=f4e141]
+        - link "YouTube" [ref=f4e143] [cursor=pointer]:
+          - /url: https://www.youtube.com/user/nvidia
+          - img "YouTube" [ref=f4e144]
+    - generic [ref=f4e147]:
+      - img "NVIDIA" [ref=f4e148]
+      - generic [ref=f4e153]: Europe
+      - list [ref=f4e154]:
+        - listitem [ref=f4e155]:
+          - link "Privacy Policy" [ref=f4e156] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-eu/about-nvidia/privacy-policy/
+        - listitem [ref=f4e157]:
+          - link "Your Privacy Choices" [ref=f4e158] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-eu/about-nvidia/privacy-center/
+        - listitem [ref=f4e159]:
+          - link "Terms of Service" [ref=f4e160] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-eu/about-nvidia/terms-of-service/
+        - listitem [ref=f4e161]:
+          - link "Accessibility" [ref=f4e162] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-eu/about-nvidia/accessibility/
+        - listitem [ref=f4e163]:
+          - link "Corporate Policies" [ref=f4e164] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-eu/about-nvidia/company-policies/
+        - listitem [ref=f4e165]:
+          - link "Product Security" [ref=f4e166] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-eu/product-security/
+        - listitem [ref=f4e167]:
+          - link "Contact" [ref=f4e168] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-eu/contact/
+      - generic [ref=f4e169]: Copyright © 2026 NVIDIA Corporation

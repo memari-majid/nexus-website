@@ -1,0 +1,6 @@
+[     613ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack://DLI/./node_modules/react-dom/cjs/react-dom.development.js?:29834
+[     697ms] [LOG]  @ webpack://DLI/./src/components/bioPage/index.js?:63
+[     810ms] [LOG] Current Locale: en-eu @ https://www.nvidia.com/content/dam/en-zz/Solutions/librarian/bundle-search-prod-pub-v3.1.js:1
+[     853ms] [LOG] Local session not found. @ https://www.nvidia.com/etc/designs/nvidiaGDC/clientlibs-all.min.f8f03a854cf75d8d0f023568c63c9f2b.js:6700
+[    1360ms] SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at eval (webpack://DLI/./src/components/bioPage/index.js?:117:23)

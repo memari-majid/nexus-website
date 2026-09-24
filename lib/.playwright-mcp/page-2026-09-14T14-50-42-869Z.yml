@@ -1,0 +1,238 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - link "Nexus AI Solutions Nexus AI" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "Nexus AI Solutions" [ref=e6]
+          - generic [ref=e7]: Nexus AI
+        - generic [ref=e8]:
+          - button "Switch to light mode" [ref=e9]
+          - button "Toggle menu" [ref=e12]
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - img "NVIDIA" [ref=e17]
+        - paragraph [ref=e19]: Training
+      - heading "NVIDIA Deep Learning Institute generative AI workshops" [level=1] [ref=e20]
+      - paragraph [ref=e21]:
+        - text: Official
+        - link "NVIDIA Deep Learning Institute" [ref=e22] [cursor=pointer]:
+          - /url: https://www.nvidia.com/en-us/training/
+        - text: workshops for industry teams, hosted by a
+        - link "Certified Instructor" [ref=e23] [cursor=pointer]:
+          - /url: https://www.nvidia.com/en-us/learn/certified-instructor-program/
+        - text: . Nexus hosts, teaches, and invoices at $500 per seat.
+      - generic [ref=e24]:
+        - heading "The workshop" [level=2] [ref=e25]
+        - generic [ref=e26]:
+          - paragraph [ref=e27]: Available now
+          - heading [level=3] [ref=e28]:
+            - link "Building Agentic AI Applications With LLMs" [ref=e29] [cursor=pointer]:
+              - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+C-FX-25+V1
+          - paragraph [ref=e30]: Eight hours · hands-on
+          - paragraph [ref=e31]: NVIDIA NIM, LangChain, LangGraph, retrieval, multi-agent workflows, and agent deployment.
+          - list [ref=e32]:
+            - listitem [ref=e33]:
+              - paragraph [ref=e34]: Agent fundamentals
+              - paragraph [ref=e35]: What an LLM agent is, where language models are strong, and where they fail, so your team can tell an agent-shaped problem from one that needs ordinary software.
+            - listitem [ref=e36]:
+              - paragraph [ref=e37]: Structured outputs and tool use
+              - paragraph [ref=e38]: Constraining a model to machine-readable output so its responses can drive function calls and API integrations reliably.
+            - listitem [ref=e39]:
+              - paragraph [ref=e40]: Retrieval and knowledge graphs
+              - paragraph [ref=e41]: Grounding agents in your domain knowledge with retrieval mechanisms and graph-backed context.
+            - listitem [ref=e42]:
+              - paragraph [ref=e43]: Multi-agent systems with LangGraph
+              - paragraph [ref=e44]: Decomposing work across specialist agents, giving them communication channels, and running them concurrently with LangGraph orchestration.
+            - listitem [ref=e45]:
+              - paragraph [ref=e46]: Deployment and final assessment
+              - paragraph [ref=e47]: Deploying an agent that schedules multiple retrieval operations and reports back, the hands-on assessment behind the NVIDIA DLI certificate.
+          - paragraph [ref=e48]: "Tools and frameworks: NVIDIA NIM, build.nvidia.com, LangChain, LangGraph, Python, PyTorch."
+      - generic [ref=e49]:
+        - heading "How delivery works" [level=2] [ref=e50]
+        - generic [ref=e51]:
+          - paragraph [ref=e52]: "NVIDIA owns the labs, curriculum, assessment, and certificate. Nexus hosts and teaches, on site anywhere in the United States or online, and handles enrollment and invoicing. Your company needs nothing: no GPUs, no local compute, no special infrastructure."
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - paragraph [ref=e55]: NVIDIA provides
+              - list [ref=e56]:
+                - listitem [ref=e57]:
+                  - generic [aria-hidden] [ref=e58]: •
+                  - generic [ref=e59]: "Cloud GPU VMs: you need no compute"
+                - listitem [ref=e60]:
+                  - generic [aria-hidden] [ref=e61]: •
+                  - generic [ref=e62]: Course content and curriculum
+                - listitem [ref=e63]:
+                  - generic [aria-hidden] [ref=e64]: •
+                  - generic [ref=e65]: Assessment
+                - listitem [ref=e66]:
+                  - generic [aria-hidden] [ref=e67]: •
+                  - generic [ref=e68]: DLI certificate
+            - generic [ref=e69]:
+              - paragraph [ref=e70]: Nexus provides
+              - list [ref=e71]:
+                - listitem [ref=e72]:
+                  - generic [aria-hidden] [ref=e73]: •
+                  - generic [ref=e74]: Consulting to scope the training your team actually needs
+                - listitem [ref=e75]:
+                  - generic [aria-hidden] [ref=e76]: •
+                  - generic [ref=e77]: In-person hosting and teaching at your offices anywhere in the United States, or online
+                - listitem [ref=e78]:
+                  - generic [aria-hidden] [ref=e79]: •
+                  - generic [ref=e80]: The right NVIDIA-certified instructor for the topic
+                - listitem [ref=e81]:
+                  - generic [aria-hidden] [ref=e82]: •
+                  - generic [ref=e83]: A private cohort built around your team
+                - listitem [ref=e84]:
+                  - generic [aria-hidden] [ref=e85]: •
+                  - generic [ref=e86]: Help every participant pass the assessment
+                - listitem [ref=e87]:
+                  - generic [aria-hidden] [ref=e88]: •
+                  - generic [ref=e89]: Enrollment and a single invoice
+          - paragraph [ref=e90]: NVIDIA owns the content, cloud GPU labs, assessment, and the DLI certificate. Nexus hosts, teaches as a Certified Instructor, and invoices you directly at $500 per seat.
+          - paragraph [ref=e91]: Private industry cohorts anywhere in the United States, in person at your offices or online. NVIDIA supplies the cloud labs. Allow six weeks to schedule.
+      - generic [ref=e92]:
+        - heading "Industry workshops" [level=2] [ref=e93]
+        - generic [ref=e94]:
+          - paragraph [ref=e95]: DLI Certified Instructor
+          - paragraph [ref=e96]: We host the official workshop for company teams anywhere in the United States, in person at your offices or online. A Certified Instructor teaches, and Nexus handles enrollment and invoicing. Engineering and data teams get a full day of hands-on practice on NVIDIA's GPU cloud. Nexus handles enrollment and invoices at $500 per seat, up to 20; larger groups get a tailored quote.
+          - button "Ask the AI Consultant about it" [ref=e98]
+      - generic [ref=e99]:
+        - heading "Who it is for" [level=2] [ref=e100]
+        - paragraph [ref=e102]: For industry teams across the United States. A Certified Instructor hosts the official workshop, in person at your offices or online.
+      - generic [ref=e103]:
+        - heading "NVIDIA Gen AI workshops we can deliver" [level=2] [ref=e104]
+        - generic [ref=e105]:
+          - paragraph [ref=e106]: NVIDIA's Deep Learning Institute adds new generative AI and LLM workshops regularly, so the catalog we can arrange keeps growing.
+          - list [ref=e107]:
+            - listitem [ref=e108]:
+              - generic [ref=e109]:
+                - link "Building Agentic AI Applications With LLMs" [ref=e110] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+C-FX-25+V1
+                - generic [ref=e111]: We teach this
+              - paragraph [ref=e112]: Design agents that retrieve and refine information, route queries, and run tasks concurrently with NVIDIA NIM, LangChain, and LangGraph. Instructor-led.
+            - listitem [ref=e113]:
+              - generic [ref=e114]:
+                - link "Building AI Agents With Multimodal Models" [ref=e115] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+C-FX-17+V1
+                - generic [ref=e116]: instructor-led
+              - paragraph [ref=e117]: Build agents that reason over text and visual inputs using multimodal models. Instructor-led.
+            - listitem [ref=e118]:
+              - generic [ref=e119]:
+                - link "Adding New Knowledge to LLMs" [ref=e120] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+C-FX-26+V1
+                - generic [ref=e121]: instructor-led
+              - paragraph [ref=e122]: Take raw data through to a fine-tuned, optimized model with NeMo Curator, continued pretraining, SFT, DPO, and quantization. Instructor-led.
+            - listitem [ref=e123]:
+              - generic [ref=e124]:
+                - link "Building RAG Agents With LLMs" [ref=e125] [cursor=pointer]:
+                  - /url: https://courses.nvidia.com/courses/course-v1%3ADLI+S-FX-15+V1/
+                - generic [ref=e126]: self-paced
+              - paragraph [ref=e127]: Design retrieval-augmented generation systems with advanced LLM composition, dialog management, and tooling. Self-paced.
+            - listitem [ref=e128]:
+              - generic [ref=e129]:
+                - link "Evaluating RAG and Semantic Search Systems" [ref=e130] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+S-FX-32+V1
+                - generic [ref=e131]: self-paced
+              - paragraph [ref=e132]: Assess and improve the quality of RAG and semantic search pipelines. Self-paced.
+            - listitem [ref=e133]:
+              - generic [ref=e134]:
+                - link "Deploying RAG Pipelines for Production at Scale" [ref=e135] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+C-FX-18+V1
+                - generic [ref=e136]: instructor-led
+              - paragraph [ref=e137]: Deploy and operate production-grade RAG pipelines at scale. Instructor-led.
+            - listitem [ref=e138]:
+              - generic [ref=e139]:
+                - link "Building LLM Applications With Prompt Engineering" [ref=e140] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+S-FX-12+V2
+                - generic [ref=e141]: self-paced
+              - paragraph [ref=e142]: Build LLM-powered applications using prompt-engineering techniques. Self-paced.
+            - listitem [ref=e143]:
+              - generic [ref=e144]:
+                - link "Building Conversational AI Applications" [ref=e145] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+C-FX-06+V2
+                - generic [ref=e146]: instructor-led
+              - paragraph [ref=e147]: Build conversational AI and dialog applications powered by LLMs. Instructor-led.
+            - listitem [ref=e148]:
+              - generic [ref=e149]:
+                - link "Generative AI With Diffusion Models" [ref=e150] [cursor=pointer]:
+                  - /url: https://courses.nvidia.com/courses/course-v1%3ADLI+S-FX-14+V1/
+                - generic [ref=e151]: self-paced
+              - paragraph [ref=e152]: Build and train diffusion models for image and data generation. Self-paced.
+            - listitem [ref=e153]:
+              - generic [ref=e154]:
+                - link "Generative AI Explained" [ref=e155] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+S-FX-07+V1
+                - generic [ref=e156]: self-paced
+              - paragraph [ref=e157]: A non-technical overview of generative AI concepts and applications. Free, self-paced.
+            - listitem [ref=e158]:
+              - generic [ref=e159]:
+                - link "Rapid Application Development Using Large Language Models" [ref=e160] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+S-FX-26+V1
+                - generic [ref=e161]: self-paced
+              - paragraph [ref=e162]: Practical LLM application development across the open-source ecosystem, from pretrained models to a working app. Self-paced.
+            - listitem [ref=e163]:
+              - generic [ref=e164]:
+                - link "Introduction to Deploying RAG Pipelines for Production at Scale" [ref=e165] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+S-FX-19+V1
+                - generic [ref=e166]: self-paced
+              - paragraph [ref=e167]: An introduction to taking RAG pipelines from prototype toward production. Self-paced.
+          - paragraph [ref=e168]: We specialize in generative AI. Beyond these NVIDIA workshops, we also design customized Gen AI training around your team and stack. We are not limited to NVIDIA's courses, but Gen AI is our focus.
+      - generic [ref=e169]:
+        - heading "The instructor" [level=2] [ref=e170]
+        - generic [ref=e171]:
+          - paragraph [ref=e172]: Majid Memari, PhD (Founder & CEO, Nexus AI Solutions LLC) is an NVIDIA DLI Certified Instructor. He teaches applied AI, machine learning, and AI entrepreneurship, and brings that method into Nexus team training.
+          - paragraph [ref=e173]:
+            - link "NVIDIA Certified Instructor Directory" [ref=e174] [cursor=pointer]:
+              - /url: https://www.nvidia.com/en-eu/training/instructor-directory/bio/?instructorId=003Vv00000J9hZLIAZ
+            - text: ·
+            - link "Full bio" [ref=e175] [cursor=pointer]:
+              - /url: /about/majid-memari
+      - region "NVIDIA resources" [ref=e176]:
+        - generic [ref=e177]:
+          - generic [ref=e178]:
+            - paragraph [ref=e179]: The workshop
+            - list [ref=e180]:
+              - listitem [ref=e181]:
+                - link "Building Agentic AI Applications With LLMs" [ref=e182] [cursor=pointer]:
+                  - /url: https://learn.nvidia.com/courses/course-detail?course_id=course-v1%3ADLI+C-FX-25+V1
+              - listitem [ref=e183]:
+                - link "Agentic AI" [ref=e184] [cursor=pointer]:
+                  - /url: https://www.nvidia.com/en-us/solutions/ai/agentic-ai/
+          - generic [ref=e185]:
+            - paragraph [ref=e186]: Instructor credential
+            - list [ref=e187]:
+              - listitem [ref=e188]:
+                - link "NVIDIA Certified Instructor Directory" [ref=e189] [cursor=pointer]:
+                  - /url: https://www.nvidia.com/en-eu/training/instructor-directory/bio/?instructorId=003Vv00000J9hZLIAZ
+              - listitem [ref=e190]:
+                - link "Certified Instructor Program" [ref=e191] [cursor=pointer]:
+                  - /url: https://www.nvidia.com/en-us/learn/certified-instructor-program/
+          - generic [ref=e192]:
+            - paragraph [ref=e193]: Browse NVIDIA training
+            - list [ref=e194]:
+              - listitem [ref=e195]:
+                - link "Deep Learning Institute" [ref=e196] [cursor=pointer]:
+                  - /url: https://www.nvidia.com/en-us/training/
+              - listitem [ref=e197]:
+                - link "Instructor-led workshops" [ref=e198] [cursor=pointer]:
+                  - /url: https://www.nvidia.com/en-us/training/instructor-led-workshops/
+              - listitem [ref=e199]:
+                - link "Full course catalog (PDF)" [ref=e200] [cursor=pointer]:
+                  - /url: https://dam-cdn.nvd.orangelogic.com/AssetLink/12gb57sa4o276e5yl0kt6lnh70127335.pdf
+          - generic [ref=e201]:
+            - paragraph [ref=e202]: Tools & docs
+            - list [ref=e203]:
+              - listitem [ref=e204]:
+                - link "NIM documentation" [ref=e205] [cursor=pointer]:
+                  - /url: https://docs.nvidia.com/nim/
+              - listitem [ref=e206]:
+                - link "build.nvidia.com" [ref=e207] [cursor=pointer]:
+                  - /url: https://build.nvidia.com/
+      - generic [ref=e208]:
+        - button "Start a conversation" [ref=e209]
+        - link "All training" [ref=e210] [cursor=pointer]:
+          - /url: /#training
+      - paragraph [ref=e211]: NVIDIA DLI Certified Instructor
+    - button "Open the AI Consultant" [ref=e212]
+  - alert [ref=e215]

@@ -1,0 +1,142 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e5]:
+    - heading [level=1]
+    - paragraph
+  - generic [ref=f2e8]:
+    - generic [ref=f2e9] [cursor=pointer]: About Course
+    - generic [ref=f2e10] [cursor=pointer]: Objectives
+    - generic [ref=f2e11] [cursor=pointer]: Topics Covered
+    - generic [ref=f2e12] [cursor=pointer]: Course Outline
+    - generic [ref=f2e13] [cursor=pointer]: Stay Informed
+    - generic [ref=f2e14] [cursor=pointer]: Contact Us
+  - generic [ref=f2e16]:
+    - generic [ref=f2e17]:
+      - heading "About this Course" [level=2] [ref=f2e19]
+      - heading "Learning Objectives" [level=2] [ref=f2e21]
+      - heading "Topics Covered" [level=2] [ref=f2e23]
+      - heading "Course Outline" [level=2] [ref=f2e25]
+    - generic [ref=f2e27]:
+      - generic [ref=f2e28]: Course Details
+      - generic [ref=f2e29]:
+        - generic [ref=f2e30]: "Price:"
+        - generic [ref=f2e31]:
+          - text: Prefer learning from an instructor?
+          - generic [ref=f2e32]:
+            - link "Request a private workshop" [ref=f2e33] [cursor=pointer]:
+              - /url: https://www.nvidia.com/en-us/deep-learning-ai/education/request-workshop/
+            - text: or view our public workshop schedule.
+  - generic [ref=f2e35]:
+    - heading "Stay Informed" [level=2] [ref=f2e36]
+    - paragraph [ref=f2e37]: Sign up for developer news, announcements, and more from NVIDIA. Get the latest information on new self-paced courses, instructor-led workshops, free training, discounts, and more. You can unsubscribe at any time.
+    - link "Subscribe" [ref=f2e39] [cursor=pointer]:
+      - /url: https://www.nvidia.com/en-us/training/newsletter/
+  - generic [ref=f2e41]:
+    - heading "Team and individual training" [level=2] [ref=f2e42]
+    - paragraph [ref=f2e43]: Whether you aim to acquire specific skills for your projects and teams, keep pace with technology in your field, or advance your career, NVIDIA Training can help you take your skills to the next level.
+    - paragraph [ref=f2e44]: Contact us if you have questions about training, whether it's for yourself or your team.
+    - link "Contact Us" [ref=f2e46] [cursor=pointer]:
+      - /url: https://www.nvidia.com/en-us/learn/organizations/contact-us/
+  - generic [ref=f2e48]:
+    - heading "Course Catalog" [level=2] [ref=f2e49]
+    - link "View Course Catalog" [ref=f2e51] [cursor=pointer]:
+      - /url: /catalog
+  - generic [ref=f2e52]:
+    - generic [ref=f2e54]:
+      - generic [ref=f2e55]:
+        - generic [ref=f2e56]:
+          - generic [ref=f2e57]: How To Learn
+          - link "Course Catalog" [ref=f2e59] [cursor=pointer]:
+            - /url: https://nvdam.widen.net/s/wlbgbqr7cj/nvidia-learning-training-course-catalog
+          - link "Learning Paths" [ref=f2e61] [cursor=pointer]:
+            - /url: https://nvdam.widen.net/s/brxsxxtskb/dli-learning-journey-2009000-r5-web
+          - link "Instructor-Led Workshops" [ref=f2e63] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/instructor-led-workshops
+          - link "Private Workshop Request" [ref=f2e65] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/deep-learning-ai/education/request-workshop/
+          - link "Self-Paced Courses" [ref=f2e67] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/self-paced-courses
+          - link "Free Training" [ref=f2e69] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/self-paced-courses#free
+          - link "Certification" [ref=f2e71] [cursor=pointer]:
+            - /url: http://www.nvidia.com/en-us/learn/certification/
+          - link "Training Videos On-Demand" [ref=f2e73] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/on-demand/playlist/playList-108242b0-35ac-4765-9796-d6961cb026c4/
+        - generic [ref=f2e74]:
+          - generic [ref=f2e75]: Training By Topic
+          - link "Accelerated Computing" [ref=f2e77] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/find-training?topics=accelerated+computing
+          - link "Data Center / Cloud" [ref=f2e79] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/find-training?topics=data+center+cloud
+          - link "Data Science" [ref=f2e81] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/find-training?topics=Data+Scientist
+          - link "Deep Learning" [ref=f2e83] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/find-training?topics=deep+learning
+          - link "Generative AI / LLMs" [ref=f2e85] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/find-training?topics=generative+ai+llm
+          - link "Networking" [ref=f2e87] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/find-training?topics=networking
+          - link "Simulation / Modeling / Design" [ref=f2e89] [cursor=pointer]:
+            - /url: https://learn.nvidia.com/en-us/training/find-training?topics=simulation+modeling+design
+        - generic [ref=f2e90]:
+          - generic [ref=f2e91]: Get Involved
+          - link "Attend GTC" [ref=f2e93] [cursor=pointer]:
+            - /url: https://www.nvidia.com/gtc/training/
+          - link "Become an Ambassador" [ref=f2e95] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/training/educator-programs/university-ambassador-program/
+          - link "Become a Certified Instructor" [ref=f2e97] [cursor=pointer]:
+            - /url: https://developer.nvidia.com/dli/cip/application-amb
+          - link "Join Forums" [ref=f2e99] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/forums/
+          - link "Join Inception Program for Startups" [ref=f2e101] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/startups/
+          - link "Join NVIDIA Developer Program" [ref=f2e103] [cursor=pointer]:
+            - /url: https://developer.nvidia.com/developer-program
+        - generic [ref=f2e104]:
+          - generic [ref=f2e105]: About Us
+          - link "Contact Us" [ref=f2e107] [cursor=pointer]:
+            - /url: https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.nvidia.com%2Fen-us%2Flearn%2Ftraining%2Fsupport%2F&data=05%7C02%7Cpprakashbabu%40nvidia.com%7Ce6cce24cfe13451aeb1908de100442de%7C43083d15727340c1b7db39efd9ccc17a%7C0%7C0%7C638965807686577674%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=Usc5Z0hjitBviWT8LYwlMtwnN6UdsRH%2Bhuf4nGOb8vw%3D&reserved=0
+          - link "Training Newsletter" [ref=f2e109] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/training/newsletter/
+          - link "Training FAQ" [ref=f2e111] [cursor=pointer]:
+            - /url: /faq
+          - link "Instructor Directory" [ref=f2e113] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/training/instructor-directory/
+      - generic [ref=f2e114]:
+        - generic [ref=f2e115]:
+          - generic [ref=f2e117]: Sign up for NVIDIA News
+          - link "Subscribe" [ref=f2e119] [cursor=pointer]:
+            - /url: https://www.nvidia.com/en-us/preferences/email-signup/
+        - generic [ref=f2e120]:
+          - generic [ref=f2e121]: Follow NVIDIA
+          - link [ref=f2e122] [cursor=pointer]:
+            - /url: https://www.facebook.com/NVIDIA
+            - img "NVIDIA Facebook" [ref=f2e123]
+          - link [ref=f2e124] [cursor=pointer]:
+            - /url: https://twitter.com/nvidia
+            - img "NVIDIA Twitter" [ref=f2e125]
+          - link [ref=f2e126] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/nvidia/
+            - img "NVIDIA Linkedin" [ref=f2e127]
+          - link [ref=f2e128] [cursor=pointer]:
+            - /url: https://www.instagram.com/nvidia/?hl=en
+            - img "NVIDIA Instagram" [ref=f2e129]
+          - link [ref=f2e130] [cursor=pointer]:
+            - /url: https://www.youtube.com/user/nvidia
+            - img "NVIDIA Facebook" [ref=f2e131]
+    - generic [ref=f2e135]:
+      - generic [ref=f2e137]:
+        - link "Privacy Policy" [ref=f2e138] [cursor=pointer]:
+          - /url: https://www.nvidia.com/en-us/about-nvidia/legal-info/
+        - generic [ref=f2e139]: "|"
+        - link "Manage my Privacy" [ref=f2e140] [cursor=pointer]:
+          - /url: https://www.nvidia.com/en-us/about-nvidia/privacy-policy/
+        - generic [ref=f2e141]: "|"
+        - link "Legal" [ref=f2e142] [cursor=pointer]:
+          - /url: https://www.nvidia.com/en-us/about-nvidia/cookie-policy/
+        - generic [ref=f2e143]: "|"
+        - link "Product Security" [ref=f2e144] [cursor=pointer]:
+          - /url: https://www.nvidia.com/en-us/contact/
+        - generic [ref=f2e145]: "|"
+        - link "Contact" [ref=f2e146] [cursor=pointer]:
+          - /url: https://www.nvidia.com/en-us/contact/
+      - generic [ref=f2e147]: Copyright © 2024 NVIDIA Corporation
