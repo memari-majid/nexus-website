@@ -4,10 +4,14 @@ import { DLI } from "@/lib/dli";
 import { FAQS } from "@/lib/faq";
 import { HAMID } from "@/lib/hamid";
 import { MAJID } from "@/lib/majid";
-import { MOHAMMAD } from "@/lib/mohammad";
 import { SITE, SITE_URL } from "@/lib/site";
+import { ASSISTANT_NAME } from "@/lib/chat-persona";
 
-export const INDEXABLE_PATHS = ["/", "/about", "/contact", "/nvidia-dli-workshops"] as const;
+/**
+ * Append only: sitemap priority is derived from index position. `/how-it-works`
+ * was removed on 2026-09-13 and redirects to `/` in `next.config.ts`.
+ */
+export const INDEXABLE_PATHS = ["/", "/about", "/contact", "/nvidia-dli-workshops", "/ai-consultant", "/nvidia-dli-workshops/details"] as const;
 
 export function absoluteUrl(path = "/"): string {
   if (path === "/") return SITE_URL;
@@ -26,25 +30,45 @@ export const FOUNDER_SAME_AS = [
 ] as const;
 
 export const PAGE_COPY = {
+  nvidiaDliDetails: {
+    title: "Workshop details | Nexus AI Solutions",
+    description: "Delivery, pricing, prerequisites and course details for your private NVIDIA DLI workshop with Nexus.",
+  },
+  aiConsultant: {
+    title: `Try our ${ASSISTANT_NAME} | Nexus AI Solutions`,
+    description:
+      "Try our AI in a live conversation. Explore an idea for your team, draft a project brief, or find a useful first step. No signup needed.",
+  },
   home: {
-    title: "Nexus AI Solutions — Utah AI Consulting & NVIDIA DLI Training",
+    title: "Nexus AI Solutions: US AI Consulting & NVIDIA DLI Training",
     description: SITE.description,
   },
   about: {
-    title: "About — Nexus AI Solutions",
+    title: "About Nexus AI Solutions",
     description:
-      "Nexus AI Solutions is led by Majid Memari, PhD (Founder & CEO) — an NVIDIA DLI Certified Instructor who hosts industry workshops — with Hamid Memari (CTO) and Mohammad Jafarinejad, PhD (CFO). AI consulting and training: advisory work, NVIDIA DLI workshops, and in-house team sessions.",
+      `Nexus AI Solutions is led by ${MAJID.fullName} (${MAJID.companyRole}), an NVIDIA DLI Certified Instructor who hosts industry workshops, and ${HAMID.fullName} (${HAMID.role}). AI consulting and training for companies across the United States: advisory work, NVIDIA DLI workshops, and in-house team sessions.`,
   },
   contact: {
-    title: "Contact Nexus AI Solutions — AI Consulting & NVIDIA DLI Training",
+    title: "Contact Nexus AI Solutions: AI Consulting & Training",
     description:
-      "Contact Nexus AI Solutions about AI consulting, team training, and NVIDIA Deep Learning Institute workshops taught by a DLI Certified Instructor. Utah-based — call (801) 810-9152 or send a message and we will get back to you.",
+      "Email Nexus AI Solutions about AI consulting, team training and NVIDIA DLI workshops. Send a message to our team. We work with companies across the United States, on site or online.",
   },
   nvidiaDli: {
-    title: "NVIDIA DLI Generative AI Workshops for Teams — Nexus AI Solutions",
+    title: "NVIDIA DLI Gen AI Workshops · Nexus AI Solutions",
     description:
-      "Official NVIDIA Deep Learning Institute workshops for industry teams, hosted by a Certified Instructor. Building Agentic AI Applications With LLMs — eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
+      "Official NVIDIA Deep Learning Institute workshops for industry teams across the United States, hosted by a Certified Instructor on site or online. Building Agentic AI Applications With LLMs: eight hours, hands-on, with cloud GPU labs and an NVIDIA DLI certificate.",
   },
+} as const;
+
+/**
+ * Shared 1200x630 social preview card. Relative so `metadataBase` in
+ * app/layout.tsx resolves it to an absolute URL on every page.
+ */
+export const OG_IMAGE = {
+  url: "/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: SITE.name,
 } as const;
 
 export function pageMetadata(
@@ -61,11 +85,16 @@ export function pageMetadata(
       title: copy.title,
       description: copy.description,
       url: path,
+      siteName: SITE.name,
+      locale: "en_US",
       type: ogType,
+      images: [OG_IMAGE],
     },
     twitter: {
+      card: "summary_large_image",
       title: copy.title,
       description: copy.description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -80,20 +109,7 @@ export function organizationJsonLd() {
     url: SITE_URL,
     image: `${SITE_URL}/og-image.png`,
     logo: `${SITE_URL}/nexus-logo.png`,
-    telephone: SITE.phone,
-    email: SITE.email,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: SITE.streetAddress,
-      addressLocality: SITE.addressLocality,
-      addressRegion: SITE.addressRegion,
-      postalCode: SITE.postalCode,
-      addressCountry: SITE.addressCountry,
-    },
-    areaServed: [
-      { "@type": "AdministrativeArea", name: "Utah" },
-      { "@type": "Country", name: "United States" },
-    ],
+    areaServed: { "@type": "Country", name: "United States" },
     founder: { "@id": `${SITE_URL}/#person` },
     employee: [
       {
@@ -105,19 +121,6 @@ export function organizationJsonLd() {
         url: HAMID.linkedin,
         image: `${SITE_URL}${HAMID.photo}`,
         sameAs: [HAMID.linkedin],
-        worksFor: { "@id": `${SITE_URL}/#organization` },
-      },
-      {
-        "@type": "Person",
-        "@id": `${SITE_URL}/#mohammad`,
-        name: MOHAMMAD.name,
-        alternateName: [MOHAMMAD.displayName, "Mohammad JN"],
-        honorificSuffix: "PhD",
-        jobTitle: MOHAMMAD.role,
-        description: MOHAMMAD.bio.join(" "),
-        url: MOHAMMAD.linkedin,
-        image: `${SITE_URL}${MOHAMMAD.photo}`,
-        sameAs: [MOHAMMAD.linkedin, MOHAMMAD.scholar],
         worksFor: { "@id": `${SITE_URL}/#organization` },
       },
     ],
@@ -152,7 +155,7 @@ export function founderJsonLd() {
     award: MAJID.aiUtah100.label,
     description: `${MAJID.roles.nexus}. ${MAJID.headlineRole}. ${MAJID.shortBio} He is a ${MAJID.aiUtah100.label}.`,
     url: MAJID.personalSite,
-    image: `${SITE_URL}/team-majid-memari.jpg`,
+    image: `${SITE_URL}${MAJID.photo}`,
     sameAs: [...FOUNDER_SAME_AS],
     worksFor: { "@id": `${SITE_URL}/#organization` },
     knowsAbout: [
@@ -189,7 +192,7 @@ export function dliCourseJsonLd() {
     },
     instructor: { "@id": `${SITE_URL}/#person` },
     teaches: DLI.outline.map((m) => m.title),
-    coursePrerequisites: "Intermediate Python experience",
+    coursePrerequisites: DLI.prerequisites,
     hasCourseInstance: {
       "@type": "CourseInstance",
       courseMode: ["Onsite", "Online"],

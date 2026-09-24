@@ -1,13 +1,10 @@
-import { NvidiaLogo, TRADEMARK_NOTICE, TRADEMARK_SHORT } from "@/app/components/NvidiaLogo";
+import { NvidiaLogo } from "@/app/components/NvidiaLogo";
 import { DLI } from "@/lib/dli";
 import { MAJID } from "@/lib/majid";
 
 /**
  * Public NVIDIA title on this commercial site: Certified Instructor.
  * Do not show University Ambassador or a free-campus offer here.
- *
- * Any page that renders this badge must also render `NvidiaTrademark` (the
- * homepage footer already carries the short form).
  */
 
 export const NVIDIA_CREDENTIAL = DLI.instructorTitle;
@@ -15,10 +12,12 @@ export const NVIDIA_CREDENTIAL = DLI.instructorTitle;
 export function NvidiaBadge({
   variant = "outline",
   className = "",
+  logoSize = 16,
 }: {
   /** `quiet` for the footer, `outline` for the hero. */
   variant?: "quiet" | "outline";
   className?: string;
+  logoSize?: 16 | 24;
 }) {
   const shell =
     variant === "outline"
@@ -30,26 +29,11 @@ export function NvidiaBadge({
       href={MAJID.nvidiaInstructorDirectory}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${DLI.instructorTitle} — NVIDIA Certified Instructor Directory`}
+      aria-label={`${DLI.instructorTitle}, NVIDIA Certified Instructor Directory`}
       className={`inline-flex items-center justify-center gap-2 text-xs text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 ${shell} ${className}`}
     >
-      <NvidiaLogo className="nvidia-mark h-4 w-4 shrink-0" />
+      <NvidiaLogo className={`nvidia-mark shrink-0 ${logoSize === 24 ? "h-6 w-6" : "h-4 w-4"}`} />
       <span>Certified Instructor</span>
     </a>
-  );
-}
-
-/** Trademark notice required on every page that shows the NVIDIA mark. */
-export function NvidiaTrademark({
-  variant = "full",
-  className = "",
-}: {
-  variant?: "full" | "short";
-  className?: string;
-}) {
-  return (
-    <p className={`text-xs leading-relaxed text-zinc-500 dark:text-zinc-500 ${className}`}>
-      {variant === "full" ? TRADEMARK_NOTICE : TRADEMARK_SHORT}
-    </p>
   );
 }

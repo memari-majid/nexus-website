@@ -2,18 +2,14 @@
  * NVIDIA eye mark, rendered monochrome in `currentColor` so it sits quietly in
  * both themes rather than imitating NVIDIA's brand lockup.
  *
- * Trademark care: the mark identifies the Deep Learning Institute workshops we
- * are certified to teach — it must never be placed so it reads as an NVIDIA
- * endorsement, partnership, or co-branding of Nexus. Always keep the
- * `TRADEMARK_NOTICE` below visible on any page that shows this mark.
+ * The mark identifies the Deep Learning Institute workshops we are certified
+ * to teach — it must never be placed so it reads as an NVIDIA endorsement,
+ * partnership, or co-branding of Nexus.
  */
 
-export const TRADEMARK_NOTICE =
-  "NVIDIA, the NVIDIA logo, and NVIDIA Deep Learning Institute are trademarks and/or registered trademarks of NVIDIA Corporation, used here to identify the workshops we are certified to teach. Nexus AI Solutions LLC is an independent business and is not a partner of, sponsored by, or endorsed by NVIDIA.";
-
-/** Compact form for the site footer, where the full notice is too heavy. */
-export const TRADEMARK_SHORT =
-  "NVIDIA® and the NVIDIA logo are trademarks of NVIDIA Corporation. Majid Memari is an NVIDIA DLI Certified Instructor; Nexus AI Solutions LLC is independent and not endorsed by NVIDIA.";
+/** Credential and compact trademark attribution for the shared footer. */
+export const TRADEMARK_SHORT = "NVIDIA DLI Certified Instructor";
+export const TRADEMARK_NOTICE = "NVIDIA and the NVIDIA logo are trademarks and/or registered trademarks of NVIDIA Corporation in the U.S. and other countries.";
 
 export function NvidiaLogo({ className = "h-6 w-6" }: { className?: string }) {
   return (

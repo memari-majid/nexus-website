@@ -1,5 +1,21 @@
 # Nexus website redesign — NVIDIA-green, dark-premium, workshop-led
 
+> **SUPERSEDED IN PART (2026-09-13). Historical record, not current direction.**
+> Two positioning decisions in this document have since been reversed by the owner.
+> Read `AGENTS.md` and `docs/PLAN.md` for the rules in force.
+>
+> 1. **Market geography.** This document says to lead with Utah and keep copy
+>    "Utah-first" (see Positioning below). That is no longer true. Nexus is based
+>    in Sandy, Utah and serves companies **across the United States**, in person at
+>    the client offices or online. Utah is the home base, never the market boundary.
+>    See `AGENTS.md` section 10. Do not reintroduce "brought to Utah", "Utah-based"
+>    as a market, or any Utah-only service area line.
+> 2. **Free for academia.** The free academic offer described here was reversed.
+>    The site is **industry-only**. Never call consulting or training free.
+>
+> Everything else here (the green color system, the dark-premium direction, the
+> chat-as-contact channel, the kept Sandy UT address) still stands.
+
 **Date:** 2026-09-12
 **Status:** Design — awaiting review
 **Scope:** `Sites/nexus-website` — homepage + `/nvidia-dli-workshops` first, then roll out

@@ -1,157 +1,187 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { useEffect, useMemo, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import { SUGGESTION_MARKER } from "@/lib/assistant";
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { OPEN_CHAT_EVENT } from "@/lib/chat-events";
-import { OPENING_CHIPS, resolveSuggestions } from "@/lib/chat-suggestions";
-
-function textFromMessage(m: { parts: { type: string; text?: string }[] }) {
-  return m.parts
-    .filter((p): p is { type: "text"; text: string } => p.type === "text" && typeof p.text === "string")
-    .map((p) => p.text)
-    .join("");
-}
-
-/**
- * The assistant ends replies with `SUGGESTIONS: a | b | c`. Split that off so
- * the chips render as buttons and the marker never reaches the visitor —
- * including mid-stream, while the line is still being typed out.
- */
-function splitSuggestions(raw: string): { body: string; suggestions: string[] } {
-  const i = raw.lastIndexOf(SUGGESTION_MARKER);
-  if (i === -1) return { body: raw, suggestions: [] };
-  const body = raw.slice(0, i).trimEnd();
-  const suggestions = raw
-    .slice(i + SUGGESTION_MARKER.length)
-    .split("|")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 1 && s.length < 60);
-  return { body, suggestions };
-}
-
-const HARMONY_FINAL = "<|channel|>final<|message|>";
+import { ASSISTANT_THE } from "@/lib/chat-persona";
+import {
+  FLOATING_PANEL_HEIGHT,
+  FOCUSABLE_SELECTOR,
+  SHEET_PANEL_QUERY,
+  chatTitleId,
+  escapeClosesDialog,
+  lockedBodyStyle,
+  trapTabTarget,
+  type Announcement,
+} from "@/lib/chat-ui";
+import { ConversationView } from "@/app/components/chat/ConversationView";
+import {
+  readDemoInView,
+  serverDemoInView,
+  setPanelOpen,
+  subscribeDemoInView,
+} from "@/app/components/chat/chatStore";
 
 /**
- * Some gateway models (notably gpt-oss "harmony" format) leak channel control
- * tokens and spill their hidden analysis/draft channels before the final
- * answer — e.g. `...enroll.<|channel|>final<|message|>Here's what I need`.
- * Keep only the final channel and strip any stray control tokens so raw markup
- * and duplicated drafts never reach the visitor, even mid-stream.
+ * The floating shell: a launcher, and a panel that holds the shared
+ * conversation view. Everything about the conversation itself lives in
+ * `app/components/chat/ConversationView.tsx`, and the transcript lives in
+ * `app/components/chat/chatStore.ts`, so a visitor who started in the inline
+ * demo on the homepage finds the same conversation here and continues it.
+ *
+ * This file owns only the chrome: the launcher, the dialog, focus, Escape,
+ * the focus trap, the iOS-safe scroll lock, and the fit rules. The panel is
+ * capped against the dynamic viewport minus its own insets, the transcript
+ * scrolls inside itself, and the composer is pinned, so the composer is
+ * visible at every height, on every viewport, with the keyboard open.
+ *
+ * It also owns this surface's live region, as the inline demo's frame owns
+ * that one. There are no tabs here and nothing hides the conversation while
+ * it is mounted, so the region is a plain sibling of the view and is always
+ * polite: the panel only exists while it is open, and while it is open it is
+ * the surface that speaks.
  */
-function stripControlTokens(raw: string): string {
-  let t = raw;
-  const i = t.lastIndexOf(HARMONY_FINAL);
-  if (i !== -1) t = t.slice(i + HARMONY_FINAL.length);
-  return t
-    .replace(/<\|channel\|>\s*\w+\s*<\|message\|>/g, "") // channel headers incl. name
-    .replace(/<\|[^|]*\|>/g, "") // any remaining control tokens
-    .trimStart();
-}
-
-/** Strip control tokens, then normalize the JSON some error paths surface. */
-function displayAssistantText(raw: string) {
-  const cleaned = stripControlTokens(raw);
-  const t = cleaned.trim();
-  if (!t.startsWith("{") || !t.includes('"error"')) return cleaned;
-  try {
-    const j = JSON.parse(t) as { error?: string };
-    if (typeof j.error === "string") return formatChatConfigMessage(j.error);
-  } catch {
-    /* ignore */
-  }
-  return cleaned;
-}
-
-function formatChatConfigMessage(error: string) {
-  if (
-    error.includes("OIDC") ||
-    error.includes("AI_GATEWAY_API_KEY") ||
-    error.includes("AI Gateway") ||
-    error.toLowerCase().includes("unauthorized")
-  ) {
-    return "Chat isn’t configured: enable AI Gateway in Vercel → Project → AI Gateway, then run `vercel env pull .env.local` (or redeploy). You can still reach us via the contact form below.";
-  }
-  return error;
-}
-
-async function chatFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-  const res = await globalThis.fetch(input, init);
-  if (!res.ok) {
-    const text = await res.text();
-    try {
-      const j = JSON.parse(text) as { error?: string };
-      if (typeof j.error === "string") throw new Error(j.error);
-    } catch (e) {
-      if (e instanceof Error && e.message !== text) throw e;
-    }
-    throw new Error(text || `Request failed (${res.status})`);
-  }
-  return res;
-}
-
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
+  const [announcement, setAnnouncement] = useState<Announcement | undefined>(undefined);
+  const idPrefix = useId();
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Whatever had focus when the dialog opened (a CTA, or the launcher).
+  // Focus goes back there on close, or to the launcher when it is gone.
+  const openerRef = useRef<HTMLElement | null>(null);
+  const wasOpenRef = useRef(false);
+  // Below `sm` the launcher sits exactly where the inline demo's Send button
+  // lands (measured: 30% of Send under it at 390x844, the same at 360x640),
+  // so it steps aside while that frame is on screen. The frame is the same
+  // conversation, and the CTAs still open this panel through the event.
+  const demoInView = useSyncExternalStore(subscribeDemoInView, readDemoInView, serverDemoInView);
 
-  const transport = useMemo(
-    () => new DefaultChatTransport({ api: "/api/chat", fetch: chatFetch }),
-    [],
-  );
-  const { messages, sendMessage, status, stop, error } = useChat({
-    transport,
-  });
+  const openDialog = useCallback(() => {
+    const active = document.activeElement;
+    openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
+    setOpen(true);
+  }, []);
 
-  const busy = status === "streaming" || status === "submitted";
+  const closeDialog = useCallback(() => setOpen(false), []);
 
+  // The inline demo watches this: while the panel is open it stops speaking,
+  // so one finished reply is announced once and not twice. Closing also drops
+  // whatever this panel last announced: the announcement now lives here rather
+  // than in the view, so it outlives the dialog, and the view seeds itself
+  // quiet on the next open. Without this the region would come back holding a
+  // stale reply.
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, open]);
+    setPanelOpen(open);
+    if (!open) setAnnouncement(undefined);
+    return () => setPanelOpen(false);
+  }, [open]);
 
   // Open the panel when any CTA dispatches the open-chat event.
   useEffect(() => {
-    const onOpen = () => setOpen(true);
+    const onOpen = () => openDialog();
     window.addEventListener(OPEN_CHAT_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_CHAT_EVENT, onOpen);
-  }, []);
+  }, [openDialog]);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!input.trim() || busy) return;
-    await sendMessage({ text: input.trim() });
-    setInput("");
-  }
+  // Focus moves into the dialog when it opens (the input, or the first
+  // control while the input is locked) and back out when it closes.
+  useEffect(() => {
+    if (open) {
+      const input = inputRef.current;
+      const target =
+        input && !input.disabled
+          ? input
+          : (dialogRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR) ?? dialogRef.current);
+      target?.focus({ preventScroll: true });
+    } else if (wasOpenRef.current) {
+      const opener = openerRef.current;
+      const usable = !!opener && opener.isConnected && opener.getClientRects().length > 0;
+      (usable ? opener : launcherRef.current)?.focus({ preventScroll: true });
+      openerRef.current = null;
+    }
+    wasOpenRef.current = open;
+  }, [open]);
 
-  const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
-  const lastUser = [...messages].reverse().find((m) => m.role === "user");
-  const usedChips = messages
-    .filter((m) => m.role === "user")
-    .map((m) => textFromMessage(m))
-    .filter(Boolean);
-  const suggestions =
-    !busy && lastAssistant
-      ? resolveSuggestions(
-          splitSuggestions(stripControlTokens(textFromMessage(lastAssistant))).suggestions,
-          {
-            lastAssistant: splitSuggestions(
-              displayAssistantText(textFromMessage(lastAssistant)),
-            ).body,
-            lastUser: lastUser ? textFromMessage(lastUser) : undefined,
-            used: usedChips,
-          },
-        )
-      : [];
+  // Escape closes the dialog (not from a native select, where it closes the
+  // option list), and Tab cycles inside it, pulling focus back in when it
+  // has drifted to the page behind.
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.isComposing) return;
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      if (e.key === "Escape") {
+        if (!escapeClosesDialog(e.target instanceof Element ? e.target.tagName : undefined)) return;
+        e.preventDefault();
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (el) => el.getClientRects().length > 0,
+      );
+      const active = document.activeElement;
+      const index = active instanceof HTMLElement ? focusable.indexOf(active) : -1;
+      const target = trapTabTarget(index, focusable.length, e.shiftKey);
+      if (target === undefined) return;
+      e.preventDefault();
+      focusable[target]?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
+  // Below `sm` the dialog is a full-screen sheet, so the page behind it is
+  // pinned while it is open (iOS Safari scrolls through overflow: hidden, so
+  // the body is fixed in place at its current offset) and put back on close.
+  // The floating panel on wider screens leaves the page alone.
+  useEffect(() => {
+    if (!open) return;
+    const media = window.matchMedia(SHEET_PANEL_QUERY);
+    const body = document.body;
+    let lock: { scrollY: number; previous: [string, string][] } | undefined;
+    const release = () => {
+      if (!lock) return;
+      for (const [name, value] of lock.previous) {
+        if (value) body.style.setProperty(name, value);
+        else body.style.removeProperty(name);
+      }
+      window.scrollTo({ top: lock.scrollY, behavior: "instant" });
+      lock = undefined;
+    };
+    const sync = () => {
+      if (media.matches) {
+        release();
+        return;
+      }
+      if (lock) return;
+      const scrollY = window.scrollY;
+      const style = lockedBodyStyle(scrollY);
+      lock = {
+        scrollY,
+        previous: Object.keys(style).map((name): [string, string] => [name, body.style.getPropertyValue(name)]),
+      };
+      for (const [name, value] of Object.entries(style)) body.style.setProperty(name, value);
+    };
+    sync();
+    media.addEventListener("change", sync);
+    return () => {
+      media.removeEventListener("change", sync);
+      release();
+    };
+  }, [open]);
 
   return (
     <>
       <button
+        ref={launcherRef}
         type="button"
-        onClick={() => setOpen(true)}
-        className={`fixed z-[60] flex h-14 w-14 min-h-[56px] min-w-[56px] items-center justify-center rounded-full bg-brand-500 text-zinc-950 shadow-lg shadow-brand-900/30 transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-zinc-50 dark:focus:ring-offset-zinc-950 ${open ? "hidden" : ""} bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))]`}
-        aria-label="Open chat"
+        onClick={openDialog}
+        className={`fixed z-[60] flex h-14 w-14 min-h-[56px] min-w-[56px] items-center justify-center rounded-full bg-brand-500 text-zinc-950 shadow-lg shadow-brand-900/30 transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-zinc-50 motion-reduce:transition-none dark:focus:ring-offset-zinc-950 ${open ? "hidden" : ""} ${demoInView ? "max-sm:hidden" : ""} bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))]`}
+        aria-label={`Open ${ASSISTANT_THE}`}
+        aria-haspopup="dialog"
       >
         <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path
@@ -164,143 +194,28 @@ export function ChatWidget() {
 
       {open && (
         <div
-          className="fixed inset-0 z-[70] flex items-stretch justify-end bg-black/50 p-0 pt-[env(safe-area-inset-top)] sm:items-end sm:p-4 md:p-6"
+          ref={dialogRef}
+          tabIndex={-1}
+          className="fixed inset-0 z-[70] flex h-[100dvh] max-h-[100dvh] items-stretch justify-end overflow-hidden bg-black/50 p-0 pt-[env(safe-area-inset-top)] outline-none sm:items-end sm:p-4 md:p-6"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="chat-title"
+          aria-labelledby={chatTitleId(idPrefix)}
         >
-          <div className="flex h-full w-full min-w-0 max-w-[100vw] flex-col rounded-none border-0 border-zinc-200 bg-white shadow-2xl sm:h-[min(560px,85vh)] sm:max-w-md sm:rounded-2xl sm:border sm:border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="flex min-w-0 items-center justify-between gap-2 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 id="chat-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    Nex
-                  </h2>
-                  <span className="inline-flex items-center rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-700 dark:border-brand-900/50 dark:bg-brand-950/40 dark:text-brand-400">
-                    Nexus AI assistant
-                  </span>
-                </div>
-                <p className="text-xs text-zinc-600 dark:text-zinc-500">
-                  Ask about AI, or get the NVIDIA workshop scheduled
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {busy && (
-                  <button
-                    type="button"
-                    onClick={() => void stop()}
-                    className="text-xs text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-                  >
-                    Stop
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-                  aria-label="Close chat"
-                >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+          <div
+            className={`flex w-full min-w-0 max-w-[100vw] flex-col overflow-hidden rounded-none border-0 border-zinc-200 bg-white shadow-2xl sm:max-w-md sm:rounded-2xl sm:border sm:border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950 ${FLOATING_PANEL_HEIGHT}`}
+          >
+            <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+              {announcement && <p key={announcement.id}>{announcement.text}</p>}
             </div>
-
-            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
-              {messages.length === 0 && (
-                <div className="space-y-3">
-                  <p className="text-sm text-zinc-600 dark:text-zinc-500">
-                    Hey, I&apos;m Nex. I can talk through AI for your team, explain the NVIDIA DLI
-                    workshop, and get it scheduled right here. What are you working on?
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {OPENING_CHIPS.map((q) => (
-                      <button
-                        key={q}
-                        type="button"
-                        disabled={busy}
-                        onClick={() => void sendMessage({ text: q })}
-                        className="rounded-full border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-left text-xs text-zinc-800 transition hover:border-brand-500 hover:text-brand-800 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-300 dark:hover:border-brand-700 dark:hover:text-brand-200"
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`rounded-xl px-3 py-2 text-sm ${
-                    m.role === "user"
-                      ? "ml-6 border border-brand-200 bg-brand-50 text-zinc-900 dark:border-brand-900/40 dark:bg-brand-950/50 dark:text-zinc-100"
-                      : "mr-4 border border-zinc-200 bg-zinc-100 text-zinc-800 dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:text-zinc-300"
-                  }`}
-                >
-                  {m.role === "assistant" ? (
-                    <div className="max-w-none text-sm leading-relaxed [&_a]:text-brand-600 [&_a]:underline dark:[&_a]:text-brand-400 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-1.5 [&_strong]:font-semibold [&_code]:rounded [&_code]:bg-zinc-200 [&_code]:px-1 dark:[&_code]:bg-zinc-800">
-                      <ReactMarkdown
-                        components={{
-                          a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                        }}
-                      >
-                        {splitSuggestions(displayAssistantText(textFromMessage(m))).body}
-                      </ReactMarkdown>
-                    </div>
-                  ) : (
-                    textFromMessage(m)
-                  )}
-                </div>
-              ))}
-              {suggestions.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {suggestions.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => void sendMessage({ text: s })}
-                      className="rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-xs text-zinc-700 transition hover:border-brand-500 hover:text-brand-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-brand-700 dark:hover:text-brand-300"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {error && (
-                <p className="text-xs text-amber-700 dark:text-amber-400">
-                  {formatChatConfigMessage(error.message) ||
-                    "Something went wrong. Try again or use the contact form."}
-                </p>
-              )}
-              <div ref={endRef} />
-            </div>
-
-            <div className="space-y-3 border-t border-zinc-200 p-3 dark:border-zinc-800">
-              <form onSubmit={onSubmit} className="flex gap-2">
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type a message…"
-                  className="min-h-[44px] min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-500 focus:border-brand-600 focus:outline-none sm:min-h-0 sm:text-sm dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder:text-zinc-600"
-                  disabled={busy}
-                />
-                <button
-                  type="submit"
-                  disabled={busy || !input.trim()}
-                  className="btn-primary btn-compact shrink-0 disabled:opacity-50"
-                >
-                  Send
-                </button>
-              </form>
-
-              <p className="text-center text-[11px] text-zinc-500 dark:text-zinc-600">
-                Trouble with chat? Email{" "}
-                <a href="mailto:info@nexusaisolution.net" className="underline hover:text-zinc-800 dark:hover:text-zinc-300">
-                  info@nexusaisolution.net
-                </a>
-              </p>
-            </div>
+            <ConversationView
+              surface="floating"
+              idPrefix={idPrefix}
+              live
+              containerRef={dialogRef}
+              inputRef={inputRef}
+              onClose={closeDialog}
+              onAnnounce={setAnnouncement}
+            />
           </div>
         </div>
       )}

@@ -1,4 +1,3 @@
-import { SITE } from "@/lib/site";
 import { twilioAuthConfigured, assertTwilioSignature, readTwilioForm } from "@/lib/twilio-signature";
 import { gather, hangup, MESSAGE_PROMPT, openingGreeting, twiml, voiceUrl } from "@/lib/voice";
 
@@ -7,17 +6,13 @@ export const maxDuration = 20;
 
 /**
  * Incoming-call webhook for a hidden programmable (Twilio) answering line.
- * Callers still dial the public Google Voice number (801) 810-9152.
- * Google Voice cannot POST here; the GV line must use the Twilio number as
- * an *AI answering destination*, not as a path to Majid's personal phone.
+ * Retained for existing integrations. The public website offers email contact.
  */
 export async function GET() {
   return Response.json({
     ok: true,
     engine: "twilio-twiml",
     role: "personal-assistant",
-    publicNumber: SITE.phone,
-    publicNumberProvider: "google-voice",
     twilioConfigured: twilioAuthConfigured(),
     hiddenTwilioNumberSet: Boolean(process.env.TWILIO_PHONE_NUMBER?.trim()),
     webhook: process.env.VOICE_WEBHOOK ?? `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://nexusaisolution.net"}/api/voice`,
@@ -35,7 +30,7 @@ export async function POST(request: Request) {
   if (!twilioAuthConfigured()) {
     return twiml(
       hangup(
-        "This Nexus phone assistant is not fully configured. Please email info at nexus A I solution dot net.",
+        "This Nexus phone assistant is not fully configured. Please send us a message through the contact page at nexus A I solution dot net.",
       ),
     );
   }

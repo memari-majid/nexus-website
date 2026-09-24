@@ -2,14 +2,6 @@
 
 import { useState } from "react";
 
-const CATEGORY_LABEL: Record<string, string> = {
-  consulting: "AI consulting",
-  workshop: "Workshops & team training",
-  careers: "Careers",
-  partnership: "Partnership",
-  general: "General inquiry",
-};
-
 const inputClass =
   "w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-base text-zinc-900 placeholder:text-zinc-500 focus:border-sky-600 focus:outline-none focus:ring-1 focus:ring-sky-600 sm:text-sm dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder:text-zinc-500";
 
@@ -19,15 +11,14 @@ export function ContactForm() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [category, setCategory] = useState<string | null>(null);
-  const [autoReply, setAutoReply] = useState<string | null>(null);
+  /** The route says whether the mail provider accepted the message; without that it only reached the server log. */
+  const [loggedOnly, setLoggedOnly] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
     setErrorMsg("");
-    setCategory(null);
-    setAutoReply(null);
+    setLoggedOnly(false);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -36,8 +27,8 @@ export function ContactForm() {
       });
       const data = (await res.json().catch(() => ({}))) as {
         error?: string;
-        category?: string;
-        autoReply?: string;
+        dev?: boolean;
+        delivered?: boolean;
       };
       if (!res.ok) {
         setStatus("error");
@@ -45,14 +36,16 @@ export function ContactForm() {
         return;
       }
       setStatus("success");
-      if (typeof data.category === "string") setCategory(data.category);
-      if (typeof data.autoReply === "string") setAutoReply(data.autoReply);
-      setName("");
-      setEmail("");
-      setMessage("");
+      const sent = data.delivered === true && data.dev !== true;
+      setLoggedOnly(!sent);
+      if (sent) {
+        setName("");
+        setEmail("");
+        setMessage("");
+      }
     } catch {
       setStatus("error");
-      setErrorMsg("Network error. Please try again or email us directly.");
+      setErrorMsg("We couldn’t send your message. Please try again shortly.");
     }
   }
 
@@ -115,33 +108,24 @@ export function ContactForm() {
         >
           {status === "loading" ? "Sending…" : "Send message"}
         </button>
-        {status === "success" && (
-          <div className="w-full space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-left dark:border-emerald-900/50 dark:bg-emerald-950/20">
-            <p className="text-sm font-medium text-emerald-800 dark:text-emerald-400">Message received</p>
-            {category && (
-              <p className="text-xs text-zinc-600 dark:text-zinc-500">
-                Routed as:{" "}
-                <span className="font-medium text-zinc-800 dark:text-zinc-300">
-                  {CATEGORY_LABEL[category] ?? category}
-                </span>
-              </p>
-            )}
-            {autoReply && (
-              <p className="border-t border-zinc-200 pt-3 text-sm leading-relaxed text-zinc-700 dark:border-zinc-800/80 dark:text-zinc-300">
-                {autoReply}
-              </p>
-            )}
+        {status === "success" && loggedOnly && (
+          <div role="status" className="w-full space-y-2 rounded-xl border border-amber-300 bg-amber-50/80 px-4 py-3 text-left dark:border-amber-900/60 dark:bg-amber-950/20">
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-400">
+              Your message wasn’t emailed
+            </p>
+            <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Please try again shortly. Your message is still here.
+            </p>
           </div>
         )}
-        {status === "error" && <p className="text-sm text-red-600 dark:text-red-400">{errorMsg}</p>}
+        {status === "success" && !loggedOnly && (
+          <div role="status" className="w-full rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-left dark:border-emerald-900/50 dark:bg-emerald-950/20">
+            <p className="text-sm font-medium text-emerald-800 dark:text-emerald-400">Message sent. We’ll reply by email.</p>
+          </div>
+        )}
+        {status === "error" && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{errorMsg}</p>}
       </div>
-      <p className="text-xs text-zinc-500 dark:text-zinc-600">
-        Prefer email? Reach us at{" "}
-        <a href="mailto:info@nexusaisolution.net" className="text-sky-600 hover:underline dark:text-sky-400">
-          info@nexusaisolution.net
-        </a>
-        .
-      </p>
+
     </form>
   );
 }

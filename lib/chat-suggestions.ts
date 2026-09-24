@@ -1,14 +1,25 @@
 /**
- * Follow-up chips for Nex. The model is asked to emit `SUGGESTIONS: a | b | c`.
+ * Follow-up chips for the assistant. The model is asked to emit `SUGGESTIONS: a | b | c`.
  * This module sanitizes that line and fills in useful defaults when it is
  * missing or generic, so visitors always get a next step they can tap.
+ *
+ * The chip lists themselves live in `lib/chat-chips.ts`, shared with the
+ * prompt, so the model's chips and the fallback chips cannot drift. This is a
+ * consulting-only site: nothing here ever offers headcount, delivery format,
+ * or timing chips, which belong to a booking flow that no longer exists.
  */
 
-export const OPENING_CHIPS = [
-  "Schedule the NVIDIA workshop",
-  "What's covered in the workshop?",
-  "Do we need our own GPUs?",
-] as const;
+import {
+  AFTER_ADVICE_CHIPS,
+  AFTER_BRIEF_CHIPS,
+  AFTER_BRIEF_CHIPS_NO_EMAIL,
+  AFTER_HANDOFF_CHIPS,
+  AFTER_SNAPSHOT_CHIPS,
+  MAX_CHIPS,
+  canOfferChip,
+} from "@/lib/chat-chips";
+
+export { OPENING_CHIPS } from "@/lib/chat-chips";
 
 const GENERIC = [
   "tell me more",
@@ -47,7 +58,7 @@ function alreadyUsed(s: string, used: readonly string[]): boolean {
   });
 }
 
-/** Keep three short, unused, non-fluff chips. */
+/** Keep at most `MAX_CHIPS` short, unused, non-fluff chips. */
 export function sanitizeSuggestions(
   chips: readonly string[],
   used: readonly string[] = [],
@@ -56,93 +67,99 @@ export function sanitizeSuggestions(
   const seen = new Set<string>();
   for (const raw of chips) {
     const s = raw.replace(/\s+/g, " ").trim();
-    if (s.length < 2 || s.length > 42) continue;
+    if (s.length < 2 || s.length > 42 || s.split(/\s+/).length > 5) continue;
     if (isGeneric(s) || alreadyUsed(s, used)) continue;
     const key = norm(s);
     if (!key || seen.has(key)) continue;
     seen.add(key);
     out.push(s);
-    if (out.length === 3) break;
+    if (out.length === MAX_CHIPS) break;
   }
   return out;
 }
 
-function pick(pool: readonly string[], used: readonly string[]): string[] {
-  return sanitizeSuggestions(pool, used);
-}
+/**
+ * The assistant just produced the brief card. Matches "I drafted your brief",
+ * "here's the brief", "your brief is above"; must NOT match an offer such as
+ * "want me to draft the brief?".
+ */
+export const BRIEF_DRAFTED_RE =
+  /\b(?:drafted|prepared|put together|pulled together|wrote up)\b[^.?!]{0,40}\bbrief\b(?![^.?!]*\?)|\bbrief\b[^.?!]{0,30}\b(?:is ready|is above|is below|is drafted|above)\b(?![^.?!]*\?)|\bhere(?:'s| is) (?:your|the|a) (?:consulting |quick |short )?brief\b(?![^.?!]*\?)/i;
+
+/** The readiness snapshot card just appeared. */
+export const SNAPSHOT_SHOWN_RE =
+  /\breadiness snapshot\b|\breadiness (?:comes out|lands|scores?|is) (?:at|around|about)?\s*\d|\b(?:scored|rated) (?:your|their|the) readiness\b/i;
+
+export type SuggestionContext = {
+  lastAssistant?: string;
+  lastUser?: string;
+  used?: readonly string[];
+  /**
+   * False when the route reports outgoing email is not configured
+   * (`emailEnabled` in the start metadata), so no chip invites an email
+   * that would end in "not sent". Defaults to true.
+   */
+  emailEnabled?: boolean;
+};
 
 /**
  * Contextual chips when the model forgets the marker or only emits fluff.
  * Match on the last assistant turn (and last user turn) so the tap continues
  * the conversation instead of restarting it.
  */
-export function fallbackSuggestions(opts: {
-  lastAssistant?: string;
-  lastUser?: string;
-  used?: readonly string[];
-}): string[] {
+export function fallbackSuggestions(opts: SuggestionContext): string[] {
   const used = opts.used ?? [];
-  const a = `${opts.lastAssistant ?? ""} ${opts.lastUser ?? ""}`.toLowerCase();
+  const pick = (pool: readonly string[], usedChips: readonly string[]) =>
+    sanitizeSuggestions(pool.filter((chip) => canOfferChip(chip, opts.emailEnabled !== false)), usedChips);
+  const assistant = opts.lastAssistant ?? "";
+  const a = `${assistant} ${opts.lastUser ?? ""}`.toLowerCase();
+  const afterBrief = opts.emailEnabled === false ? AFTER_BRIEF_CHIPS_NO_EMAIL : AFTER_BRIEF_CHIPS;
 
-  if (/filed|on the way|inbox|follow up by email|request is in/.test(a)) {
-    return pick(
-      ["What should people prepare?", "How many people can join?", "What's covered?"],
-      used,
-    );
+  if (BRIEF_DRAFTED_RE.test(assistant)) return pick(afterBrief, used);
+  if (SNAPSHOT_SHOWN_RE.test(assistant)) return pick(AFTER_SNAPSHOT_CHIPS, used);
+
+  if (/filed|on the way|inbox|follow up by email|request is in|noted but not sent|hand-off|handoff/.test(a)) {
+    return pick(AFTER_HANDOFF_CHIPS, used);
   }
 
   if (/name and email|your name|your email|email address/.test(a)) {
     return [];
   }
 
-  if (/how many|headcount|participants|people/.test(a)) {
-    return pick(["About 15 people", "About 25 people", "About 40 people"], used);
-  }
-
-  if (/in person or|on site or|remote|online or/.test(a)) {
-    return pick(["In person", "Remote", "Not sure yet"], used);
-  }
-
-  if (/when|six weeks|date|schedule|lead time/.test(a) && /workshop|cohort|host/.test(a)) {
-    return pick(["In about two months", "This quarter", "Just exploring for now"], used);
-  }
-
   if (/consult|adopt|when not to|scoping/.test(a)) {
-    return pick(
-      ["When should we skip AI?", "Would the workshop help?", "Schedule a scoping chat"],
-      used,
-    );
+    return pick(AFTER_ADVICE_CHIPS, used);
   }
 
   if (/workshop|nvidia|dli|agentic|certificate/.test(a)) {
     return pick(
-      ["Schedule the workshop", "What's covered?", "Do we need our own GPUs?"],
+      ["What would you recommend?", "What's covered?", "Do we need our own GPUs?"],
       used,
     );
   }
 
   return pick(
     [
-      "Schedule the NVIDIA workshop",
-      "What's covered in the workshop?",
+      "What can AI do for my team?",
       "How does consulting work?",
+      "Have Majid follow up",
     ],
     used,
   );
 }
 
-/** Prefer model chips; fall back to contextual defaults. */
+/**
+ * Prefer the model's own chips, then contextual defaults. With email off,
+ * any chip that invites an email is dropped before the fallback fills in.
+ */
 export function resolveSuggestions(
   modelChips: readonly string[],
-  context: {
-    lastAssistant?: string;
-    lastUser?: string;
-    used?: readonly string[];
-  },
+  context: SuggestionContext,
 ): string[] {
   const used = context.used ?? [];
-  const fromModel = sanitizeSuggestions(modelChips, used);
-  if (fromModel.length >= 2) return fromModel;
+  const candidates =
+    modelChips.filter((chip) => canOfferChip(chip, context.emailEnabled !== false));
+  const fromModel = sanitizeSuggestions(candidates, used);
+  if (fromModel.length >= MAX_CHIPS) return fromModel;
   const fallback = fallbackSuggestions({ ...context, used: [...used, ...fromModel] });
   return sanitizeSuggestions([...fromModel, ...fallback], used);
 }

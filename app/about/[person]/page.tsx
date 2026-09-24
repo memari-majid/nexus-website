@@ -1,12 +1,19 @@
+import { StudentFeedback } from "@/app/components/StudentFeedback";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Avatar } from "@/app/components/Avatar";
 import { ChatWidget } from "@/app/components/ChatWidget";
 import { NavBar } from "@/app/components/NavBar";
-import { NvidiaBadge, NvidiaTrademark } from "@/app/components/NvidiaBadge";
+import { NvidiaBadge } from "@/app/components/NvidiaBadge";
 import { PEOPLE, getPerson } from "@/lib/people";
-import { breadcrumbJsonLd, organizationJsonLd, personJsonLd, websiteJsonLd } from "@/lib/seo";
+import {
+  OG_IMAGE,
+  breadcrumbJsonLd,
+  organizationJsonLd,
+  personJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import { SITE, SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -22,8 +29,11 @@ export async function generateMetadata({
   const person = getPerson(slug);
   if (!person) return {};
 
-  const title = `${person.displayName} — ${person.role}, Nexus AI Solutions`;
+  const title = `${person.displayName}: ${person.role}, Nexus AI Solutions`;
   const path = `/about/${person.slug}`;
+  // The 1200x630 card leads so large-image previews are never a cropped face;
+  // the original headshot follows for platforms that let the sharer pick.
+  const headshot = { url: person.image, alt: person.displayName };
   return {
     title: { absolute: title },
     description: person.summary,
@@ -32,10 +42,17 @@ export async function generateMetadata({
       title,
       description: person.summary,
       url: path,
+      siteName: SITE.name,
+      locale: "en_US",
       type: "profile",
-      images: [{ url: person.image, alt: person.displayName }],
+      images: [OG_IMAGE, headshot],
     },
-    twitter: { title, description: person.summary, images: [person.image] },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: person.summary,
+      images: [OG_IMAGE],
+    },
   };
 }
 
@@ -53,7 +70,7 @@ export default async function PersonPage({ params }: { params: Promise<{ person:
       "@type": "ProfilePage",
       "@id": `${url}#page`,
       url,
-      name: `${person.displayName} — ${person.role}, ${SITE.name}`,
+      name: `${person.displayName}: ${person.role}, ${SITE.name}`,
       isPartOf: { "@id": `${SITE_URL}/#website` },
       about: { "@id": `${SITE_URL}/${person.schemaId}` },
       mainEntity: { "@id": `${SITE_URL}/${person.schemaId}` },
@@ -128,6 +145,8 @@ export default async function PersonPage({ params }: { params: Promise<{ person:
           ))}
         </div>
 
+        {person.slug === "majid-memari" && <StudentFeedback />}
+
         <ul className="mt-12 flex flex-wrap gap-x-5 gap-y-2 border-t border-zinc-200 pt-8 text-sm dark:border-zinc-800">
           {person.links.map((link) => (
             <li key={link.href}>
@@ -148,10 +167,6 @@ export default async function PersonPage({ params }: { params: Promise<{ person:
             Contact Nexus
           </Link>
         </p>
-
-        {person.nvidiaCertified ? (
-          <NvidiaTrademark className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800" />
-        ) : null}
       </main>
       <ChatWidget />
     </div>
