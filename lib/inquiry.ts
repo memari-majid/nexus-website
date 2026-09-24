@@ -30,7 +30,6 @@
  */
 
 import { createHash } from "node:crypto";
-import { SITE } from "@/lib/site";
 import {
   CONTACT_CLASSIFY_MAX_CONSECUTIVE_FAILURES,
   CONTACT_CLASSIFY_MESSAGE_CHARS,
@@ -335,7 +334,7 @@ export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess
 
   // The consultation hand-off is the one source that goes to the founder's
   // inbox; everything else goes to the shared contact inbox.
-  const to = isHandoff ? founderInbox() : process.env.CONTACT_TO_EMAIL ?? SITE.email;
+  const to = isHandoff ? founderInbox() : process.env.CONTACT_TO_EMAIL?.trim() || founderInbox();
   const subject = cleanSubject(
     isVoice
       ? `[Nexus voice] Message for Majid from ${name}${phone ? ` (${phone})` : ""}`
@@ -365,11 +364,11 @@ export async function submitInquiry(input: InquiryInput): Promise<InquirySuccess
     const confirm = await sendEmail({
       to: email,
       subject: "We got your message, Nexus AI Solutions",
-      replyTo: founderInbox(),
-      text: `${autoReply}\n\nWe'll follow up by email to confirm the details. No need to call. You can reply straight to this message.\n\nNexus AI Solutions`,
+
+      text: `${autoReply}\n\nFor anything else, send us a note at https://nexusaisolution.net/contact.\n\nNexus AI Solutions`,
       html: renderEmail({
         heading: "We've got your request",
-        bodyHtml: `<p>${escapeHtml(autoReply)}</p><p style="margin-top:14px;">We'll follow up by email to confirm the details. No need to call. You can reply straight to this message.</p>`,
+        bodyHtml: `<p>${escapeHtml(autoReply)}</p><p style="margin-top:14px;">For anything else, send us a note at https://nexusaisolution.net/contact.</p>`,
       }),
     });
     if (!confirm.ok) {

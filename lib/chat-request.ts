@@ -296,6 +296,7 @@ function sanitizeToolPart(
 function sanitizeUserPart(raw: LoosePart): TextPart | null | "too-long" {
   if (raw.type !== "text" || typeof raw.text !== "string") return null;
   if (raw.text.length > MAX_CHARS_PER_TEXT_PART) return "too-long";
+  if (!raw.text.trim()) return null;
   return { type: "text", text: raw.text };
 }
 
@@ -402,6 +403,10 @@ export function parseChatBody(rawText: string, options: SanitizeOptions = {}): P
   }
   const parsed = chatBodySchema.safeParse(raw);
   if (!parsed.success) return { ok: false, status: 400, error: INVALID };
+  const last = parsed.data.messages.at(-1);
+  if (last?.role === "user" && !last.parts.some(
+    (part) => part.type === "text" && typeof part.text === "string" && part.text.trim().length > 0,
+  )) return { ok: false, status: 400, error: INVALID };
   if (parsed.data.messages.length > MAX_MESSAGES) return { ok: false, status: 413, error: TOO_LONG };
   const transcript = sanitizeTranscript(parsed.data.messages, options);
   if (!transcript.ok) return { ok: false, status: 400, error: INVALID };

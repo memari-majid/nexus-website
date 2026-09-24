@@ -104,13 +104,14 @@ async function chatFetch(input: RequestInfo | URL, init?: RequestInit): Promise<
   const res = await globalThis.fetch(input, init);
   if (!res.ok) {
     const text = await res.text();
+    let detail = text;
     try {
       const j = JSON.parse(text) as { error?: string };
-      if (typeof j.error === "string") throw new Error(j.error);
-    } catch (e) {
-      if (e instanceof Error && e.message !== text) throw e;
+      if (typeof j.error === "string") detail = j.error;
+    } catch {
+      // A proxy may return plain text or HTML, not the route's JSON body.
     }
-    throw new Error(text || `Request failed (${res.status})`);
+    throw new Error(detail || `Request failed (${res.status})`);
   }
   return res;
 }

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { approvalSecret, verifyDraft } from "@/lib/approval-signature";
 import { BRIEF_TOOL_NAME } from "@/lib/brief-schema";
 import { SAMPLE_BRIEF } from "@/lib/brief-schema.test";
-import { APPROVAL_TOOLS, chatTools, isFailureReason, notSentHint, toolContext } from "@/lib/chat-tools";
+import { activeChatTools, APPROVAL_TOOLS, chatTools, isFailureReason, notSentHint, toolContext } from "@/lib/chat-tools";
 import { MAX_FACTS } from "@/lib/site-facts";
 import { OUTREACH_TOOL_NAME } from "@/lib/outreach";
 import { SAMPLE_NOTE } from "@/lib/outreach.test";
@@ -61,7 +61,7 @@ const briefMessage: ModelMessage = {
 };
 
 const saved: Record<string, string | undefined> = {};
-const KEYS = ["RESEND_API_KEY", "RESEND_FROM_EMAIL"];
+const KEYS = ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "CONTACT_CC_EMAIL"];
 
 beforeEach(() => {
   for (const k of KEYS) {
@@ -251,7 +251,7 @@ describe("emailMajidNote.execute", () => {
       subject: string;
       text: string;
     };
-    expect(sent.to).toEqual(["memari.majid@hotmail.com"]);
+    expect(sent.to).toEqual(["memari.mj@gmail.com"]);
     expect(sent.replyTo).toBe("ada@acme.com");
     expect(sent.subject).toContain(FOUNDER_CHAT_NAME);
     expect(sent.text).toContain(SAMPLE_NOTE.ask);
@@ -323,7 +323,7 @@ describe("toModelOutput", () => {
     expect(res.value).toMatch(/do not claim an email went out/);
   });
 
-  it("reserves 'noted' for the not-configured hand-off and never names an email address", () => {
+  it("reserves 'noted' for the not-configured hand-off and only offers the verified email", () => {
     const noted = notSentHint("handoff", "not-configured");
     expect(noted).toMatch(/noted but not sent/);
     expect(noted).toContain("/contact");
@@ -395,7 +395,7 @@ describe("handOffToMajid.execute", () => {
     );
     expect(logs).toHaveLength(1);
     const preview = logs[0][1] as { to: string; preview: string };
-    expect(preview.to).toBe("memari.majid@hotmail.com");
+    expect(preview.to).toBe("memari.mj@gmail.com");
     expect(preview.preview).toContain("RAG over SOPs");
   });
 
@@ -458,7 +458,7 @@ describe("emailBriefToVisitor.execute and emailWorkshopInfo.execute", () => {
     );
     const sent = logs[0][1] as { to: string; cc: string[]; preview: string };
     expect(sent.to).toBe("ada@acme.com");
-    expect(sent.cc).toEqual(["memari.majid@hotmail.com"]);
+    expect(sent.cc).toEqual(["memari.mj@gmail.com"]);
     expect(sent.preview.startsWith(`You asked for this in a chat with the ${ASSISTANT_NAME}`)).toBe(
       true,
     );
@@ -681,5 +681,20 @@ describe("pure tools", () => {
     )) as { overall: number; weakest: { key: string } | null };
     expect(out.overall).toBe(2);
     expect(out.weakest?.key).toBe("data");
+  });
+});
+
+
+describe("tools available to the model", () => {
+  it("withholds every delivery tool when email cannot reach anyone", () => {
+    for (const name of APPROVAL_TOOLS) expect(activeChatTools(false)).not.toContain(name);
+    expect(activeChatTools(false)).toContain("draftConsultingBrief");
+    expect(activeChatTools(true)).toEqual(Object.keys(chatTools));
+  });
+  it("does not call an unconfigured contact form a reliable notification channel", async () => {
+    const result = await tools.lookupSiteFacts.execute!({query:"contact email phone",limit:4}, options()) as {facts:{id:string,text:string}[]};
+    const contact = result.facts.find(f=>f.id === "contact");
+    expect(contact?.text).toContain("do not notify anyone");
+    expect(contact?.text).not.toContain("the form is the reliable path");
   });
 });

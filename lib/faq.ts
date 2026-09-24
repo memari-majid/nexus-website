@@ -1,4 +1,6 @@
 /** Homepage FAQ, also used for FAQPage JSON-LD. Keep answers honest. */
+import { HAMID } from "@/lib/hamid";
+import { MAJID } from "@/lib/majid";
 
 export const FAQS = [
   {
@@ -27,7 +29,7 @@ export const FAQS = [
   },
   {
     q: "Who delivers Nexus client work?",
-    a: "Every statement of work is executed under Nexus AI Solutions LLC. Majid Memari, PhD, Founder and CEO, NVIDIA DLI Certified Instructor, and a researcher working on LLMs, agents, and retrieval, leads AI consulting and team training. He is a 2026 AI Utah 100 honoree. Hamid Memari, Chief Technology Officer, leads the technical side of that consulting, training, and follow-on implementation. Mohammad Jafarinejad, PhD, Chief Financial Officer, leads pricing, engagement economics, and financial planning. Nexus is based in Utah's Salt Lake metro and works with companies across the United States, in person at your offices or online. Every engagement is delivered by this team, not a revolving cast of subcontractors.",
+    a: `Every statement of work is executed under Nexus AI Solutions LLC. ${MAJID.fullName}, ${MAJID.companyRole}, NVIDIA DLI Certified Instructor, and a researcher working on LLMs, agents, and retrieval, leads AI consulting and team training. He is a 2026 AI Utah 100 honoree. ${HAMID.fullName}, ${HAMID.role}, brings software engineering experience since 2012. He supports technical consulting and workshop delivery, and leads client partnerships, proposals, deal negotiations and onboarding. Nexus is based in Utah's Salt Lake metro and works with companies across the United States, in person at your offices or online. Every engagement is delivered by this team, not a revolving cast of subcontractors.`,
   },
   {
     q: "What is the founder's research background?",

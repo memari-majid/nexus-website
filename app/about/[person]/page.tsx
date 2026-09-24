@@ -1,3 +1,4 @@
+import { StudentFeedback } from "@/app/components/StudentFeedback";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -31,8 +32,8 @@ export async function generateMetadata({
   const title = `${person.displayName}: ${person.role}, Nexus AI Solutions`;
   const path = `/about/${person.slug}`;
   // The 1200x630 card leads so large-image previews are never a cropped face;
-  // the 640x640 headshot follows for platforms that let the sharer pick.
-  const headshot = { url: person.image, width: 640, height: 640, alt: person.displayName };
+  // the original headshot follows for platforms that let the sharer pick.
+  const headshot = { url: person.image, alt: person.displayName };
   return {
     title: { absolute: title },
     description: person.summary,
@@ -143,6 +144,8 @@ export default async function PersonPage({ params }: { params: Promise<{ person:
             </div>
           ))}
         </div>
+
+        {person.slug === "majid-memari" && <StudentFeedback />}
 
         <ul className="mt-12 flex flex-wrap gap-x-5 gap-y-2 border-t border-zinc-200 pt-8 text-sm dark:border-zinc-800">
           {person.links.map((link) => (

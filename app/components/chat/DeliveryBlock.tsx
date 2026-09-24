@@ -52,16 +52,13 @@ function ChatLink({ href, children }: { href: string; children: ReactNode }) {
 }
 
 /**
- * Hand-off only: the other way to reach the founder. Never an email address
- * here; the site's public inbox does not receive mail yet, and the contact
- * form says on its own screen whether a message was emailed or only logged.
+ * Direct email remains available when sending through the website fails.
  */
 function ReachFounder() {
   return (
     <>
       {" "}
-      The <ChatLink href="/contact">contact form</ChatLink> is the other way to reach{" "}
-      {FOUNDER_CHAT_NAME}.
+      You can try the <ChatLink href="/contact">contact form</ChatLink>.
     </>
   );
 }

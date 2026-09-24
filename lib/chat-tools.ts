@@ -31,15 +31,14 @@
  *   the approved input that is executing again, which the SDK echoes back
  *   with the call.
  * - Email quotas are reserved only when email can actually go out
- *   (`isEmailConfigured()`); production has no Resend today, and a
+ *   (`isEmailConfigured()`); a
  *   not-configured attempt must never burn the day's allowance.
  * - The model-facing not-sent hint is per tool and per reason. "Noted" is
  *   reserved for the not-configured hand-off, the one outcome that writes
  *   the request to the server log; everything else is plainly "not sent".
  *   Noted means logged, not read: until email is connected nothing is
  *   delivered to anyone, so that hint also says not to promise a review or
- *   a follow-up. No hint ever names an email address: info@ has no inbound
- *   mail.
+ *   a follow-up. The verified business email is available for direct contact.
  * - The two draft tools sign their own input into their output (`signDraft`).
  *   The sends re-read a draft from the echoed transcript, and the request
  *   sanitizer keeps a draft part only when that signature verifies, so a
@@ -136,9 +135,9 @@ export function isFailureReason(v: unknown): v is ToolFailureReason {
 type SendKind = "handoff" | "note" | "brief" | "workshop";
 
 const WORKSHOP_PAGE = "/nvidia-dli-workshops";
-const CONTACT_FORM = "point them to the contact form at /contact";
+const CONTACT_FORM = `offer the contact form at /contact`;
 const FORM_ONLY_RECORDS =
-  "which also only records messages on the server until email delivery is connected";
+  "the form itself only records messages on the server until email delivery is connected";
 const NEVER_CLAIM = "do not claim an email went out";
 /**
  * A logged hand-off is not a read one. Until email is connected the request
@@ -276,7 +275,9 @@ export const lookupSiteFacts = tool({
       facts: facts.map((f) => ({
         id: f.id,
         topic: f.topic,
-        text: f.text,
+        text: !isEmailConfigured() && (f.id === "contact" || f.id === "how-the-agent-works")
+          ? `${f.text} Email delivery is disconnected. This chat and the contact form do not notify anyone or guarantee a follow-up. Keep any brief on screen to copy and try again later.`
+          : f.text,
         source: f.source.label,
         path: f.source.path,
       })),
@@ -685,7 +686,7 @@ export const emailBriefToVisitor = tool({
     const sent = await sendEmail({
       to: base.email,
       cc: [founderInbox()],
-      replyTo: founderInbox(),
+
       subject,
       text,
       html,
@@ -730,7 +731,7 @@ export const emailWorkshopInfo = tool({
     const sent = await sendEmail({
       to: base.email,
       cc: [founderInbox()],
-      replyTo: founderInbox(),
+
       subject: prepared.subject,
       text: prepared.text,
       html: prepared.html,
@@ -779,3 +780,10 @@ export const APPROVAL_TOOLS = [
   "emailBriefToVisitor",
   "emailWorkshopInfo",
 ] as const;
+
+/** Do not offer a send path that cannot deliver. Keep all tools for validating past turns. */
+export function activeChatTools(emailEnabled: boolean): (keyof ChatTools)[] {
+  return (Object.keys(chatTools) as (keyof ChatTools)[]).filter(
+    (name) => emailEnabled || !(APPROVAL_TOOLS as readonly string[]).includes(name),
+  );
+}

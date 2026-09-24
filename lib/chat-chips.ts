@@ -66,9 +66,9 @@ export const AFTER_BRIEF_CHIPS = [
  * prompt and the fallback use.
  */
 export const AFTER_BRIEF_CHIPS_NO_EMAIL = [
-  `Send it to ${FOUNDER_CHAT_NAME}`,
   "Rate our AI readiness",
   "What should we fix first?",
+  "Summarize the brief",
 ] as const;
 
 /** Right after the readiness snapshot appears. */
@@ -86,6 +86,10 @@ export const AFTER_HANDOFF_CHIPS = [
 ] as const;
 
 /** Renders a list the way the prompt asks the model to emit it: the first `MAX_CHIPS` only. */
-export function chipLine(chips: readonly string[]): string {
-  return chips.slice(0, MAX_CHIPS).join(" | ");
+export function canOfferChip(chip: string, emailEnabled = true): boolean {
+  return emailEnabled || !/\b(?:email|send|forward|notify|handoff)\b|\bhand[- ]off\b|\bfollow[- ]?up\b|\b(?:talk|speak|connect|contact|reach)\b.*\b(?:majid|memari)\b/i.test(chip);
+}
+
+export function chipLine(chips: readonly string[], emailEnabled = true): string {
+  return chips.filter((chip) => canOfferChip(chip, emailEnabled)).slice(0, MAX_CHIPS).join(" | ");
 }

@@ -7,8 +7,9 @@
  * partnership, or co-branding of Nexus.
  */
 
-/** Compact form for the site footer. Owner prefers just the credential line. */
+/** Credential and compact trademark attribution for the shared footer. */
 export const TRADEMARK_SHORT = "NVIDIA DLI Certified Instructor";
+export const TRADEMARK_NOTICE = "NVIDIA and the NVIDIA logo are trademarks and/or registered trademarks of NVIDIA Corporation in the U.S. and other countries.";
 
 export function NvidiaLogo({ className = "h-6 w-6" }: { className?: string }) {
   return (

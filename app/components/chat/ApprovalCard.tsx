@@ -20,19 +20,19 @@ export type PendingApproval = Extract<DeliveryPart, { state: "approval-requested
 const COPY = {
   "tool-handOffToMajid": {
     heading: `Send this to ${FOUNDER_CHAT_NAME}?`,
-    note: `Goes to ${FOUNDER_CHAT_NAME}'s inbox as a short summary. Nothing is sent until you approve.`,
+    note: `Goes to ${FOUNDER_CHAT_NAME} and the Nexus team as a short summary. Nothing is sent until you approve.`,
   },
   "tool-emailMajidNote": {
     heading: `Email this note to ${FOUNDER_CHAT_NAME}?`,
-    note: `Sends the note above exactly as it is drafted, with your address as the reply-to. Nothing is sent until you approve.`,
+    note: `Sends this note to ${FOUNDER_CHAT_NAME} and the Nexus team, with your address as the reply-to. Nothing is sent until you approve.`,
   },
   "tool-emailBriefToVisitor": {
     heading: "Email you a copy of the brief?",
-    note: `A fixed template with your brief, sent to the address below with ${FOUNDER_CHAT_NAME} copied. Nothing is sent until you approve.`,
+    note: "Your brief, sent to the address below with the Nexus team copied. Nothing is sent until you approve.",
   },
   "tool-emailWorkshopInfo": {
     heading: "Email you the NVIDIA workshop details?",
-    note: `The workshop one-pager, sent to the address below with ${FOUNDER_CHAT_NAME} copied. Nothing is sent until you approve.`,
+    note: "The workshop details, sent to the address below with the Nexus team copied. Nothing is sent until you approve.",
   },
 } as const;
 

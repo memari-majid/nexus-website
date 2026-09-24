@@ -6,14 +6,19 @@ import {
   escapeHtml,
   founderInbox,
   isEmailConfigured,
+  renderEmail,
   scrubForEmail,
   sendEmail,
 } from "@/lib/email";
 
+const { resendSend } = vi.hoisted(() => ({ resendSend: vi.fn() }));
+vi.mock("resend", () => ({ Resend: class { emails = { send: resendSend }; } }));
+
 const saved: Record<string, string | undefined> = {};
-const KEYS = ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "WORKSHOP_TO_EMAIL"];
+const KEYS = ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "WORKSHOP_TO_EMAIL", "CONTACT_CC_EMAIL"];
 
 beforeEach(() => {
+  resendSend.mockReset();
   for (const k of KEYS) {
     saved[k] = process.env[k];
     delete process.env[k];
@@ -92,8 +97,8 @@ describe("EMAIL_RE and founderInbox", () => {
     expect(EMAIL_RE.test("a@b")).toBe(false);
   });
 
-  it("defaults to the founder's hotmail and honours WORKSHOP_TO_EMAIL", () => {
-    expect(founderInbox()).toBe("memari.majid@hotmail.com");
+  it("defaults to the verified business inbox and honours WORKSHOP_TO_EMAIL", () => {
+    expect(founderInbox()).toBe("memari.mj@gmail.com");
     process.env.WORKSHOP_TO_EMAIL = "owner@example.com";
     expect(founderInbox()).toBe("owner@example.com");
   });
@@ -104,6 +109,35 @@ describe("EMAIL_RE and founderInbox", () => {
 });
 
 describe("isEmailConfigured and sendEmail", () => {
+  it("copies the business team once while preserving the visitor reply address", async () => {
+    process.env.RESEND_API_KEY = "re_test";
+    process.env.RESEND_FROM_EMAIL = "Nexus AI <hello@mail.nexusaisolution.net>";
+    process.env.CONTACT_CC_EMAIL = " colleague@example.com, COLLEAGUE@example.com, owner@example.com, invalid ";
+    resendSend.mockResolvedValue({ data: { id: "email_test" }, error: null });
+    expect(await sendEmail({
+      to: "owner@example.com", cc: ["Colleague@example.com"],
+      replyTo: "visitor@example.com", subject: "Website inquiry", text: "Test message",
+    })).toEqual({ ok: true, delivered: true });
+    expect(resendSend).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
+      to: ["owner@example.com"], bcc: ["Colleague@example.com"], replyTo: "visitor@example.com",
+    }));
+  });
+
+  it("does not claim success when the email provider rejects the send", async () => {
+    process.env.RESEND_API_KEY = "re_test";
+    process.env.RESEND_FROM_EMAIL = "Nexus AI <hello@mail.nexusaisolution.net>";
+    resendSend.mockResolvedValue({ error: { message: "Rejected" } });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(await sendEmail({ to: "owner@example.com", subject: "Test", text: "Test" }))
+      .toEqual({ ok: false, error: "Email send failed." });
+  });
+
+  it("keeps the removed street address and phone out of email footers", () => {
+    const html = renderEmail({ heading: "Your message", bodyHtml: "<p>Thanks</p>" });
+    expect(html).not.toMatch(/8330|El Manicero|84093|810[- ]?9152|tel:/);
+    expect(html).toContain("/contact");
+  });
+
   it("requires both the API key and a verified From", () => {
     expect(isEmailConfigured()).toBe(false);
     process.env.RESEND_API_KEY = "re_test";

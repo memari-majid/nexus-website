@@ -531,10 +531,10 @@ describe("stripControlTokens", () => {
 });
 
 describe("displayAssistantText", () => {
-  it("turns a gateway configuration error into the setup line", () => {
+  it("keeps configuration internals out of the customer error", () => {
     const shown = displayAssistantText('{"error":"AI Gateway unauthorized"}');
-    expect(shown).toContain("AI Gateway");
-    expect(shown).toContain("contact form");
+    expect(shown).toContain("temporarily unavailable");
+    expect(shown).not.toMatch(/Gateway|Vercel|env pull/);
   });
 
   it("leaves ordinary JSON-looking prose alone", () => {
@@ -550,9 +550,18 @@ describe("friendlyError", () => {
   });
 
   it("always says something", () => {
-    expect(friendlyError("")).toContain("contact form");
+    expect(friendlyError("")).toContain("try again");
     expect(friendlyError("Rate limit reached. Try again in a minute.")).toBe(
       "Rate limit reached. Try again in a minute.",
     );
+  });
+});
+
+
+describe("connection errors", () => {
+  it("turns network and proxy failures into a useful retry message", () => {
+    for (const error of ["Failed to fetch", "Load failed", "<!DOCTYPE html><html>502 Bad Gateway</html>"]) {
+      expect(friendlyError(error)).toBe("The connection dropped. Please try again.");
+    }
   });
 });

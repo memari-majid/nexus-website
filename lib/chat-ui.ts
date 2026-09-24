@@ -603,7 +603,7 @@ export function formatChatConfigMessage(error: string): string {
     error.includes("AI Gateway") ||
     error.toLowerCase().includes("unauthorized")
   ) {
-    return "Chat isn’t configured: enable AI Gateway in Vercel → Project → AI Gateway, then run `vercel env pull .env.local` (or redeploy). You can still reach us via the contact form below.";
+    return "Chat is temporarily unavailable. Please try again in a moment.";
   }
   return error;
 }
@@ -628,5 +628,8 @@ export function friendlyError(message: string): string {
   if (/start a new chat|getting long/i.test(m)) {
     return "This conversation is getting long. Tap New above to start a fresh one.";
   }
-  return m || "Something went wrong. Try again or use the contact form.";
+  if (/failed to fetch|fetch failed|load failed|network|<!doctype|<html|unexpected token|internal server error|bad gateway/i.test(m)) {
+    return "The connection dropped. Please try again.";
+  }
+  return m || "Something went wrong. Please try again.";
 }

@@ -15,7 +15,6 @@ import { OPENING_CHIPS } from "@/lib/chat-chips";
 import {
   ASSISTANT_NAME,
   ASSISTANT_THE,
-  FOUNDER_CHAT_NAME,
   WIDGET_BADGE,
 } from "@/lib/chat-persona";
 import { resolveSuggestions } from "@/lib/chat-suggestions";
@@ -56,7 +55,7 @@ const SUBTITLE: Record<ChatSurface, string> = {
 };
 
 /** What the empty transcript says before the first message. */
-const INTRO = `Hey, I'm the ${ASSISTANT_NAME} for Nexus. Tell me what your team does and where you want to go with AI. I'll give you straight, useful guidance first, and when it helps I can draft a brief, size the work, score your readiness, and hand you off to ${FOUNDER_CHAT_NAME}. What are you working on?`;
+const INTRO = `Hey, I'm the ${ASSISTANT_NAME} for Nexus. Tell me what you're working on. I can help you explore an idea, draft a brief or plan your team's training.`;
 
 /** Shown once, in the empty inline frame: what the assistant can do for a visitor. */
 const CAPABILITIES: readonly string[] = [
@@ -65,7 +64,6 @@ const CAPABILITIES: readonly string[] = [
   "Effort estimate in weeks",
   "AI readiness score",
   "A note you can send internally",
-  `Hand-off to ${FOUNDER_CHAT_NAME}`,
 ];
 
 /**
@@ -463,9 +461,14 @@ export function ConversationView({
           </div>
         )}
         {error && (
-          <p role={errorRole(live)} className="text-xs text-amber-700 dark:text-amber-400">
-            {friendlyError(error.message)}
-          </p>
+          <div className="space-y-2 text-xs text-amber-700 dark:text-amber-400">
+            <p role={errorRole(live)}>{friendlyError(error.message)}</p>
+            {!busy && !approvalUnsettled && (
+              <button type="button" onClick={retrySend} className="min-h-[44px] underline underline-offset-4">
+                Try again
+              </button>
+            )}
+          </div>
         )}
       </div>
 

@@ -60,7 +60,7 @@ function emailLogs(info: { mock: { calls: unknown[][] } }): EmailLog[] {
 }
 
 const saved: Record<string, string | undefined> = {};
-const KEYS = ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "WORKSHOP_TO_EMAIL", "CONTACT_TO_EMAIL"];
+const KEYS = ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "CONTACT_CC_EMAIL", "WORKSHOP_TO_EMAIL", "CONTACT_TO_EMAIL"];
 
 beforeEach(() => {
   for (const k of KEYS) {
@@ -111,7 +111,7 @@ describe("submitInquiry with source chat-handoff", () => {
     expect(classify).not.toHaveBeenCalled();
     const sends = emailLogs(info);
     expect(sends).toHaveLength(1);
-    expect(sends[0].to).toBe("memari.majid@hotmail.com");
+    expect(sends[0].to).toBe("memari.mj@gmail.com");
     expect(sends[0].subject).toBe("[Nexus consultation] Hand-off from Ada");
     expect(sends[0].preview).toContain("Source: chat-handoff");
   });
@@ -146,7 +146,7 @@ describe("submitInquiry with every other source", () => {
     expect(classify).toHaveBeenCalledTimes(1);
     const sends = emailLogs(info);
     expect(sends).toHaveLength(2);
-    expect(sends[0].to).toBe("info@nexusaisolution.net");
+    expect(sends[0].to).toBe("memari.mj@gmail.com");
     expect(sends[0].subject).toBe("[Nexus AI Website] [workshop] Message from Ada");
     expect(sends[0].preview).toContain("Source: contact-form");
     expect(sends[1].to).toBe("ada@acme.com");
@@ -166,7 +166,7 @@ describe("submitInquiry with every other source", () => {
     expect(classify).toHaveBeenCalledTimes(1);
     const sends = emailLogs(info);
     expect(sends).toHaveLength(2);
-    expect(sends[0].to).toBe("info@nexusaisolution.net");
+    expect(sends[0].to).toBe("memari.mj@gmail.com");
     expect(sends[0].subject).toBe("[Nexus AI Website] [workshop] Message from Ada");
     expect(sends[0].subject).not.toMatch(/Nexus workshop/);
     expect(sends[0].preview).toContain("Source: chat-workshop");
@@ -319,7 +319,7 @@ describe("submitInquiry meters the classifier", () => {
     expect(result.autoReply).toContain("Thank you for contacting Nexus AI Solutions");
     const sends = emailLogs(info);
     expect(sends).toHaveLength(2);
-    expect(sends[0].to).toBe("info@nexusaisolution.net");
+    expect(sends[0].to).toBe("memari.mj@gmail.com");
     expect(sends[0].subject).toBe("[Nexus AI Website] [general] Message from Ada");
     expect(usageLine(log).outcome).toBe("rate-limited");
   });

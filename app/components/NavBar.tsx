@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 import { openChat } from "@/lib/chat-events";
 
@@ -14,23 +14,13 @@ const NAV_ITEMS = [
   { label: "Contact", href: "/contact" },
 ];
 
-export function NavBar() {
+export function NavBar({ chatHref }: { chatHref?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <nav
-      className={`fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)] transition-all duration-300 ${
-        scrolled
-          ? "border-b border-zinc-200/80 bg-white/90 shadow-lg shadow-zinc-900/5 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/90 dark:shadow-black/20"
-          : "bg-transparent"
-      }`}
+      aria-label="Main navigation"
+      className="fixed inset-x-0 top-0 z-50 border-b border-zinc-200/60 bg-zinc-50/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-zinc-800/60 dark:bg-zinc-950/90"
     >
       <div className="mx-auto flex min-w-0 max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 lg:py-4">
         <Link href="/" className="group flex min-h-[44px] min-w-0 shrink-0 items-center gap-2.5">
@@ -47,7 +37,7 @@ export function NavBar() {
           </span>
         </Link>
 
-        <div className="hidden items-center gap-3 xl:flex 2xl:gap-6">
+        <div className="hidden items-center gap-6 lg:flex">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
@@ -58,16 +48,22 @@ export function NavBar() {
             </Link>
           ))}
           <ThemeToggle />
-          <button
-            type="button"
-            onClick={openChat}
-            className="btn-primary btn-compact"
-          >
-            Start a conversation
-          </button>
+          {chatHref ? (
+            <Link href={chatHref} className="btn-primary btn-compact">
+              Ask our AI
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={openChat}
+              className="btn-primary btn-compact"
+            >
+              Ask our AI
+            </button>
+          )}
         </div>
 
-        <div className="flex items-center gap-2 xl:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <ThemeToggle />
           <button
             type="button"
@@ -88,7 +84,7 @@ export function NavBar() {
       </div>
 
       {menuOpen && (
-        <div className="max-h-[min(70vh,calc(100dvh-env(safe-area-inset-top)-5rem))] space-y-3 overflow-y-auto border-t border-zinc-200/80 bg-white/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/95 xl:hidden">
+        <div className="max-h-[min(70vh,calc(100dvh-env(safe-area-inset-top)-5rem))] space-y-3 overflow-y-auto border-t border-zinc-200/80 bg-white/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/95 lg:hidden">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
@@ -99,16 +95,22 @@ export function NavBar() {
               {item.label}
             </Link>
           ))}
-          <button
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              openChat();
-            }}
-            className="btn-primary block w-full"
-          >
-            Start a conversation
-          </button>
+          {chatHref ? (
+            <Link href={chatHref} onClick={() => setMenuOpen(false)} className="btn-primary block w-full">
+              Ask our AI
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                openChat();
+              }}
+              className="btn-primary block w-full"
+            >
+              Ask our AI
+            </button>
+          )}
         </div>
       )}
     </nav>
