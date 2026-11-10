@@ -142,3 +142,8 @@ paragraph in `AGENTS.md` §9.4 is the record). What that means in this repo:
 - **Removed on 2026-09-13.** The evaluations tab and its live run route, the checked-in bake-off
   artifacts and the `evals/` scripts, the model picker, the per-reply stats line, and the public
   teardown page. `/how-it-works` redirects permanently to `/` so old links do not 404.
+
+
+## Shared prototype presentation
+
+The web UI uses Majid Memari’s cream, navy, and teal editorial theme with a portfolio return link. Existing sign-in and data access controls are preserved.

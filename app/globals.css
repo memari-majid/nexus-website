@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+
+/* Shared Majid Memari prototype theme. Semantic status colors remain distinct. */
+@theme {
+  --color-zinc-50: #f7f6f2;
+  --color-zinc-100: #edf0f4;
+  --color-zinc-200: #d8dfe7;
+  --color-zinc-300: #bdc8d5;
+  --color-zinc-400: #7a8ba0;
+  --color-zinc-500: #536176;
+  --color-zinc-600: #536176;
+  --color-zinc-700: #34465f;
+  --color-zinc-800: #203955;
+  --color-zinc-900: #243249;
+  --color-zinc-950: #182a46;
+  --color-sky-50: #eaf5f3;
+  --color-sky-100: #d4eeea;
+  --color-sky-200: #acdcd6;
+  --color-sky-500: #009b94;
+  --color-sky-600: #007f7a;
+  --color-sky-700: #006b66;
+  --font-serif: Georgia, "Times New Roman", serif;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
@@ -278,3 +301,20 @@
     transform: none;
   }
 }
+
+body { background: #f7f6f2; color: #243249; }
+.btn-primary { background: #007f7a; color: #fff; }
+.btn-primary:hover { background: #006b66; }
+.gradient-text { color: #007f7a; }
+
+
+/* Editorial typography and a quiet return path across the prototype collection. */
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+h1, h2 { font-family: Georgia, "Times New Roman", serif; color: #182a46; text-wrap: balance; }
+:focus-visible { outline: 3px solid #2563eb; outline-offset: 4px; }
+.portfolio-footer {
+  clear: both; width: 100%; padding: 1.25rem 1rem; text-align: center;
+  background: #f7f6f2; color: #536176; border-top: 1px solid #d8dfe7;
+  font: 0.8125rem/1.6 system-ui, sans-serif;
+}
+.portfolio-footer a { color: #007f7a; text-decoration: underline; text-underline-offset: 4px; }

@@ -110,6 +110,10 @@ export default function RootLayout({
         <ThemeProvider>{children}</ThemeProvider>
         <Analytics />
         <SpeedInsights />
+
+        <footer className="portfolio-footer">
+          <a href="https://www.majidmemari.com/prototypes">AI solution prototypes by Majid Memari</a>
+        </footer>
       </body>
     </html>
   );
